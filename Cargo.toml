@@ -1,0 +1,66 @@
+[package]
+name = "forever_alone"
+version = "0.0.1"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+bevy = { version = "0.14", default-features = false, features = [
+    "animation",
+    "bevy_asset",
+    "bevy_state",
+    "bevy_color",
+    "bevy_gilrs",
+    "bevy_scene",
+    "bevy_core_pipeline",
+    "bevy_pbr",
+    "bevy_gltf",
+    "bevy_render",
+    "bevy_sprite",
+    "bevy_text",
+    "bevy_ui",
+    "multi_threaded",
+    "png",
+    "hdr",
+    "x11",
+    "bevy_gizmos",
+    "tonemapping_luts",
+    "smaa_luts",
+    "default_font",
+    "webgl2",
+    "sysinfo_plugin",
+] }
+bevy_ecs_ldtk = { version = "0.10", features = [
+    "default",
+    "derive",
+    "atlas",
+    "render",
+] }
+bevy-inspector-egui = "0.27.0"
+bevy_rapier2d = "0.27.0"
+rand = "0.8"
+pecs = "0.6"
+bevy_particle_systems = "0.13"
+bevy_asset_loader = "0.21"
+bevy_kira_audio = "0.20"
+bevy_tweening = "0.11"
+bevy_novel = "0.0.1"
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.dev]
+opt-level = 1
+
+[profile.release]
+lto = true
+codegen-units = 1
+
+[profile.dist]
+inherits = "release"
+lto = "thin"
+
+[features]
+dev = [
+    "bevy/dynamic_linking",
+]
