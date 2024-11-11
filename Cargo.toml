@@ -5,6 +5,7 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
+anyhow = "1.0.93"
 bevy = { version = "0.14", default-features = false, features = [
     "animation",
     "bevy_asset",
@@ -36,15 +37,22 @@ bevy_ecs_ldtk = { version = "0.10", features = [
     "atlas",
     "render",
 ] }
-bevy-inspector-egui = "0.27.0"
-bevy_rapier2d = "0.27.0"
-rand = "0.8"
-pecs = "0.6"
-bevy_particle_systems = "0.13"
 bevy_asset_loader = "0.21"
 bevy_kira_audio = "0.20"
-bevy_tweening = "0.11"
+bevy_la_mesa = { path="../bevy_la_mesa" }
+bevy_lunex = { version = "0.2.4" }
 bevy_novel = { path="../bevy_novel"}
+bevy_particle_systems = "0.13"
+bevy_rapier2d = "0.27.0"
+bevy_tweening = "0.11"
+bevy-inspector-egui = "0.27.0"
+image = "0.25.5"
+mistralrs = { git = "https://github.com/EricLBuehler/mistral.rs.git", features=["cuda"] }
+pecs = "0.6"
+rand = "0.8"
+renpy_parser = "0.0.3"
+reqwest = "0.12.9"
+tokio = { version = "1.41.1", features = ["full"] }
 
 [profile.dev.package."*"]
 opt-level = 3
