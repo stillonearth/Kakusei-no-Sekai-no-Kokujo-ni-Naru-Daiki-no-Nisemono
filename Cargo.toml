@@ -53,6 +53,8 @@ rand = "0.8"
 renpy_parser = "0.0.3"
 reqwest = "0.12.9"
 tokio = { version = "1.41.1", features = ["full"] }
+ollama-rs = "0.2.1"
+bevy-tokio-tasks = "=0.14.0"
 
 [profile.dev.package."*"]
 opt-level = 3

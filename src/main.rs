@@ -1,4 +1,5 @@
 mod cards;
+mod llms;
 
 use bevy::{input::common_conditions::input_toggle_active, prelude::*};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
@@ -8,10 +9,12 @@ use bevy_la_mesa::{
 };
 use bevy_lunex::{prelude::MainUi, UiMinimalPlugins};
 use bevy_novel::{
-    events::{EventHandleNode, EventStartScenario},
-    NovelPlugin, NovelSettings,
+    events::{EventHandleNode, EventStartScenario, EventSwitchNextNode},
+    NovelData, NovelPlugin, NovelSettings,
 };
+use bevy_tokio_tasks::*;
 use cards::{Chip, PokerCard};
+use llms::{EventLLMRequest, EventLLMResponse, LLMPlugin};
 use renpy_parser::{
     group_logical_lines,
     lexer::Lexer,
@@ -27,7 +30,12 @@ fn main() {
         .add_plugins(
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         )
-        .add_plugins((NovelPlugin {}, LaMesaPlugin::<PokerCard, Chip>::default()))
+        .add_plugins((
+            NovelPlugin {},
+            LaMesaPlugin::<PokerCard, Chip>::default(),
+            LLMPlugin {},
+            TokioTasksPlugin::default(),
+        ))
         .insert_resource(NovelSettings {
             assets_path: "plot".to_string(),
         })
@@ -40,7 +48,7 @@ fn main() {
             Startup,
             (setup_camera, start_visual_novel, setup_card_scene),
         )
-        .add_systems(Update, handle_new_node)
+        .add_systems(Update, (handle_new_node, handle_llm_response))
         .run();
 }
 
@@ -102,10 +110,7 @@ fn start_visual_novel(
     let path = "assets/plot/intro.rpy";
     let ast = load_scenario(path.to_string());
 
-    println!("asts: {:?}", ast);
-
     ew_start_scenario.send(EventStartScenario { ast });
-
     ew_render_deck.send(RenderDeck::<PokerCard> {
         marker: 1,
         deck: load_poker_deck(),
@@ -139,20 +144,43 @@ fn setup_camera(mut commands: Commands) {
     ));
 }
 
+fn handle_llm_response(
+    mut novel_data: ResMut<NovelData>,
+    mut er_llm_response: EventReader<EventLLMResponse>,
+    mut ew_switch_next_node: EventWriter<EventSwitchNextNode>,
+) {
+    for event in er_llm_response.read() {
+        novel_data.push_text_node(None, event.0.clone());
+        ew_switch_next_node.send(EventSwitchNextNode {});
+    }
+}
+
 fn handle_new_node(
+    mut novel_data: ResMut<NovelData>,
+    mut ew_switch_next_node: EventWriter<EventSwitchNextNode>,
     mut er_handle_node: EventReader<EventHandleNode>,
+    mut ew_llm_request: EventWriter<EventLLMRequest>,
     mut ew_draw: EventWriter<DrawHand>,
 ) {
     for event in er_handle_node.read() {
         match event.ast.clone() {
             AST::Return(_, _) => {
-                println!("drawing hand");
-
                 ew_draw.send(DrawHand {
                     deck_marker: 1,
                     num_cards: 5,
                     player: 1,
                 });
+
+                // when sending llm request indicate user that
+                novel_data.push_text_node(
+                    Some("AI".to_string()),
+                    "I'm meditating the answer".to_string(),
+                );
+                ew_switch_next_node.send(EventSwitchNextNode {});
+
+                ew_llm_request.send(EventLLMRequest(
+                    "Say something funny in one simple sentence.".to_string(),
+                ));
             }
             _ => {}
         }
