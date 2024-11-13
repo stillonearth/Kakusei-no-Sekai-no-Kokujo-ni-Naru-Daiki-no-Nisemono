@@ -1,5 +1,4 @@
-use bevy::ecs::world::CommandQueue;
-use bevy::{prelude::*, tasks::AsyncComputeTaskPool};
+use bevy::prelude::*;
 
 use bevy_tokio_tasks::TokioTasksRuntime;
 use ollama_rs::generation::completion::request::GenerationRequest;
