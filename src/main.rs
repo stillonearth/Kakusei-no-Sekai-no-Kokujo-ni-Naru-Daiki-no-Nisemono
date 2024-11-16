@@ -1,4 +1,6 @@
-mod cards;
+mod cards_game;
+mod cards_scene;
+mod cards_ui;
 mod llms;
 mod visual_novel;
 
@@ -8,10 +10,11 @@ use bevy_la_mesa::*;
 use bevy_lunex::{prelude::MainUi, UiMinimalPlugins};
 use bevy_novel::*;
 use bevy_tokio_tasks::*;
-use cards::{Chip, PokerCard};
-use llms::LLMPlugin;
+use pecs::prelude::*;
 
-use crate::cards::*;
+use crate::cards_scene::*;
+use crate::cards_ui::*;
+use crate::llms::*;
 use crate::visual_novel::*;
 
 fn main() {
@@ -22,20 +25,14 @@ fn main() {
             UiMinimalPlugins,
             TokioTasksPlugin::default(),
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
+            PecsPlugin,
             NovelPlugin {},
-            LaMesaPlugin::<PokerCard, Chip>::default(),
+            LaMesaPlugin::<cards_game::PokerCard>::default(),
             LLMPlugin {},
         ))
         .add_systems(
             Startup,
-            (
-                setup_camera,
-                // VN setting
-                start_visual_novel,
-                // cards ui
-                setup_card_scene,
-                setup_ui,
-            ),
+            (setup_camera, start_visual_novel, setup_card_scene),
         )
         .add_systems(
             Update,
@@ -44,7 +41,14 @@ fn main() {
                 handle_llm_response,
                 handle_buttons,
                 handle_card_press,
+                handle_draw_hand,
+                handle_deck_rendered_card_game,
+                handle_deck_rendered_card_ui,
+                handle_hide_ui_overlay,
+                handle_play_hand_effect,
+                handle_update_game_state_ui,
                 handle_play_hand,
+                handle_end_game,
             ),
         )
         // Plugin Settings
@@ -57,7 +61,18 @@ fn main() {
             back_card_path: "cards/Back_5.png".into(),
         })
         // Events
-        .add_event::<PlayHand>()
+        .add_event::<EventPlayHand>()
+        .add_event::<EventEndGame>()
+        .add_event::<EventHideUIOverlay>()
+        .add_event::<EventUpdateGameStateUI>()
+        .add_event::<EventPlayHandEffect>()
+        // Resources
+        .insert_resource(GameState {
+            max_number_of_draws: 3,
+            end_of_game: false,
+            enable_play_hand: false,
+            ..default()
+        })
         .run();
 }
 

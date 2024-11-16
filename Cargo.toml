@@ -1,5 +1,5 @@
 [package]
-name = "forever_alone"
+name = "vn_poker_llm"
 version = "0.0.1"
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -46,15 +46,13 @@ bevy_particle_systems = "0.13"
 bevy_rapier2d = "0.27.0"
 bevy_tweening = "0.11"
 bevy-inspector-egui = "0.27.0"
-image = "0.25.5"
-mistralrs = { git = "https://github.com/EricLBuehler/mistral.rs.git", features=["cuda"] }
-pecs = "0.6"
-rand = "0.8"
-renpy_parser = "0.0.3"
-reqwest = "0.12.9"
-tokio = { version = "1.41.1", features = ["full"] }
-ollama-rs = "0.2.1"
 bevy-tokio-tasks = "=0.14.0"
+image = "0.25.5"
+ollama-rs = "0.2.1"
+pecs = {git="https://github.com/stillonearth/pecs.git", rev ="97879f3"}
+rand = "0.8"
+renpy_parser = "0.0.5"
+tokio = { version = "1.41.1", features = ["full"] }
 
 [profile.dev.package."*"]
 opt-level = 3
@@ -70,7 +68,12 @@ codegen-units = 1
 inherits = "release"
 lto = "thin"
 
-[features]
-dev = [
-    "bevy/dynamic_linking",
+# [features]
+# dev = [
+#     "bevy/dynamic_linking",
+# ]
+
+[target.x86_64-unknown-linux-gnu]
+rustflags = [
+    "-C", "link-arg=-fuse-ld=lld",
 ]

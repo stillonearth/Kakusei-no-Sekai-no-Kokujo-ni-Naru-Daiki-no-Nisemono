@@ -1,80 +1,98 @@
-use crate::cards::PokerCard;
-use crate::llms::{EventLLMRequest, EventLLMResponse};
 use bevy::prelude::*;
-use bevy_la_mesa::events::{DrawHand, RenderDeck};
+use bevy_la_mesa::events::RenderDeck;
 use bevy_novel::{
     events::{EventHandleNode, EventStartScenario, EventSwitchNextNode},
     NovelData,
 };
-use renpy_parser::{
-    group_logical_lines,
-    lexer::Lexer,
-    list_logical_lines,
-    parsers::{parse_block, AST},
-};
+use renpy_parser::{parse_scenario, parsers::AST};
 
-use crate::cards::*;
+use crate::llms::*;
+use crate::{cards_game::*, GameState};
 
-pub(crate) fn load_scenario(path: String) -> Vec<AST> {
-    let lines = list_logical_lines(&path).unwrap();
-    let blocks = group_logical_lines(lines).unwrap();
-
-    let l = &mut Lexer::new(blocks.clone(), true);
-
-    let (ast, _) = parse_block(l);
-    ast
-}
-
-pub(crate) fn start_visual_novel(
-    ew_start_scenario: EventWriter<EventStartScenario>,
-    mut ew_render_deck: EventWriter<RenderDeck<PokerCard>>,
-) {
+pub(crate) fn start_visual_novel(mut ew_start_scenario: EventWriter<EventStartScenario>) {
     let path = "assets/plot/intro.rpy";
-    let ast = load_scenario(path.to_string());
+    let (ast, _) = parse_scenario(path).unwrap();
 
-    // ew_start_scenario.send(EventStartScenario { ast });
-    ew_render_deck.send(RenderDeck::<PokerCard> {
-        marker: 1,
-        deck: load_poker_deck(),
-    });
+    ew_start_scenario.send(EventStartScenario { ast });
 }
 
 pub(crate) fn handle_llm_response(
+    game_state: Res<GameState>,
     mut novel_data: ResMut<NovelData>,
     mut er_llm_response: EventReader<EventLLMResponse>,
     mut ew_switch_next_node: EventWriter<EventSwitchNextNode>,
 ) {
     for event in er_llm_response.read() {
-        novel_data.push_text_node(None, event.0.clone());
+        println!("Got Response!");
+
+        novel_data.push_text_node(
+            Some(event.who.clone()),
+            event.response.clone(),
+            game_state.current_vn_node + 1,
+        );
+
+        println!(
+            "nodes len: {:?}\t{}",
+            novel_data.ast, game_state.current_vn_node
+        );
+
         ew_switch_next_node.send(EventSwitchNextNode {});
     }
 }
 
 pub(crate) fn handle_new_node(
     mut novel_data: ResMut<NovelData>,
+    mut game_state: ResMut<GameState>,
     mut ew_switch_next_node: EventWriter<EventSwitchNextNode>,
     mut er_handle_node: EventReader<EventHandleNode>,
     mut ew_llm_request: EventWriter<EventLLMRequest>,
-    mut ew_draw: EventWriter<DrawHand>,
+    // mut ew_draw: EventWriter<DrawHand>,
+    mut ew_render_deck: EventWriter<RenderDeck<PokerCard>>,
 ) {
     for event in er_handle_node.read() {
-        if let AST::Return(_, _) = event.ast.clone() {
-            ew_draw.send(DrawHand {
-                deck_marker: 1,
-                num_cards: 5,
-                player: 1,
-            });
+        game_state.current_vn_node = event.ast.index();
 
+        if let AST::LLMGenerate(_, who, prompt) = event.ast.clone() {
             // when sending llm request indicate user that
+
             novel_data.push_text_node(
                 Some("AI".to_string()),
-                "I'm meditating the answer".to_string(),
+                "...".to_string(),
+                game_state.current_vn_node + 1,
             );
             ew_switch_next_node.send(EventSwitchNextNode {});
 
-            ew_llm_request.send(EventLLMRequest(
-                "Say something funny in one simple sentence.".to_string(),
-            ));
+            println!(
+                "nodes len: {:?}\t{}",
+                novel_data.ast, game_state.current_vn_node
+            );
+
+            let prompt = prompt
+                .unwrap()
+                .replace(
+                    "{COMBINATIONS}",
+                    &game_state
+                        .combinations
+                        .iter()
+                        .map(|c| c.to_string())
+                        .collect::<Vec<String>>()
+                        .join(", "),
+                )
+                .replace("{SCORE}", &game_state.score.to_string());
+
+            ew_llm_request.send(EventLLMRequest {
+                prompt: prompt,
+                who: who,
+            });
+        }
+
+        if let AST::GameMechanic(_, mechanic) = event.ast.clone() {
+            if mechanic == "card play" {
+                ew_render_deck.send(RenderDeck::<PokerCard> {
+                    marker: 1,
+                    deck: load_poker_deck(),
+                });
+            }
         }
     }
 }

@@ -7,10 +7,16 @@ use ollama_rs::Ollama;
 pub struct LLMPlugin {}
 
 #[derive(Event)]
-pub struct EventLLMRequest(pub String);
+pub struct EventLLMRequest {
+    pub prompt: String,
+    pub who: String,
+}
 
 #[derive(Event)]
-pub struct EventLLMResponse(pub String);
+pub struct EventLLMResponse {
+    pub response: String,
+    pub who: String,
+}
 
 impl Plugin for LLMPlugin {
     fn build(&self, app: &mut App) {
@@ -25,28 +31,28 @@ fn handle_llm_request(
     runtime: ResMut<TokioTasksRuntime>,
 ) {
     for er in er_llm_request.read() {
-        let prompt = er.0.clone();
+        let prompt = er.prompt.clone();
+        let who = er.who.clone();
         runtime.spawn_background_task(|mut ctx| async move {
             let model = "llama3.2:3b".to_string();
             let ollama = Ollama::new("http://192.168.88.242".to_string(), 11434);
-
-            println!("requesting llm");
 
             let res = ollama.generate(GenerationRequest::new(model, prompt)).await;
 
             if res.is_ok() {
                 let response = res.unwrap().response;
 
-                println!("success: {}", response);
-
                 ctx.run_on_main_thread(move |ctx| {
-                    let event_response = EventLLMResponse(response);
+                    let event_response = EventLLMResponse {
+                        response: response.clone(),
+                        who: who.clone(),
+                    };
                     let world: &mut World = ctx.world;
                     world.send_event(event_response);
                 })
                 .await;
             } else {
-                println!("error");
+                panic!();
             }
         });
     }
