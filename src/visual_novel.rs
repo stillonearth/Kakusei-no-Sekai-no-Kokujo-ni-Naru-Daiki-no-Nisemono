@@ -23,17 +23,10 @@ pub(crate) fn handle_llm_response(
     mut ew_switch_next_node: EventWriter<EventSwitchNextNode>,
 ) {
     for event in er_llm_response.read() {
-        println!("Got Response!");
-
         novel_data.push_text_node(
             Some(event.who.clone()),
             event.response.clone(),
             game_state.current_vn_node + 1,
-        );
-
-        println!(
-            "nodes len: {:?}\t{}",
-            novel_data.ast, game_state.current_vn_node
         );
 
         ew_switch_next_node.send(EventSwitchNextNode {});
@@ -47,7 +40,7 @@ pub(crate) fn handle_new_node(
     mut er_handle_node: EventReader<EventHandleNode>,
     mut ew_llm_request: EventWriter<EventLLMRequest>,
     // mut ew_draw: EventWriter<DrawHand>,
-    mut ew_render_deck: EventWriter<RenderDeck<PokerCard>>,
+    mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
 ) {
     for event in er_handle_node.read() {
         game_state.current_vn_node = event.ast.index();
@@ -88,7 +81,7 @@ pub(crate) fn handle_new_node(
 
         if let AST::GameMechanic(_, mechanic) = event.ast.clone() {
             if mechanic == "card play" {
-                ew_render_deck.send(RenderDeck::<PokerCard> {
+                ew_render_deck.send(RenderDeck::<VNCard> {
                     marker: 1,
                     deck: load_poker_deck(),
                 });

@@ -27,7 +27,7 @@ fn main() {
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
             PecsPlugin,
             NovelPlugin {},
-            LaMesaPlugin::<cards_game::PokerCard>::default(),
+            LaMesaPlugin::<cards_game::VNCard>::default(),
             LLMPlugin {},
         ))
         .add_systems(
@@ -58,7 +58,7 @@ fn main() {
         .insert_resource(LaMesaPluginSettings {
             num_players: 1,
             hand_size: 5,
-            back_card_path: "cards/Back_5.png".into(),
+            back_card_path: "poker-cards/Back_5.png".into(),
         })
         // Events
         .add_event::<EventPlayHand>()
