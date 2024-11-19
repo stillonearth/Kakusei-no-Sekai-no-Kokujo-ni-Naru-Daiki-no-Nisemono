@@ -1,0 +1,751 @@
+[
+  {
+    "name": "Quantum Leap",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "Flip this card to introduce a sudden time travel scenario affecting the story's direction.",
+    "flavor_text": "A single quantum leap can change everything."
+  },
+  {
+    "name": "Galactic Conquest",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must resolve an interstellar war between two alien factions.",
+    "flavor_text": "The stars are the battleground of the future."
+  },
+  {
+    "name": "The Enchanted Forest",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "Adds a mystical forest setting with magical creatures and ancient secrets.",
+    "flavor_text": "Beware, for within these woods lies power beyond imagination."
+  },
+  {
+    "name": "Dragon's Hoard",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must find a way to retrieve an artifact from the lair of a dragon guarding it fiercely.",
+    "flavor_text": "The dragon sleeps, but its dreams are made of gold."
+  },
+  {
+    "name": "The Missing Heirloom",
+    "card_type": "Plot Twist",
+    "genre": "Mystery",
+    "effect": "Introduce a piece of family history that was thought lost and is now central to the mystery.",
+    "flavor_text": "Sometimes, what you seek lies in plain sight."
+  },
+  {
+    "name": "Shadowy Figure",
+    "card_type": "Conflict",
+    "genre": "Mystery",
+    "effect": "A mysterious character, providing clues or misleading information.",
+    "flavor_text": "The shadows hold secrets that the light cannot reveal."
+  },
+  {
+    "name": "Time Loop",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "Introduces a time loop where players must break free from an endless cycle.",
+    "flavor_text": "Yesterday's tomorrow is today."
+  },
+  {
+    "name": "Alien Invasion",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must protect Earth from extraterrestrial threats.",
+    "flavor_text": "When the sky turns red, there's nowhere to hide."
+  },
+  {
+    "name": "Ancient Prophecy",
+    "card_type": "Plot Twist",
+    "genre": "Fantasy",
+    "effect": "An ancient prophecy comes true, changing the course of history.",
+    "flavor_text": "The past shapes the future, but it is not set in stone."
+  },
+  {
+    "name": "Quest for the Oracle",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "Players embark on a quest to seek guidance from an oracle.",
+    "flavor_text": "Wisdom lies beyond the horizon, where no man has gone before."
+  },
+  {
+    "name": "Mystery at Midnight",
+    "card_type": "Plot Twist",
+    "genre": "Detective",
+    "effect": "A sudden and unexpected event occurs at midnight, leading to a new mystery.",
+    "flavor_text": "The darkest hour holds the most secrets."
+  },
+  {
+    "name": "Final Confrontation",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players face a powerful antagonist in an epic battle.",
+    "flavor_text": "Destiny is not written; it is forged."
+  },
+  {
+    "name": "The Last Artifact",
+    "card_type": "Plot Twist",
+    "genre": "Adventure",
+    "effect": "A legendary artifact, leading to a quest for ultimate power.",
+    "flavor_text": "Power lies in the hands of those who seek it out."
+  },
+  {
+    "name": "Space Pirates",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must defend their ship from space pirates.",
+    "flavor_text": "The void is dark and full of terrors."
+  },
+  {
+    "name": "Ancient Library",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "Adds an ancient library or knowledge repository to the story setting.",
+    "flavor_text": "Wisdom lies not in books, but in understanding them."
+  },
+  {
+    "name": "Lost City",
+    "card_type": "Setting",
+    "genre": "Adventure",
+    "effect": "A lost city is discovered, filled with ancient treasures and dangers.",
+    "flavor_text": "History whispers of a place beyond the known world."
+  },
+  {
+    "name": "Time Traveler's Dilemma",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler from the future disrupts the present.",
+    "flavor_text": "The past is a fragile tapestry, easily unravelled."
+  },
+  {
+    "name": "Guardian of the Gate",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must confront a guardian to pass through a mystical gate.",
+    "flavor_text": "The path to enlightenment is guarded by those who have already walked it."
+  },
+  {
+    "name": "Cursed Relic",
+    "card_type": "Plot Twist",
+    "genre": "Adventure",
+    "effect": "A cursed relic brings misfortune and danger upon the players.",
+    "flavor_text": "Sometimes, what you seek can be a curse in disguise."
+  },
+  {
+    "name": "Cybernetic Rebellion",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must stop a rebellion by cyber-enhanced beings.",
+    "flavor_text": "The line between man and machine is blurred in the digital age."
+  },
+  {
+    "name": "Eldritch Tome",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A tome filled with forbidden knowledge, altering the world.",
+    "flavor_text": "Some secrets are better left buried in darkness."
+  },
+  {
+    "name": "Secret Agent Mission",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must complete a secret mission to prevent a global catastrophe.",
+    "flavor_text": "The fate of the world rests on the shoulders of one agent."
+  },
+  {
+    "name": "Dragon's Lair",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must defeat a dragon to save a village from destruction.",
+    "flavor_text": "The breath of fire is hotter than the blood of battle."
+  },
+  {
+    "name": "Ancient Guardian",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "A guardian spirit protects an ancient artifact, challenging players.",
+    "flavor_text": "Some guardians are not to be trifled with."
+  },
+  {
+    "name": "Alien Artifact",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "An alien artifact grants mysterious powers, but at a cost.",
+    "flavor_text": "The stars hold the keys to unimaginable power and destruction."
+  },
+  {
+    "name": "Mystic Island",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A mystical island, filled with wonders and dangers.",
+    "flavor_text": "Beyond the horizon lies a place of magic and mystery."
+  },
+  {
+    "name": "Time Capsule Mystery",
+    "card_type": "Plot Twist",
+    "genre": "Adventure",
+    "effect": "Players find a time capsule containing clues to a hidden treasure.",
+    "flavor_text": "The past holds the key to an uncertain future."
+  },
+  {
+    "name": "Cybernetic Surgeon",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must confront a rogue cybernetic surgeon.",
+    "flavor_text": "When science goes wrong, the line between doctor and patient blurs."
+  },
+  {
+    "name": "Enchanted Forest",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A forest filled with magical creatures and dangers.",
+    "flavor_text": "In the heart of nature lies a world of wonders unseen by mortals."
+  },
+  {
+    "name": "Secret Agent Training",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players undergo secret agent training to prepare for missions.",
+    "flavor_text": "The path to becoming an agent is paved with challenges and secrets."
+  },
+  {
+    "name": "Dragon's Egg",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must protect a dragon's egg from those who seek to steal it.",
+    "flavor_text": "The future of the world rests in the hands of an unborn dragon."
+  },
+  {
+    "name": "Ancient Temple",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A temple filled with ancient treasures and traps.",
+    "flavor_text": "The path to enlightenment is paved with trials and tribulations."
+  },
+  {
+    "name": "Time Traveler's Quest",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler seeks help from the players to change history.",
+    "flavor_text": "The past is a tapestry, and every thread matters."
+  },
+  {
+    "name": "Cybernetic Uprising",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must stop an uprising by cyber-enhanced beings.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted Lake",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A lake filled with magical creatures and dangers.",
+    "flavor_text": "Beyond the shores lies a world of wonder and peril."
+  },
+  {
+    "name": "Secret Agent Mission: Sabotage",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must prevent sabotage to ensure mission success.",
+    "flavor_text": "Saboteurs seek to disrupt the delicate balance of power."
+  },
+  {
+    "name": "Dragon's Hoard",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must confront a dragon guarding its treasure hoard.",
+    "flavor_text": "The allure of gold and jewels is strong, but so is the dragon's wrath."
+  },
+  {
+    "name": "Ancient Ruins",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "Ruins filled with ancient treasures and traps appear.",
+    "flavor_text": "The past holds secrets waiting to be uncovered."
+  },
+  {
+    "name": "Time Traveler's Dilemma",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler faces a moral dilemma, seeking players' help.",
+    "flavor_text": "The choices we make shape the future in ways we cannot foresee."
+  },
+  {
+    "name": "Cybernetic Infiltration",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must prevent cyber-enhanced beings from infiltrating a secure facility.",
+    "flavor_text": "The line between security and freedom is thin."
+  },
+  {
+    "name": "Enchanted Mountain",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A mountain filled with magical creatures and dangers.",
+    "flavor_text": "Beyond the peaks lies a world of wonder and peril."
+  },
+  {
+    "name": "Secret Agent Mission: Rescue",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must rescue an agent from hostile territory.",
+    "flavor_text": "The mission is to save one, but the risk affects many."
+  },
+  {
+    "name": "Dragon's Lair 2.0",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must defeat a more powerful dragon to save a village from destruction.",
+    "flavor_text": "The breath of fire is hotter, the scales tougher."
+  },
+  {
+    "name": "Ancient City",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A city filled with ancient treasures and secrets.",
+    "flavor_text": "In the heart of history lies a world of wonders unseen by mortals."
+  },
+  {
+    "name": "Time Traveler's Warning",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler warns players about an impending disaster.",
+    "flavor_text": "The future is not set in stone; it can be changed."
+  },
+  {
+    "name": "Cybernetic Rebellion",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must prevent a cyber-enhanced rebellion from taking over.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted Desert",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A desert filled with magical creatures and dangers.",
+    "flavor_text": "Beyond the sands lies a world of wonder and peril."
+  },
+  {
+    "name": "Secret Agent Mission: Espionage",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must gather intelligence to thwart enemy plans.",
+    "flavor_text": "Knowledge is power, but it comes at a price."
+  },
+  {
+    "name": "Dragon's Lair 3.0",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must defeat an even more powerful dragon to save the world.",
+    "flavor_text": "The breath of fire is hotter, the scales tougher."
+  },
+  {
+    "name": "Ancient Library",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A library filled with ancient knowledge and secrets.",
+    "flavor_text": "In the heart of books lies a world of wisdom unseen by mortals."
+  },
+  {
+    "name": "Time Traveler's Challenge",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler challenges players to solve complex puzzles.",
+    "flavor_text": "The test of time reveals the true nature of one's character."
+  },
+  {
+    "name": "Cybernetic Overthrow",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must prevent a cyber-enhanced rebellion from overthrowing the government.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted Forest 2.0",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A more dangerous enchanted forest, filled with magical creatures and dangers.",
+    "flavor_text": "Beyond the trees lies a world of wonder and peril."
+  },
+  {
+    "name": "Secret Agent Mission: Diplomacy",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must negotiate a diplomatic to an international crisis.",
+    "flavor_text": "Words can be as powerful as swords in the right hands."
+  },
+  {
+    "name": "Dragon's Lair: Final Battle",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must defeat a final, ultimate dragon to save the world.",
+    "flavor_text": "The breath of fire is hotter, the scales tougher."
+  },
+  {
+    "name": "Ancient Temple",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A temple filled with ancient treasures and secrets.",
+    "flavor_text": "In the heart of worship lies a world of wisdom unseen by mortals."
+  },
+  {
+    "name": "Time Traveler's Revelation",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler reveals critical information about an impending disaster.",
+    "flavor_text": "The future is not set in stone; it can be changed."
+  },
+  {
+    "name": "Cybernetic Conquest",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must prevent a cyber-enhanced army from conquering the world.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted Cave",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A cave filled with magical creatures and dangers.",
+    "flavor_text": "Beyond the darkness lies a world of wonder and peril."
+  },
+  {
+    "name": "Secret Agent Mission: Espionage 2.0",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must gather more complex intelligence to thwart enemy plans.",
+    "flavor_text": "Knowledge is power, but it comes at a price."
+  },
+  {
+    "name": "Dragon's Lair: Final Quest",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must complete the final quest to save the world from dragons.",
+    "flavor_text": "The journey is long, but the reward is worth it."
+  },
+  {
+    "name": "Ancient Market",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A market filled with ancient artifacts and secrets.",
+    "flavor_text": "In the heart of commerce lies a world of wonders unseen by mortals."
+  },
+  {
+    "name": "Time Traveler's Quest",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler seeks players' help on a critical quest.",
+    "flavor_text": "The choices we make shape the future in ways we cannot foresee."
+  },
+  {
+    "name": "Cybernetic Tyranny",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must prevent a cyber-enhanced regime from establishing totalitarian rule.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted Swamp",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A swamp filled with magical creatures and dangers.",
+    "flavor_text": "Beyond the mire lies a world of wonder and peril."
+  },
+  {
+    "name": "Secret Agent Mission: Espionage 3.0",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must gather highly advanced intelligence to thwart enemy plans.",
+    "flavor_text": "Knowledge is power, but it comes at a price."
+  },
+  {
+    "name": "Dragon's Lair: Ultimate Battle",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must defeat the ultimate dragon to save the world.",
+    "flavor_text": "The breath of fire is hotter, the scales tougher."
+  },
+  {
+    "name": "Ancient Island",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "An island filled with ancient treasures and secrets.",
+    "flavor_text": "In the heart of isolation lies a world of wonders unseen by mortals."
+  },
+  {
+    "name": "Time Traveler's Discovery",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler uncovers a critical discovery about the past and future.",
+    "flavor_text": "The past shapes the present, but the future is ours to shape."
+  },
+  {
+    "name": "Cybernetic Rebellion",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must lead a rebellion against an oppressive cyber-enhanced regime.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted City",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A city filled with magical creatures and wonders.",
+    "flavor_text": "Beyond the walls lies a world of wonder and enchantment."
+  },
+  {
+    "name": "Secret Agent Mission: Espionage 4.0",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must gather advanced intelligence to thwart an international conspiracy.",
+    "flavor_text": "Knowledge is power, but it comes at a price."
+  },
+  {
+    "name": "Dragon's Lair: Final Confrontation",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must confront the ultimate dragon to save the world.",
+    "flavor_text": "The breath of fire is hotter, the scales tougher."
+  },
+  {
+    "name": "Ancient Library",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A library filled with ancient knowledge and secrets.",
+    "flavor_text": "In the heart of learning lies a world of wisdom unseen by mortals."
+  },
+  {
+    "name": "Time Traveler's Destiny",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler uncovers their destiny and must act to change it.",
+    "flavor_text": "The past shapes the present, but the future is ours to shape."
+  },
+  {
+    "name": "Cybernetic Liberation",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must liberate humanity from cyber-enhanced oppression.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted Forest",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A forest filled with magical creatures and dangers.",
+    "flavor_text": "Beyond the trees lies a world of wonder and peril."
+  },
+  {
+    "name": "Secret Agent Mission: Espionage 5.0",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must gather top-secret intelligence to thwart an international espionage ring.",
+    "flavor_text": "Knowledge is power, but it comes at a price."
+  },
+  {
+    "name": "Dragon's Lair: Final Triumph",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must triumph over the ultimate dragon to save the world.",
+    "flavor_text": "The breath of fire is hotter, the scales tougher."
+  },
+  {
+    "name": "Ancient Ruins",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "Ruins filled with ancient treasures and secrets appear.",
+    "flavor_text": "In the heart of decay lies a world of wonders unseen by mortals."
+  },
+  {
+    "name": "Time Traveler's Legacy",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler leaves behind a legacy that shapes the future.",
+    "flavor_text": "The past shapes the present, but the future is ours to shape."
+  },
+  {
+    "name": "Cybernetic Revolution",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must lead a revolution against an oppressive cyber-enhanced regime.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted Desert",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A desert filled with magical creatures and dangers.",
+    "flavor_text": "Beyond the sands lies a world of wonder and peril."
+  },
+  {
+    "name": "Secret Agent Mission: Espionage 6.0",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must gather ultra-secret intelligence to prevent an international catastrophe.",
+    "flavor_text": "Knowledge is power, but it comes at a price."
+  },
+  {
+    "name": "Dragon's Lair: Final Victory",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must achieve final victory over the ultimate dragon to save the world.",
+    "flavor_text": "The breath of fire is hotter, the scales tougher."
+  },
+  {
+    "name": "Ancient Temple",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A temple filled with ancient mysteries and treasures.",
+    "flavor_text": "In the heart of devotion lies a world of wonders unseen by mortals."
+  },
+  {
+    "name": "Time Traveler's Invention",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler invents a device that changes history.",
+    "flavor_text": "The past shapes the present, but the future is ours to shape."
+  },
+  {
+    "name": "Cybernetic Redemption",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must redeem humanity from cyber-enhanced oppression.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted Castle",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A castle filled with magical creatures and wonders.",
+    "flavor_text": "Beyond the ramparts lies a world of wonder and enchantment."
+  },
+  {
+    "name": "Secret Agent Mission: Espionage 7.0",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must gather classified intelligence to prevent an international disaster.",
+    "flavor_text": "Knowledge is power, but it comes at a price."
+  },
+  {
+    "name": "Dragon's Lair: Final Redemption",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must redeem the world from the ultimate dragon.",
+    "flavor_text": "The breath of fire is hotter, the scales tougher."
+  },
+  {
+    "name": "Ancient Observatory",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "An observatory filled with ancient knowledge and secrets.",
+    "flavor_text": "In the heart of the cosmos lies a world of wisdom unseen by mortals."
+  },
+  {
+    "name": "Time Traveler's Vision",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler foresees a critical event that must be prevented.",
+    "flavor_text": "The past shapes the present, but the future is ours to shape."
+  },
+  {
+    "name": "Cybernetic Freedom",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must free humanity from cyber-enhanced oppression.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted River",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A river filled with magical creatures and wonders.",
+    "flavor_text": "Beyond the waters lies a world of wonder and enchantment."
+  },
+  {
+    "name": "Secret Agent Mission: Espionage 8.0",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must gather top-secret intelligence to prevent an international crisis.",
+    "flavor_text": "Knowledge is power, but it comes at a price."
+  },
+  {
+    "name": "Dragon's Lair: Final Triumph",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must triumph over the ultimate dragon to save the world.",
+    "flavor_text": "The breath of fire is hotter, the scales tougher."
+  },
+  {
+    "name": "Ancient Village",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A village filled with ancient traditions and secrets.",
+    "flavor_text": "In the heart of community lies a world of wonders unseen by mortals."
+  },
+  {
+    "name": "Time Traveler's Revelation",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler uncovers a critical truth that changes history.",
+    "flavor_text": "The past shapes the present, but the future is ours to shape."
+  },
+  {
+    "name": "Cybernetic Salvation",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must save humanity from cyber-enhanced oppression.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted Forest",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A forest filled with magical creatures and wonders.",
+    "flavor_text": "Beyond the trees lies a world of wonder and enchantment."
+  },
+  {
+    "name": "Secret Agent Mission: Espionage 9.0",
+    "card_type": "Plot Twist",
+    "genre": "Spy",
+    "effect": "Players must gather ultra-confidential intelligence to prevent an international catastrophe.",
+    "flavor_text": "Knowledge is power, but it comes at a price."
+  },
+  {
+    "name": "Dragon's Lair: Final Redemption",
+    "card_type": "Conflict",
+    "genre": "Fantasy",
+    "effect": "Players must redeem the world from the ultimate dragon.",
+    "flavor_text": "The breath of fire is hotter, the scales tougher."
+  },
+  {
+    "name": "Ancient Ruins",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "Ruins filled with ancient mysteries and treasures appear.",
+    "flavor_text": "In the heart of history lies a world of wonders unseen by mortals."
+  },
+  {
+    "name": "Time Traveler's Legacy",
+    "card_type": "Plot Twist",
+    "genre": "Sci-Fi",
+    "effect": "A time traveler leaves behind an artifact that alters history.",
+    "flavor_text": "The past shapes the present, but the future is ours to shape."
+  },
+  {
+    "name": "Cybernetic Uprising",
+    "card_type": "Conflict",
+    "genre": "Sci-Fi",
+    "effect": "Players must lead a rebellion against cyber-enhanced oppression.",
+    "flavor_text": "The future is uncertain when machines rise against their creators."
+  },
+  {
+    "name": "Enchanted Lake",
+    "card_type": "Setting",
+    "genre": "Fantasy",
+    "effect": "A lake filled with magical creatures and wonders.",
+    "flavor_text": "Beyond the waters lies a world of wonder and enchantment."
+  }
+]

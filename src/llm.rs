@@ -6,16 +6,24 @@ use ollama_rs::Ollama;
 
 pub struct LLMPlugin {}
 
+#[derive(Clone, Copy)]
+pub enum LLMRequestType {
+    Story,
+    Text2ImagePrompt,
+}
+
 #[derive(Event)]
 pub struct EventLLMRequest {
     pub prompt: String,
-    pub who: String,
+    pub who: Option<String>,
+    pub request_type: LLMRequestType,
 }
 
 #[derive(Event)]
 pub struct EventLLMResponse {
     pub response: String,
-    pub who: String,
+    pub who: Option<String>,
+    pub request_type: LLMRequestType,
 }
 
 impl Plugin for LLMPlugin {
@@ -33,7 +41,9 @@ fn handle_llm_request(
     for er in er_llm_request.read() {
         let prompt = er.prompt.clone();
         let who = er.who.clone();
-        runtime.spawn_background_task(|mut ctx| async move {
+        let request_type = er.request_type.clone();
+
+        runtime.spawn_background_task(move |mut ctx| async move {
             let model = "llama3.2:3b".to_string();
             let ollama = Ollama::new("http://192.168.88.242".to_string(), 11434);
 
@@ -46,13 +56,14 @@ fn handle_llm_request(
                     let event_response = EventLLMResponse {
                         response: response.clone(),
                         who: who.clone(),
+                        request_type: request_type.clone(),
                     };
                     let world: &mut World = ctx.world;
                     world.send_event(event_response);
                 })
                 .await;
             } else {
-                panic!();
+                panic!("{:?}", res.err());
             }
         });
     }

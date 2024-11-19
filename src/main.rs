@@ -1,7 +1,8 @@
 mod cards_game;
 mod cards_scene;
 mod cards_ui;
-mod llms;
+mod llm;
+mod text2img;
 mod visual_novel;
 
 use bevy::{input::common_conditions::input_toggle_active, prelude::*};
@@ -11,10 +12,11 @@ use bevy_lunex::{prelude::MainUi, UiMinimalPlugins};
 use bevy_novel::*;
 use bevy_tokio_tasks::*;
 use pecs::prelude::*;
+use text2img::Text2ImagePlugin;
 
 use crate::cards_scene::*;
 use crate::cards_ui::*;
-use crate::llms::*;
+use crate::llm::*;
 use crate::visual_novel::*;
 
 fn main() {
@@ -29,6 +31,7 @@ fn main() {
             NovelPlugin {},
             LaMesaPlugin::<cards_game::VNCard>::default(),
             LLMPlugin {},
+            Text2ImagePlugin {},
         ))
         .add_systems(
             Startup,
@@ -37,40 +40,40 @@ fn main() {
         .add_systems(
             Update,
             (
-                handle_new_node,
-                handle_llm_response,
-                handle_buttons,
                 handle_card_press,
-                handle_draw_hand,
                 handle_deck_rendered_card_game,
                 handle_deck_rendered_card_ui,
+                handle_draw_hand,
+                handle_end_card_game,
                 handle_hide_ui_overlay,
+                handle_llm_response,
+                handle_new_vn_node,
                 handle_play_hand_effect,
-                handle_update_game_state_ui,
                 handle_play_hand,
-                handle_end_game,
+                handle_start_narrative_game,
+                handle_start_poker_game,
+                handle_text_2_image_response,
+                handle_ui_buttons,
+                handle_ui_update_game_state,
             ),
         )
         // Plugin Settings
         .insert_resource(NovelSettings {
             assets_path: "plot".to_string(),
         })
-        .insert_resource(LaMesaPluginSettings {
-            num_players: 1,
-            hand_size: 5,
-            back_card_path: "poker-cards/Back_5.png".into(),
-        })
         // Events
-        .add_event::<EventPlayHand>()
-        .add_event::<EventEndGame>()
+        .add_event::<EventEndCardGame>()
         .add_event::<EventHideUIOverlay>()
+        .add_event::<EventPlayPokerHand>()
+        .add_event::<EventPlayPokerHandEffect>()
+        .add_event::<EventStartNarrativeGame>()
+        .add_event::<EventStartPokerGame>()
         .add_event::<EventUpdateGameStateUI>()
-        .add_event::<EventPlayHandEffect>()
         // Resources
         .insert_resource(GameState {
-            max_number_of_draws: 3,
-            end_of_game: false,
-            enable_play_hand: false,
+            max_n_poker_draws: 3,
+            ui_end_of_game: false,
+            ui_enable_play_hand: false,
             ..default()
         })
         .run();

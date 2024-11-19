@@ -1,9 +1,13 @@
 use std::cmp::Ordering;
 use std::fmt;
+use std::fs::File;
+use std::io::Read;
 
+use anyhow::Result;
 use bevy::render::render_resource::encase::rts_array::Length;
 use bevy::utils::HashMap;
 use bevy_la_mesa::CardMetadata;
+use serde::Deserialize;
 
 #[derive(Clone, Debug, Default)]
 pub(crate) struct VNCard {
@@ -11,11 +15,20 @@ pub(crate) struct VNCard {
     pub(crate) metadata: VNCardMetadata,
 }
 
+#[derive(Deserialize)]
+struct NarrativeCard {
+    name: String,
+    card_type: String,
+    genre: String,
+    effect: String,
+    flavor_text: String,
+}
+
 #[derive(Clone, Debug)]
 pub(crate) enum VNCardMetadata {
     // value, suit
     Poker(u8, String),
-    // index, name, type, effect, flavorText
+    // index, card_type, genre, name, effect
     Narrative(usize, String, String, String, String),
 }
 
@@ -30,14 +43,42 @@ impl VNCardMetadata {
         if let VNCardMetadata::Poker(_, suit) = self {
             return Some(suit.clone());
         }
-        return None;
+        None
     }
 
     pub(crate) fn value(&self) -> Option<u8> {
         if let VNCardMetadata::Poker(value, _) = self {
             return Some(*value);
         }
-        return None;
+        None
+    }
+
+    pub(crate) fn card_type(&self) -> Option<String> {
+        if let VNCardMetadata::Narrative(_index, card_type, _genre, _name, _effect) = self {
+            return Some(card_type.clone());
+        }
+        None
+    }
+
+    pub(crate) fn genre(&self) -> Option<String> {
+        if let VNCardMetadata::Narrative(_index, _card_type, genre, _name, _effect) = self {
+            return Some(genre.clone());
+        }
+        None
+    }
+
+    pub(crate) fn effect(&self) -> Option<String> {
+        if let VNCardMetadata::Narrative(_index, _card_type, _genre, _name, effect) = self {
+            return Some(effect.clone());
+        }
+        None
+    }
+
+    pub(crate) fn name(&self) -> Option<String> {
+        if let VNCardMetadata::Narrative(_index, _card_type, _genre, name, _effect) = self {
+            return Some(name.clone());
+        }
+        None
     }
 }
 
@@ -144,11 +185,65 @@ pub(crate) fn load_poker_deck() -> Vec<VNCard> {
     deck
 }
 
+#[allow(clippy::vec_init_then_push)]
+pub(crate) fn load_narrative_deck() -> Result<Vec<VNCard>> {
+    let mut deck: Vec<VNCard> = vec![];
+
+    let mut file = File::open("assets/narrative-cards/cards.json")?;
+    let mut data = String::new();
+    file.read_to_string(&mut data)?;
+
+    let narrative_cards: Vec<NarrativeCard> = serde_json::from_str(&data)?;
+
+    for (i, narrative_card) in narrative_cards.iter().enumerate() {
+        deck.push(VNCard {
+            filename: format!("narrative-cards/card-{}.png", i + 1),
+            metadata: VNCardMetadata::Narrative(
+                i + 1,
+                narrative_card.card_type.clone(),
+                narrative_card.genre.clone(),
+                narrative_card.name.clone(),
+                narrative_card.effect.clone(),
+            ),
+        });
+    }
+
+    Ok(deck)
+}
+
+fn load_narrative_cards_by_type(tp: String) -> Result<Vec<VNCard>> {
+    let narrative_deck = load_narrative_deck()?;
+    let cards: Vec<VNCard> = narrative_deck
+        .iter()
+        .filter(|card| card.metadata.card_type().unwrap_or_default() == tp).cloned()
+        .collect();
+    Ok(cards)
+}
+
+pub fn load_narrative_setting_deck() -> Result<Vec<VNCard>> {
+    load_narrative_cards_by_type("Setting".to_string())
+}
+
+pub fn load_narrative_plot_twist_deck() -> Result<Vec<VNCard>> {
+    load_narrative_cards_by_type("Plot Twist".to_string())
+}
+
+pub fn load_narrative_conflict_deck() -> Result<Vec<VNCard>> {
+    load_narrative_cards_by_type("Conflict".to_string())
+}
+
 impl CardMetadata for VNCard {
     type Output = VNCard;
 
-    fn filename(&self) -> String {
+    fn front_image_filename(&self) -> String {
         self.filename.clone()
+    }
+
+    fn back_image_filename(&self) -> String {
+        match self.metadata {
+            VNCardMetadata::Poker(_, _) => "poker-cards/Back_1.png".into(),
+            VNCardMetadata::Narrative(_, _, _, _, _) => "poker-cards/Back_2.png".into(),
+        }
     }
 }
 
@@ -366,8 +461,6 @@ impl Ord for PokerCombination {
         }
     }
 }
-
-// implement comparator for PokerCombination
 
 pub(crate) fn check_poker_hand(cards: Vec<VNCard>) -> (PokerCombination, u8) {
     let sorted_cards = {
