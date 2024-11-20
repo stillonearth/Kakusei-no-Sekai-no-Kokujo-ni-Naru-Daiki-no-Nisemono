@@ -1,10 +1,25 @@
 use bevy::prelude::*;
 
+use anyhow::Result;
 use bevy_tokio_tasks::TokioTasksRuntime;
-use ollama_rs::generation::completion::request::GenerationRequest;
-use ollama_rs::Ollama;
+use reqwest::Client;
+use serde::{Deserialize, Serialize};
+
+use crate::llm;
+
+const API_ENDPOINT: &str = "http://167.88.162.83/api";
 
 pub struct LLMPlugin {}
+
+#[derive(Serialize)]
+struct LLMRequest {
+    pub prompt: String,
+}
+
+#[derive(Deserialize)]
+struct LLMResponse {
+    pub response: String,
+}
 
 #[derive(Clone, Copy)]
 pub enum LLMRequestType {
@@ -44,17 +59,14 @@ fn handle_llm_request(
         let request_type = er.request_type.clone();
 
         runtime.spawn_background_task(move |mut ctx| async move {
-            let model = "llama3.2:3b".to_string();
-            let ollama = Ollama::new("http://192.168.88.242".to_string(), 11434);
+            let llm_request = LLMRequest { prompt };
+            let llm_response = api_llm_request(llm_request).await;
 
-            let res = ollama.generate(GenerationRequest::new(model, prompt)).await;
-
-            if res.is_ok() {
-                let response = res.unwrap().response;
-
+            if llm_response.is_ok() {
+                let llm_response = llm_response.unwrap();
                 ctx.run_on_main_thread(move |ctx| {
                     let event_response = EventLLMResponse {
-                        response: response.clone(),
+                        response: llm_response.clone(),
                         who: who.clone(),
                         request_type: request_type.clone(),
                     };
@@ -63,8 +75,25 @@ fn handle_llm_request(
                 })
                 .await;
             } else {
-                panic!("{:?}", res.err());
+                panic!("error: {}", llm_response.err().unwrap());
             }
         });
     }
+}
+
+async fn api_llm_request(prompt: LLMRequest) -> Result<String> {
+    let url = format!("{}/llm", API_ENDPOINT);
+    let payload_json = serde_json::to_string(&prompt)?;
+
+    let client = Client::new();
+    let response = client
+        .post(url)
+        .header("Content-Type", "application/json")
+        .body(payload_json)
+        .send()
+        .await?;
+    let response_text = response.text().await?;
+    let response: LLMResponse = serde_json::from_str(&response_text)?;
+
+    Ok(response.response)
 }

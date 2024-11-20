@@ -6,6 +6,8 @@ use image::{self, DynamicImage};
 use std::io::Cursor;
 use url::{form_urlencoded, Url};
 
+const API_ENDPOINT: &str = "http://167.88.162.83/api";
+
 pub struct Text2ImagePlugin {}
 
 #[derive(Event)]
@@ -34,12 +36,12 @@ fn handle_text_2_image_request(
         let prompt = er.prompt.clone();
 
         runtime.spawn_background_task(|mut ctx| async move {
-            let mut url = Url::parse("http://localhost:5000/generate_image").unwrap();
+            let url = format!("{}/image", API_ENDPOINT);
+            let mut url = Url::parse(&url).unwrap();
 
-            // Add the query parameter `text` with the URL-escaped value of `prompt`
             let encoded_prompt =
                 form_urlencoded::byte_serialize(prompt.as_bytes()).collect::<String>();
-            url.query_pairs_mut().append_pair("text", &encoded_prompt);
+            url.query_pairs_mut().append_pair("prompt", &encoded_prompt);
 
             let image = download_and_load_image(&url.to_string()).await;
 
@@ -62,7 +64,7 @@ async fn download_and_load_image(url: &str) -> Result<DynamicImage> {
 
     if response.status().is_success() {
         let image_bytes = response.bytes().await?;
-        let img: DynamicImage = image::load(Cursor::new(image_bytes), image::ImageFormat::Png)?;
+        let img: DynamicImage = image::load(Cursor::new(image_bytes), image::ImageFormat::Jpeg)?;
         Ok(img)
     } else {
         Err(anyhow!(format!("Failed to download image: {}", response.status())).into())

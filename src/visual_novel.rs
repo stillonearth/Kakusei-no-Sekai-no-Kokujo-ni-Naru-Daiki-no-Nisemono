@@ -18,8 +18,14 @@ const PROMPT: &str = "You are narrator in a visual novel. Create a script for vi
 
 pub(crate) fn start_visual_novel(mut ew_start_scenario: EventWriter<EventStartScenario>) {
     let path = "assets/plot/intro.rpy";
-    let (ast, _) = parse_scenario(path).unwrap();
+    let result = parse_scenario(path);
 
+    if result.is_err() {
+        panic!("{:?}", result.err());
+        return;
+    }
+
+    let (ast, _) = result.unwrap();
     ew_start_scenario.send(EventStartScenario { ast });
 }
 
@@ -89,7 +95,6 @@ pub(crate) fn handle_llm_response(
                 game_state.n_vn_node_scene_request = game_state.n_vn_node;
             }
             LLMRequestType::Text2ImagePrompt => {
-                println!("Text2ImagePrompt response: {}", event.response.clone());
                 ew_text_2_image_reqeust.send(EventText2ImageRequest {
                     prompt: event.response.clone(),
                 });
