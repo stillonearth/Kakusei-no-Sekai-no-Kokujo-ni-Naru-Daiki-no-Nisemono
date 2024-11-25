@@ -5,7 +5,6 @@ use bevy_tokio_tasks::TokioTasksRuntime;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
-use crate::llm;
 
 const API_ENDPOINT: &str = "http://167.88.162.83/api";
 
@@ -56,7 +55,7 @@ fn handle_llm_request(
     for er in er_llm_request.read() {
         let prompt = er.prompt.clone();
         let who = er.who.clone();
-        let request_type = er.request_type.clone();
+        let request_type = er.request_type;
 
         runtime.spawn_background_task(move |mut ctx| async move {
             let llm_request = LLMRequest { prompt };
@@ -68,7 +67,7 @@ fn handle_llm_request(
                     let event_response = EventLLMResponse {
                         response: llm_response.clone(),
                         who: who.clone(),
-                        request_type: request_type.clone(),
+                        request_type,
                     };
                     let world: &mut World = ctx.world;
                     world.send_event(event_response);

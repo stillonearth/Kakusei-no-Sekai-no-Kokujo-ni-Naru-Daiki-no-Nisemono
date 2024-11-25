@@ -68,8 +68,8 @@ pub fn handle_card_position_out(
 }
 
 pub fn handle_card_position_press(
-    mut commands: Commands,
-    mut game_state: ResMut<GameState>,
+    commands: Commands,
+    game_state: ResMut<GameState>,
     mut card_position_press: EventReader<CardPositionPress>,
     mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
     q_cards_in_hand: Query<(Entity, &Card<VNCard>, &Hand)>,

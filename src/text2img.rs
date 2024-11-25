@@ -43,7 +43,7 @@ fn handle_text_2_image_request(
                 form_urlencoded::byte_serialize(prompt.as_bytes()).collect::<String>();
             url.query_pairs_mut().append_pair("prompt", &encoded_prompt);
 
-            let image = download_and_load_image(&url.to_string()).await;
+            let image = download_and_load_image(url.as_ref()).await;
 
             if image.is_ok() {
                 ctx.run_on_main_thread(move |ctx| {
@@ -67,6 +67,6 @@ async fn download_and_load_image(url: &str) -> Result<DynamicImage> {
         let img: DynamicImage = image::load(Cursor::new(image_bytes), image::ImageFormat::Jpeg)?;
         Ok(img)
     } else {
-        Err(anyhow!(format!("Failed to download image: {}", response.status())).into())
+        Err(anyhow!(format!("Failed to download image: {}", response.status())))
     }
 }

@@ -2,7 +2,6 @@ use bevy::prelude::*;
 use bevy_la_mesa::events::*;
 use bevy_la_mesa::*;
 use bevy_mod_picking::{events::*, prelude::*};
-use bevy_tweening::{lens::*, *};
 
 use crate::cards_game::*;
 use crate::cards_solitaire::*;
