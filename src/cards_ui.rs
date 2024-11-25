@@ -463,7 +463,7 @@ pub fn handle_ui_buttons(
                     GameType::Poker => {
                         ew_draw.send(DrawHand {
                             deck_marker: 1,
-                            num_cards: 5,
+                            num_cards: 1,
                             player: 1,
                         });
                     }

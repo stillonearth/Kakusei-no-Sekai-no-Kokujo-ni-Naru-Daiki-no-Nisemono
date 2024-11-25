@@ -5,6 +5,8 @@ label start:
 
 label chapter1_1:
 
+    game_mechanic "card play poker"
+
     # scene intro_2
 
     # "This world has lost all meaning."
@@ -20,17 +22,17 @@ label chapter1_1:
 
     # scene intro_3
 
-    game_mechanic "card play narrative setting"
+    # game_mechanic "card play narrative setting"
 
-    llm_generate storyteller "{PROMPT} Setting of novel is: ```{SETTING}```."
+    # llm_generate storyteller "{PROMPT} Setting of novel is: ```{SETTING}```."
 
-    game_mechanic "card play narrative conflict"
+    # game_mechanic "card play narrative conflict"
 
-    llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a conflict: ```{CONFLICT}```."
+    # llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a conflict: ```{CONFLICT}```."
 
-    game_mechanic "card play narrative plot twist"
+    # game_mechanic "card play narrative plot twist"
 
-    llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a plot twist: ```{PLOT TWIST}```."
+    # llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a plot twist: ```{PLOT TWIST}```."
 
     # game_mechanic "card play narrative plot twist"
 

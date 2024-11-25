@@ -1,5 +1,6 @@
 mod cards_game;
 mod cards_scene;
+mod cards_solitaire;
 mod cards_ui;
 mod llm;
 mod text2img;
@@ -15,6 +16,7 @@ use pecs::prelude::*;
 use text2img::Text2ImagePlugin;
 
 use crate::cards_scene::*;
+use crate::cards_solitaire::*;
 use crate::cards_ui::*;
 use crate::llm::*;
 use crate::visual_novel::*;
@@ -55,6 +57,9 @@ fn main() {
                 handle_text_2_image_response,
                 handle_ui_buttons,
                 handle_ui_update_game_state,
+                handle_card_position_hover,
+                handle_card_position_out,
+                handle_card_position_press,
             ),
         )
         // Plugin Settings
@@ -69,9 +74,12 @@ fn main() {
         .add_event::<EventStartNarrativeGame>()
         .add_event::<EventStartPokerGame>()
         .add_event::<EventUpdateGameStateUI>()
+        .add_event::<CardPositionHover>()
+        .add_event::<CardPositionOut>()
+        .add_event::<CardPositionPress>()
         // Resources
         .insert_resource(GameState {
-            max_n_poker_draws: 3,
+            max_n_poker_draws: 25,
             ui_end_of_game: false,
             ui_enable_play_hand: false,
             ..default()
@@ -96,7 +104,7 @@ fn setup_camera(mut commands: Commands) {
     commands.spawn((
         Name::new("Camera 3d"),
         Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 15.0, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(0.0, 18.2, 11.9).looking_at(Vec3::ZERO, Vec3::Y),
             camera: Camera {
                 order: 2,
                 ..default()
