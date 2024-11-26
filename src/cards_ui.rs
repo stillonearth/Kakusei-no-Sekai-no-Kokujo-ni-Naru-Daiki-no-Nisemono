@@ -244,40 +244,6 @@ pub(crate) fn handle_deck_rendered_card_ui(
                 Name::new("UI"),
             ))
             .with_children(|parent| {
-                // Shuffle
-                // parent
-                //     .spawn((
-                //         ButtonBundle {
-                //             style: Style {
-                //                 width: Val::Px(350.0),
-                //                 height: Val::Px(65.0),
-                //                 border: UiRect::all(Val::Px(5.0)),
-                //                 // horizontally center child text
-                //                 justify_content: JustifyContent::Center,
-                //                 // vertically center child text
-                //                 align_items: AlignItems::Center,
-                //                 ..default()
-                //             },
-                //             border_color: BorderColor(Color::BLACK),
-                //             border_radius: BorderRadius::MAX,
-                //             background_color: NORMAL_BUTTON.into(),
-                //             visibility: Visibility::Hidden,
-                //             ..default()
-                //         },
-                //         ButtonShuffleDeck,
-                //     ))
-                //     .with_children(|parent| {
-                //         parent.spawn(TextBundle::from_section(
-                //             "shuffle deck",
-                //             TextStyle {
-                //                 // font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                //                 font_size: 40.0,
-                //                 color: Color::srgb(0.9, 0.9, 0.9),
-                //                 ..default()
-                //             },
-                //         ));
-                //     });
-
                 // Draw hands
                 parent
                     .spawn((
@@ -531,6 +497,7 @@ pub(crate) fn handle_end_card_game(
     mut commands: Commands,
     q_ui_root_nodes: Query<(Entity, &UIRootNode)>,
     q_cards: Query<(Entity, &Card<VNCard>)>,
+    q_play_areas: Query<(Entity, &PlayArea)>,
     mut er_end_game: EventReader<EventEndCardGame>,
     mut ew_switch_next_vn_node: EventWriter<EventSwitchNextNode>,
 ) {
@@ -540,6 +507,10 @@ pub(crate) fn handle_end_card_game(
         }
 
         for (entity, _) in q_cards.iter() {
+            commands.entity(entity).despawn_recursive();
+        }
+
+        for (entity, _) in q_play_areas.iter() {
             commands.entity(entity).despawn_recursive();
         }
 

@@ -1,6 +1,10 @@
 use bevy::prelude::*;
-use bevy_la_mesa::{events::PlaceCardOnTable, Card, Hand, PlayArea};
+use bevy_la_mesa::{
+    events::{DrawHand, PlaceCardOnTable},
+    Card, Hand, PlayArea,
+};
 use bevy_mod_picking::{events::*, prelude::*};
+use pecs::prelude::*;
 
 use crate::{cards_game::VNCard, GameState};
 
@@ -68,12 +72,14 @@ pub fn handle_card_position_out(
 }
 
 pub fn handle_card_position_press(
-    commands: Commands,
+    mut commands: Commands,
     game_state: ResMut<GameState>,
     mut card_position_press: EventReader<CardPositionPress>,
     mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
     q_cards_in_hand: Query<(Entity, &Card<VNCard>, &Hand)>,
     mut q_play_areas: Query<(Entity, &mut Visibility, &PlayArea)>,
+
+    time: Res<Time>,
 ) {
     for event in card_position_press.read() {
         if q_cards_in_hand.iter().len() == 0 {
@@ -82,12 +88,30 @@ pub fn handle_card_position_press(
 
         let (card_entity, _, _) = q_cards_in_hand.single();
 
-        if let Ok((entity, mut visibility, area)) = q_play_areas.get_mut(event.entity) {
+        if let Ok((_, mut visibility, area)) = q_play_areas.get_mut(event.entity) {
             ew_place_card_on_table.send(PlaceCardOnTable {
                 card_entity,
                 player: 1,
                 marker: area.marker,
             });
+
+            if game_state.n_draws < game_state.max_n_poker_draws {
+                // a heck to invoke system next frame
+
+                let start = time.elapsed_seconds();
+                commands
+                    .promise(|| start)
+                    .then(asyn!(state => {
+                        state.asyn().timeout(0.001)
+                    }))
+                    .then(asyn!(_, mut ew_draw: EventWriter<DrawHand>  => {
+                        ew_draw.send(DrawHand {
+                            deck_marker: 1,
+                            num_cards: 1,
+                            player: 1,
+                        });
+                    }));
+            }
 
             *visibility = Visibility::Hidden;
         }

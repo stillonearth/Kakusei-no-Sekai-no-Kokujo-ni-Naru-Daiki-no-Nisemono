@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_la_mesa::events::RenderDeck;
 use bevy_novel::{
     events::{EventHandleNode, EventStartScenario, EventSwitchNextNode},
     NovelData, NovelSettings,
@@ -8,10 +7,9 @@ use renpy_parser::{parse_scenario, parsers::AST};
 use uuid::Uuid;
 
 use crate::{
-    cards_game::*,
     llm::*,
     text2img::{EventText2ImageRequest, EventText2ImageResponse},
-    EventStartNarrativeGame, EventStartPokerGame, GameState, GameType,
+    EventStartNarrativeGame, EventStartPokerGame, GameState,
 };
 
 const PROMPT: &str = "You are narrator in a visual novel. Create a script for visual novel based on this setting. Respond only with story sentences. Do not include any instructions or explanations. Respond with at least 20 sentences each separated with new line. Each sentence no longer 10 words.";
@@ -167,52 +165,6 @@ pub(crate) fn handle_new_vn_node(
 
             if mechanic == "card play narrative plot twist" {
                 ew_start_narrative_game.send(EventStartNarrativeGame::PlotTwist);
-            }
-        }
-    }
-}
-
-pub(crate) fn handle_start_poker_game(
-    mut game_state: ResMut<GameState>,
-    mut er_start_poker_game: EventReader<EventStartPokerGame>,
-    mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
-) {
-    for _ in er_start_poker_game.read() {
-        game_state.game_type = GameType::Poker;
-
-        ew_render_deck.send(RenderDeck::<VNCard> {
-            marker: 1,
-            deck: load_poker_deck(),
-        });
-    }
-}
-
-pub(crate) fn handle_start_narrative_game(
-    mut game_state: ResMut<GameState>,
-    mut er_start_narrative_game: EventReader<EventStartNarrativeGame>,
-    mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
-) {
-    for event in er_start_narrative_game.read() {
-        game_state.game_type = GameType::Narrative;
-
-        match event {
-            EventStartNarrativeGame::Setting => {
-                ew_render_deck.send(RenderDeck::<VNCard> {
-                    marker: 1,
-                    deck: load_narrative_setting_deck().unwrap(),
-                });
-            }
-            EventStartNarrativeGame::PlotTwist => {
-                ew_render_deck.send(RenderDeck::<VNCard> {
-                    marker: 1,
-                    deck: load_narrative_plot_twist_deck().unwrap(),
-                });
-            }
-            EventStartNarrativeGame::Conflict => {
-                ew_render_deck.send(RenderDeck::<VNCard> {
-                    marker: 1,
-                    deck: load_narrative_conflict_deck().unwrap(),
-                });
             }
         }
     }
