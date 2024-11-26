@@ -330,11 +330,26 @@ pub(crate) fn handle_start_card_shop(
     mut meshes: ResMut<Assets<Mesh>>,
     mut game_state: ResMut<GameState>,
     mut er_start_card_shop: EventReader<EventStartNarrativeCardShop>,
-    // mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
+    mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
 ) {
     for _ in er_start_card_shop.read() {
         game_state.game_type = GameType::CardShop;
 
+        // Deck 1 - Shop Cards
+        commands.spawn((
+            PbrBundle {
+                mesh: meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10)),
+                material: materials.add(Color::BLACK),
+                transform: Transform::from_translation(Vec3::new(8.5, 0.0, 0.0))
+                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
+                visibility: Visibility::Hidden,
+                ..default()
+            },
+            DeckArea { marker: 1 },
+            Name::new("Deck 1 -- Shop Cards"),
+        ));
+
+        // Deck 2 - All Cards
         commands.spawn((
             PbrBundle {
                 mesh: meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10)),
@@ -376,6 +391,12 @@ pub(crate) fn handle_start_card_shop(
                 ));
             }
         }
+
+        // load narrative cards
+        ew_render_deck.send(RenderDeck::<VNCard> {
+            marker: 1,
+            deck: load_narrative_deck().unwrap(),
+        });
 
         // ew_render_deck.send(RenderDeck::<VNCard> {
         //     marker: 1,
