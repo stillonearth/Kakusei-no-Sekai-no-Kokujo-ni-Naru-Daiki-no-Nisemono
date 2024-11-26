@@ -16,6 +16,7 @@ pub(crate) enum GameType {
     #[default]
     Poker,
     Narrative,
+    CardShop,
 }
 
 #[derive(Resource, Default)]
@@ -41,6 +42,9 @@ pub(crate) struct GameState {
 
 #[derive(Event)]
 pub(crate) struct EventStartPokerGame {}
+
+#[derive(Event)]
+pub(crate) struct EventStartNarrativeCardShop {}
 
 #[derive(Event)]
 pub(crate) enum EventStartNarrativeGame {
@@ -306,9 +310,9 @@ pub(crate) fn handle_start_poker_game(
                         player: 1,
                     },
                     Name::new(format!("Play Area {} {}", i, j)),
-                    On::<Pointer<Over>>::send_event::<CardPositionHover>(),
-                    On::<Pointer<Down>>::send_event::<CardPositionPress>(),
-                    On::<Pointer<Out>>::send_event::<CardPositionOut>(),
+                    On::<Pointer<Over>>::send_event::<EventCardPositionHover>(),
+                    On::<Pointer<Down>>::send_event::<EventCardPositionPress>(),
+                    On::<Pointer<Out>>::send_event::<EventCardPositionOut>(),
                 ));
             }
         }
@@ -317,6 +321,66 @@ pub(crate) fn handle_start_poker_game(
             marker: 1,
             deck: load_poker_deck(),
         });
+    }
+}
+
+pub(crate) fn handle_start_card_shop(
+    mut commands: Commands,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut game_state: ResMut<GameState>,
+    mut er_start_card_shop: EventReader<EventStartNarrativeCardShop>,
+    // mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
+) {
+    for _ in er_start_card_shop.read() {
+        game_state.game_type = GameType::CardShop;
+
+        commands.spawn((
+            PbrBundle {
+                mesh: meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10)),
+                material: materials.add(Color::BLACK),
+                transform: Transform::from_translation(Vec3::new(11.0, 0.0, -3.0))
+                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
+                visibility: Visibility::Hidden,
+                ..default()
+            },
+            DeckArea { marker: 2 },
+            Name::new("Deck -- Bought Cards"),
+        ));
+
+        // Play Area
+        for i in 0..5 {
+            for j in 0..5 {
+                let material = materials.add(Color::srgb_u8(124, 144, 255));
+
+                commands.spawn((
+                    PbrBundle {
+                        mesh: meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10)),
+                        material,
+                        transform: Transform::from_translation(Vec3::new(
+                            -6.0 + 2.6 * (i as f32),
+                            0.0,
+                            6.0 - 3.6 * (j as f32),
+                        )),
+                        visibility: Visibility::Visible,
+                        ..default()
+                    },
+                    PlayArea {
+                        marker: i * 5 + j,
+                        player: 1,
+                    },
+                    Name::new(format!("Play Area {} {}", i, j)),
+                    // On::<Pointer<Over>>::send_event::<EventCardPositionHover>(),
+                    // On::<Pointer<Down>>::send_event::<EventCardPositionPress>(),
+                    // On::<Pointer<Out>>::send_event::<EventCardPositionOut>(),
+                ));
+            }
+        }
+
+        // ew_render_deck.send(RenderDeck::<VNCard> {
+        //     marker: 1,
+        //     deck: load_poker_deck(),
+        // });
     }
 }
 

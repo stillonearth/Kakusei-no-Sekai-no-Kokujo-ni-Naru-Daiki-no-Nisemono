@@ -440,6 +440,7 @@ pub fn handle_ui_buttons(
                             player: 1,
                         });
                     }
+                    GameType::CardShop => {}
                 }
             }
             Interaction::Hovered => {

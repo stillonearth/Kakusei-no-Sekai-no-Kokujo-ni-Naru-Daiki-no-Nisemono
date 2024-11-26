@@ -22,14 +22,15 @@ struct NarrativeCard {
     genre: String,
     effect: String,
     flavor_text: String,
+    price: u16,
 }
 
 #[derive(Clone, Debug)]
 pub(crate) enum VNCardMetadata {
     // value, suit
     Poker(u8, String),
-    // index, card_type, genre, name, effect
-    Narrative(usize, String, String, String, String),
+    // index, card_type, genre, name, effect, price
+    Narrative(usize, String, String, String, String, u16),
 }
 
 impl Default for VNCardMetadata {
@@ -54,29 +55,36 @@ impl VNCardMetadata {
     }
 
     pub(crate) fn card_type(&self) -> Option<String> {
-        if let VNCardMetadata::Narrative(_index, card_type, _genre, _name, _effect) = self {
+        if let VNCardMetadata::Narrative(_index, card_type, _genre, _name, _effect, _price) = self {
             return Some(card_type.clone());
         }
         None
     }
 
     pub(crate) fn genre(&self) -> Option<String> {
-        if let VNCardMetadata::Narrative(_index, _card_type, genre, _name, _effect) = self {
+        if let VNCardMetadata::Narrative(_index, _card_type, genre, _name, _effect, _price) = self {
             return Some(genre.clone());
         }
         None
     }
 
     pub(crate) fn effect(&self) -> Option<String> {
-        if let VNCardMetadata::Narrative(_index, _card_type, _genre, _name, effect) = self {
+        if let VNCardMetadata::Narrative(_index, _card_type, _genre, _name, effect, _price) = self {
             return Some(effect.clone());
         }
         None
     }
 
     pub(crate) fn name(&self) -> Option<String> {
-        if let VNCardMetadata::Narrative(_index, _card_type, _genre, name, _effect) = self {
+        if let VNCardMetadata::Narrative(_index, _card_type, _genre, name, _effect, _price) = self {
             return Some(name.clone());
+        }
+        None
+    }
+
+    pub(crate) fn price(&self) -> Option<u16> {
+        if let VNCardMetadata::Narrative(_index, _card_type, _genre, _name, _effect, price) = self {
+            return Some(price.clone());
         }
         None
     }
@@ -204,6 +212,7 @@ pub(crate) fn load_narrative_deck() -> Result<Vec<VNCard>> {
                 narrative_card.genre.clone(),
                 narrative_card.name.clone(),
                 narrative_card.effect.clone(),
+                narrative_card.price.clone(),
             ),
         });
     }
@@ -215,21 +224,22 @@ fn load_narrative_cards_by_type(tp: String) -> Result<Vec<VNCard>> {
     let narrative_deck = load_narrative_deck()?;
     let cards: Vec<VNCard> = narrative_deck
         .iter()
-        .filter(|card| card.metadata.card_type().unwrap_or_default() == tp).cloned()
+        .filter(|card| card.metadata.card_type().unwrap_or_default() == tp)
+        .cloned()
         .collect();
     Ok(cards)
 }
 
 pub fn load_narrative_setting_deck() -> Result<Vec<VNCard>> {
-    load_narrative_cards_by_type("Setting".to_string())
+    load_narrative_cards_by_type("setting".to_string())
 }
 
 pub fn load_narrative_plot_twist_deck() -> Result<Vec<VNCard>> {
-    load_narrative_cards_by_type("Plot Twist".to_string())
+    load_narrative_cards_by_type("plot twist".to_string())
 }
 
 pub fn load_narrative_conflict_deck() -> Result<Vec<VNCard>> {
-    load_narrative_cards_by_type("Conflict".to_string())
+    load_narrative_cards_by_type("conflict".to_string())
 }
 
 impl CardMetadata for VNCard {
@@ -242,7 +252,7 @@ impl CardMetadata for VNCard {
     fn back_image_filename(&self) -> String {
         match self.metadata {
             VNCardMetadata::Poker(_, _) => "poker-cards/Back_1.png".into(),
-            VNCardMetadata::Narrative(_, _, _, _, _) => "poker-cards/Back_2.png".into(),
+            VNCardMetadata::Narrative(_, _, _, _, _, _) => "poker-cards/Back_2.png".into(),
         }
     }
 }

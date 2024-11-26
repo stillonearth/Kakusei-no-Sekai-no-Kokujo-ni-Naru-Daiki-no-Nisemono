@@ -42,6 +42,9 @@ fn main() {
         .add_systems(
             Update,
             (
+                handle_card_position_hover,
+                handle_card_position_out,
+                handle_card_position_press,
                 handle_card_press,
                 handle_deck_rendered_card_game,
                 handle_deck_rendered_card_ui,
@@ -52,14 +55,12 @@ fn main() {
                 handle_new_vn_node,
                 handle_play_hand_effect,
                 handle_play_hand,
+                handle_start_card_shop,
                 handle_start_narrative_game,
                 handle_start_poker_game,
                 handle_text_2_image_response,
                 handle_ui_buttons,
                 handle_ui_update_game_state,
-                handle_card_position_hover,
-                handle_card_position_out,
-                handle_card_position_press,
             ),
         )
         // Plugin Settings
@@ -67,16 +68,17 @@ fn main() {
             assets_path: "plot".to_string(),
         })
         // Events
+        .add_event::<EventCardPositionHover>()
+        .add_event::<EventCardPositionOut>()
+        .add_event::<EventCardPositionPress>()
         .add_event::<EventEndCardGame>()
         .add_event::<EventHideUIOverlay>()
         .add_event::<EventPlayPokerHand>()
         .add_event::<EventPlayPokerHandEffect>()
         .add_event::<EventStartNarrativeGame>()
         .add_event::<EventStartPokerGame>()
+        .add_event::<EventStartNarrativeCardShop>()
         .add_event::<EventUpdateGameStateUI>()
-        .add_event::<CardPositionHover>()
-        .add_event::<CardPositionOut>()
-        .add_event::<CardPositionPress>()
         // Resources
         .insert_resource(GameState {
             max_n_poker_draws: 25,

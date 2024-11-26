@@ -9,46 +9,46 @@ use pecs::prelude::*;
 use crate::{cards_game::VNCard, GameState};
 
 #[derive(Event)]
-pub struct CardPositionHover {
+pub struct EventCardPositionHover {
     pub entity: Entity,
 }
 
-impl From<ListenerInput<Pointer<Over>>> for CardPositionHover {
+impl From<ListenerInput<Pointer<Over>>> for EventCardPositionHover {
     fn from(event: ListenerInput<Pointer<Over>>) -> Self {
-        CardPositionHover {
+        EventCardPositionHover {
             entity: event.target,
         }
     }
 }
 
 #[derive(Event)]
-pub struct CardPositionOut {
+pub struct EventCardPositionOut {
     pub entity: Entity,
 }
 
-impl From<ListenerInput<Pointer<Out>>> for CardPositionOut {
+impl From<ListenerInput<Pointer<Out>>> for EventCardPositionOut {
     fn from(event: ListenerInput<Pointer<Out>>) -> Self {
-        CardPositionOut {
+        EventCardPositionOut {
             entity: event.target,
         }
     }
 }
 
 #[derive(Event)]
-pub struct CardPositionPress {
+pub struct EventCardPositionPress {
     pub entity: Entity,
 }
 
-impl From<ListenerInput<Pointer<Down>>> for CardPositionPress {
+impl From<ListenerInput<Pointer<Down>>> for EventCardPositionPress {
     fn from(event: ListenerInput<Pointer<Down>>) -> Self {
-        CardPositionPress {
+        EventCardPositionPress {
             entity: event.target,
         }
     }
 }
 // Event Handlers
 pub fn handle_card_position_hover(
-    mut hover: EventReader<CardPositionHover>,
+    mut hover: EventReader<EventCardPositionHover>,
     mut query: Query<(Entity, &mut Handle<StandardMaterial>, &PlayArea)>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
@@ -60,7 +60,7 @@ pub fn handle_card_position_hover(
 }
 
 pub fn handle_card_position_out(
-    mut hover: EventReader<CardPositionOut>,
+    mut hover: EventReader<EventCardPositionOut>,
     mut query: Query<(Entity, &mut Handle<StandardMaterial>, &PlayArea)>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
@@ -74,7 +74,7 @@ pub fn handle_card_position_out(
 pub fn handle_card_position_press(
     mut commands: Commands,
     game_state: ResMut<GameState>,
-    mut card_position_press: EventReader<CardPositionPress>,
+    mut card_position_press: EventReader<EventCardPositionPress>,
     mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
     q_cards_in_hand: Query<(Entity, &Card<VNCard>, &Hand)>,
     mut q_play_areas: Query<(Entity, &mut Visibility, &PlayArea)>,
@@ -117,28 +117,3 @@ pub fn handle_card_position_press(
         }
     }
 }
-
-// pub fn handle_card_out<T>(
-//     mut commands: Commands,
-//     mut out: EventReader<CardOut>,
-//     mut query: Query<(Entity, &Card<T>, &Hand, &mut Transform)>,
-// ) where
-//     T: Send + Sync + Debug + 'static,
-// {
-//     out.read().for_each(|hover| {
-//         if let Ok((_, card, _, transform)) = query.get_mut(hover.entity) {
-//             if card.pickable && card.transform.is_some() {
-//                 let tween = Tween::new(
-//                     EaseFunction::QuadraticIn,
-//                     Duration::from_millis(300),
-//                     TransformPositionLens {
-//                         start: transform.translation,
-//                         end: card.transform.unwrap().translation,
-//                     },
-//                 );
-
-//                 commands.entity(hover.entity).insert(Animator::new(tween));
-//             }
-//         }
-//     });
-// }

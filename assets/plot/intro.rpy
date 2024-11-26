@@ -5,7 +5,11 @@ label start:
 
 label chapter1_1:
 
+    # game_mechanic "card shop"
+    # game_mechanic "card play poker"
     game_mechanic "card play narrative setting"
+    # game_mechanic "card play poker"
+    # game_mechanic "card play narrative plot twist"
 
     # scene intro_2
 

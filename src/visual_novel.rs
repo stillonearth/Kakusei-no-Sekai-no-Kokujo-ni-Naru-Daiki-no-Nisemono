@@ -9,7 +9,7 @@ use uuid::Uuid;
 use crate::{
     llm::*,
     text2img::{EventText2ImageRequest, EventText2ImageResponse},
-    EventStartNarrativeGame, EventStartPokerGame, GameState,
+    EventStartNarrativeCardShop, EventStartNarrativeGame, EventStartPokerGame, GameState,
 };
 
 const PROMPT: &str = "You are narrator in a visual novel. Create a script for visual novel based on this setting. Respond only with story sentences. Do not include any instructions or explanations. Respond with at least 20 sentences each separated with new line. Each sentence no longer 10 words.";
@@ -20,7 +20,6 @@ pub(crate) fn start_visual_novel(mut ew_start_scenario: EventWriter<EventStartSc
 
     if result.is_err() {
         panic!("{:?}", result.err());
-        return;
     }
 
     let (ast, _) = result.unwrap();
@@ -111,6 +110,7 @@ pub(crate) fn handle_new_vn_node(
     // mut ew_draw: EventWriter<DrawHand>,
     mut ew_start_poker_game: EventWriter<EventStartPokerGame>,
     mut ew_start_narrative_game: EventWriter<EventStartNarrativeGame>,
+    mut ew_start_narrative_card_shop: EventWriter<EventStartNarrativeCardShop>,
 ) {
     for event in er_handle_node.read() {
         game_state.n_vn_node = event.ast.index();
@@ -165,6 +165,10 @@ pub(crate) fn handle_new_vn_node(
 
             if mechanic == "card play narrative plot twist" {
                 ew_start_narrative_game.send(EventStartNarrativeGame::PlotTwist);
+            }
+
+            if mechanic == "card shop" {
+                ew_start_narrative_card_shop.send(EventStartNarrativeCardShop {});
             }
         }
     }
