@@ -8,6 +8,7 @@ mod llm;
 mod text2img;
 mod visual_novel;
 
+use bevy::asset::AssetMetaCheck;
 use bevy_wasm_tasks::*;
 
 use bevy::{input::common_conditions::input_toggle_active, prelude::*};
@@ -30,7 +31,19 @@ fn main() {
     App::new()
         .add_plugins(())
         .add_plugins((
-            DefaultPlugins.set(ImagePlugin::default_nearest()),
+            DefaultPlugins
+                .set(ImagePlugin::default_nearest())
+                .set(AssetPlugin {
+                    meta_check: AssetMetaCheck::Never,
+                    ..default()
+                })
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        canvas: Some("#bevy".to_string()),
+                        ..default()
+                    }),
+                    ..default()
+                }),
             AsyncPlugin::default_settings(),
             JsonAssetPlugin::<NarrativeCards>::new(&["json"]),
             LaMesaPlugin::<cards_game::VNCard>::default(),
