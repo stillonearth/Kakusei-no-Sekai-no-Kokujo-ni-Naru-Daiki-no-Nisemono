@@ -7,3 +7,5 @@
 A visual novel / poker-themed rouglike with LLM-generated narrative.
 
 Built with bevy on Rust.
+
+## todo: event handlers card shop

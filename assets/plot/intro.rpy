@@ -5,51 +5,38 @@ label start:
 
 label chapter1_1:
 
-    game_mechanic "card shop"
-    # game_mechanic "card play poker"
-    # game_mechanic "card play narrative setting"
-    # game_mechanic "card play poker"
-    # game_mechanic "card play narrative plot twist"
+    "PRESS SPACE"
 
-    # scene intro_2
+    scene intro_2
+    game_mechanic "card play poker"
+    # game_mechanic "card shop"
 
-    # "This world has lost all meaning."
-    # "All narratives are gone."
-    # "I am here to fix this world."
+    "This world has lost all meaning."
+    "All narratives are gone."
+    "I am here to fix this world."
 
-    # scene intro_2
-    # show character igor
+    scene intro_4
 
-    # igor "My name is Igor."
-    # igor "I am storyteller that willguide you through this journey."
-    # igor "Choose your destiny."
+    "Play Poker Solitaire to earn score."
+    "Each turn you place one card on any free place on table."
+    "Your goal is to maximize score by making poker combinations."
 
-    # scene intro_3
+    "You can spend your score to buy action cards."
+    "There is 3 types of action cards that affect story narrative."
+    "Setting, Plot Twist and Conflict"
 
-    # game_mechanic "card play narrative setting"
+    game_mechanic "card play narrative setting"
 
-    # llm_generate storyteller "{PROMPT} Setting of novel is: ```{SETTING}```."
+    llm_generate storyteller "{PROMPT} Setting of novel is: ```{SETTING}```."
 
-    # game_mechanic "card play narrative conflict"
+    game_mechanic "card play narrative conflict"
 
-    # llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a conflict: ```{CONFLICT}```."
+    llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a conflict: ```{CONFLICT}```."
 
-    # game_mechanic "card play narrative plot twist"
+    game_mechanic "card play narrative plot twist"
 
-    # llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a plot twist: ```{PLOT TWIST}```."
+    llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a plot twist: ```{PLOT TWIST}```."
 
-    # game_mechanic "card play narrative plot twist"
+    llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a plot twist: ```{PLOT TWIST}```."
 
-    # "So you want to listen a story about alien invasion?"
-    # "Or maybe you prefer a story about love?"
-    # "Or maybe a political thriller set in fantasy world."
-
-    # show character igor
-
-    # igor "You need to draw poker combinations to earn points."
-    # igor "Exchnage points to narrative cards."
-    # igor "Shape the narrative."
-
-    # scene intro_4
-
-    # game_mechanic "card play poker"
+    llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a plot twist: ```{PLOT TWIST}```."

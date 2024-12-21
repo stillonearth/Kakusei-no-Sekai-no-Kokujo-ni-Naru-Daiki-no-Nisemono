@@ -1,10 +1,9 @@
 use bevy::prelude::*;
 
 use anyhow::Result;
-use bevy_tokio_tasks::TokioTasksRuntime;
+use bevy_wasm_tasks::*;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-
 
 const API_ENDPOINT: &str = "http://167.88.162.83/api";
 
@@ -48,17 +47,43 @@ impl Plugin for LLMPlugin {
     }
 }
 
-fn handle_llm_request(
-    mut er_llm_request: EventReader<EventLLMRequest>,
-    runtime: ResMut<TokioTasksRuntime>,
-) {
+fn handle_llm_request(mut er_llm_request: EventReader<EventLLMRequest>, tasks: Tasks) {
     for er in er_llm_request.read() {
         let prompt = er.prompt.clone();
         let who = er.who.clone();
         let request_type = er.request_type;
 
-        runtime.spawn_background_task(move |mut ctx| async move {
-            let llm_request = LLMRequest { prompt };
+        // TODO: DEDUP
+        #[cfg(not(target_arch = "wasm32"))]
+        tasks.spawn_tokio(move |ctx| async move {
+            let llm_request = LLMRequest {
+                prompt: prompt.clone(),
+            };
+
+            let llm_response = api_llm_request(llm_request).await;
+
+            if llm_response.is_ok() {
+                let llm_response = llm_response.unwrap();
+                ctx.run_on_main_thread(move |ctx| {
+                    let event_response = EventLLMResponse {
+                        response: llm_response.clone(),
+                        who: who.clone(),
+                        request_type,
+                    };
+                    let world: &mut World = ctx.world;
+                    world.send_event(event_response);
+                })
+                .await;
+            } else {
+                panic!("error: {}", llm_response.err().unwrap());
+            }
+        });
+        #[cfg(target_arch = "wasm32")]
+        tasks.spawn_wasm(move |ctx| async move {
+            let llm_request = LLMRequest {
+                prompt: prompt.clone(),
+            };
+
             let llm_response = api_llm_request(llm_request).await;
 
             if llm_response.is_ok() {

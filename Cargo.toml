@@ -1,12 +1,12 @@
 [package]
-name = "vn_poker_llm"
+name = "kakuseinosekainokokujoninarudaikinonisemono"
 version = "0.0.1"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-anyhow = "1.0.93"
-bevy = { version = "0.14", default-features = false, features = [
+anyhow = "1.0"
+bevy = { version = "0.15", default-features = false, features = [
     "animation",
     "bevy_asset",
     "bevy_color",
@@ -33,21 +33,27 @@ bevy = { version = "0.14", default-features = false, features = [
     "webgl2",
     "x11",
 ] }
-bevy_la_mesa = { path="../bevy_la_mesa" }
-bevy_lunex = { version = "0.2.4" }
-bevy_mod_picking = "0.20"
-bevy_novel = { path="../bevy_novel"}
-bevy_tweening = "0.11"
-bevy-inspector-egui = "0.27.0"
-bevy-tokio-tasks = "=0.14.0"
-image = "0.25.5"
-pecs = { git="https://github.com/stillonearth/pecs.git", rev ="97879f3" }
+bevy_asset_loader = "0.22"
+bevy_common_assets = {version="0.12.0", features = ["json"]}
+bevy_defer = "0.13"
+bevy_la_mesa = { path = "../bevy_la_mesa" }
+bevy_novel = { path = "../bevy_novel" }
+bevy_tweening = "0.12"
+bevy-inspector-egui = "0.28"
+image = "0.25"
 rand = "0.8"
-renpy_parser = "0.0.6"
+renpy_parser = "0.0.9"
 reqwest = "0.12.9"
-serde = "1.0.215"
-serde_json = "1.0.133"
+serde = "1.0"
+serde_json = "1.0"
 url = "2.5.4"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+bevy-wasm-tasks = {git="https://github.com/stillonearth/bevy-wasm-tasks.git", rev="09060af", features=["tokio"]}
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+bevy-wasm-tasks = {git="https://github.com/stillonearth/bevy-wasm-tasks.git", rev="09060af", features=["wasm"]}
+
 
 [dependencies.uuid]
 version = "1.11.0"

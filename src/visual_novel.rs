@@ -1,29 +1,58 @@
 use bevy::prelude::*;
 use bevy_novel::{
-    events::{EventHandleNode, EventStartScenario, EventSwitchNextNode},
+    events::{EventHandleNode, EventHideTextNode, EventStartScenario, EventSwitchNextNode},
+    rpy_asset_loader::Rpy,
     NovelData, NovelSettings,
 };
-use renpy_parser::{parse_scenario, parsers::AST};
+use renpy_parser::parsers::AST;
 use uuid::Uuid;
 
 use crate::{
+    cards_game::{filter_initial_narrative_cards, NarrativeCards, VNCard, VNCardMetadata},
     llm::*,
     text2img::{EventText2ImageRequest, EventText2ImageResponse},
-    EventStartNarrativeCardShop, EventStartNarrativeGame, EventStartPokerGame, GameState,
+    AppState, EventStartNarrativeCardShop, EventStartNarrativeGame, EventStartPokerGame, GameState,
+    NarrativeCardsHandle, ScenarioHandle,
 };
 
 const PROMPT: &str = "You are narrator in a visual novel. Create a script for visual novel based on this setting. Respond only with story sentences. Do not include any instructions or explanations. Respond with at least 20 sentences each separated with new line. Each sentence no longer 10 words.";
 
-pub(crate) fn start_visual_novel(mut ew_start_scenario: EventWriter<EventStartScenario>) {
-    let path = "assets/plot/intro.rpy";
-    let result = parse_scenario(path);
+pub fn start_visual_novel(
+    mut ew_start_scenario: EventWriter<EventStartScenario>,
+    scenario_handle: Res<ScenarioHandle>,
+    rpy_assets: Res<Assets<Rpy>>,
+    narrative_cards_handle: Res<NarrativeCardsHandle>,
+    narrative_cards_assets: Res<Assets<NarrativeCards>>,
+    mut app_state: ResMut<NextState<AppState>>,
+    mut game_state: ResMut<GameState>,
+) {
+    if let Some(rpy) = rpy_assets.get(scenario_handle.id())
+        && let Some(narrative_cards) = narrative_cards_assets.get(narrative_cards_handle.id())
+    {
+        ew_start_scenario.send(EventStartScenario { ast: rpy.0.clone() });
 
-    if result.is_err() {
-        panic!("{:?}", result.err());
+        let mut deck: Vec<VNCard> = vec![];
+        for (i, narrative_card) in narrative_cards.iter().enumerate() {
+            if i > 39 {
+                break;
+            }
+            deck.push(VNCard {
+                filename: format!("narrative-cards/card-{}.png", i + 1),
+                metadata: VNCardMetadata::Narrative(
+                    i + 1,
+                    narrative_card.card_type.clone(),
+                    narrative_card.genre.clone(),
+                    narrative_card.name.clone(),
+                    narrative_card.effect.clone(),
+                    narrative_card.price,
+                ),
+            });
+        }
+
+        game_state.game_deck = deck.clone();
+        game_state.collected_deck = filter_initial_narrative_cards(deck.clone());
+        app_state.set(AppState::Novel);
     }
-
-    let (ast, _) = result.unwrap();
-    ew_start_scenario.send(EventStartScenario { ast });
 }
 
 pub(crate) fn handle_text_2_image_response(
@@ -51,10 +80,10 @@ pub(crate) fn handle_text_2_image_response(
 
 pub(crate) fn handle_llm_response(
     mut game_state: ResMut<GameState>,
+    mut novel_settings: ResMut<NovelSettings>,
     mut novel_data: ResMut<NovelData>,
     mut er_llm_response: EventReader<EventLLMResponse>,
     mut ew_llm_request: EventWriter<EventLLMRequest>,
-    // mut ew_switch_next_node: EventWriter<EventSwitchNextNode>,
     mut ew_text_2_image_reqeust: EventWriter<EventText2ImageRequest>,
 ) {
     for event in er_llm_response.read() {
@@ -76,10 +105,18 @@ pub(crate) fn handle_llm_response(
                         sentence.clone(),
                         game_state.n_vn_node + 1 + i,
                     );
+
+                    novel_settings.pause_handle_switch_node = false;
                 }
 
                 let text_2_image_prompt = format!(
-                    "Create prompt for text-to-image model based short story. Respond only with one prompt. Do not include any explanations. Story:`{}`",
+                    r#"
+                    Create prompt for text-to-image model based short story. 
+                    Respond only with one prompt. 
+                    Do not include any explanations. 
+                    THEME OF STORY: SECRETS.
+                    Story:`{}`
+                    "#,
                     sentences.join(" ")
                 );
 
@@ -104,26 +141,26 @@ pub(crate) fn handle_llm_response(
 pub(crate) fn handle_new_vn_node(
     mut novel_data: ResMut<NovelData>,
     mut game_state: ResMut<GameState>,
+    mut novel_settings: ResMut<NovelSettings>,
     mut ew_switch_next_node: EventWriter<EventSwitchNextNode>,
     mut er_handle_node: EventReader<EventHandleNode>,
     mut ew_llm_request: EventWriter<EventLLMRequest>,
-    // mut ew_draw: EventWriter<DrawHand>,
     mut ew_start_poker_game: EventWriter<EventStartPokerGame>,
     mut ew_start_narrative_game: EventWriter<EventStartNarrativeGame>,
     mut ew_start_narrative_card_shop: EventWriter<EventStartNarrativeCardShop>,
+    mut ew_hide_vn_text_node: EventWriter<EventHideTextNode>,
 ) {
     for event in er_handle_node.read() {
         game_state.n_vn_node = event.ast.index();
 
         if let AST::LLMGenerate(_, who, prompt) = event.ast.clone() {
-            // when sending llm request indicate user that
-
             novel_data.push_text_node(
-                Some("AI".to_string()),
+                Some("".to_string()),
                 "...".to_string(),
                 game_state.n_vn_node + 1,
             );
             ew_switch_next_node.send(EventSwitchNextNode {});
+            novel_settings.pause_handle_switch_node = true;
 
             let prompt = prompt
                 .unwrap()
@@ -136,7 +173,7 @@ pub(crate) fn handle_new_vn_node(
                         .collect::<Vec<String>>()
                         .join(", "),
                 )
-                .replace("{SCORE}", &game_state.poker_score.to_string())
+                .replace("{SCORE}", &game_state.score.to_string())
                 .replace("{SETTING}", &game_state.narrative_settings.join(" "))
                 .replace("{PLOT TWIST}", &game_state.narrative_plot_twists.join(" "))
                 .replace("{CONFLICT}", &game_state.narrative_conflicts.join(" "))
@@ -148,9 +185,14 @@ pub(crate) fn handle_new_vn_node(
                 who: Some(who),
                 request_type: LLMRequestType::Story,
             });
+        } else {
+            novel_settings.pause_handle_switch_node = false;
         }
 
         if let AST::GameMechanic(_, mechanic) = event.ast.clone() {
+            ew_hide_vn_text_node.send(EventHideTextNode {});
+            novel_settings.pause_handle_switch_node = true;
+
             if mechanic == "card play poker" {
                 ew_start_poker_game.send(EventStartPokerGame {});
             }

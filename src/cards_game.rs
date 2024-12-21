@@ -1,9 +1,10 @@
 use std::cmp::Ordering;
 use std::fmt;
-use std::fs::File;
-use std::io::Read;
 
 use anyhow::Result;
+use bevy::asset::Asset;
+use bevy::prelude::{Deref, DerefMut};
+use bevy::reflect::TypePath;
 use bevy::render::render_resource::encase::rts_array::Length;
 use bevy::utils::HashMap;
 use bevy_la_mesa::CardMetadata;
@@ -15,16 +16,21 @@ pub(crate) struct VNCard {
     pub(crate) metadata: VNCardMetadata,
 }
 
-#[derive(Deserialize)]
-struct NarrativeCard {
-    name: String,
-    card_type: String,
-    genre: String,
-    effect: String,
-    flavor_text: String,
-    price: u16,
+#[allow(dead_code)]
+#[derive(Deserialize, Clone)]
+pub struct NarrativeCard {
+    pub name: String,
+    pub card_type: String,
+    pub genre: String,
+    pub effect: String,
+    pub flavor_text: String,
+    pub price: u16,
 }
 
+#[derive(Deserialize, Asset, TypePath, Deref, DerefMut)]
+pub struct NarrativeCards(pub Vec<NarrativeCard>);
+
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub(crate) enum VNCardMetadata {
     // value, suit
@@ -39,6 +45,7 @@ impl Default for VNCardMetadata {
     }
 }
 
+#[allow(dead_code)]
 impl VNCardMetadata {
     pub(crate) fn suit(&self) -> Option<String> {
         if let VNCardMetadata::Poker(_, suit) = self {
@@ -84,7 +91,7 @@ impl VNCardMetadata {
 
     pub(crate) fn price(&self) -> Option<u16> {
         if let VNCardMetadata::Narrative(_index, _card_type, _genre, _name, _effect, price) = self {
-            return Some(price.clone());
+            return Some(*price);
         }
         None
     }
@@ -193,36 +200,15 @@ pub(crate) fn load_poker_deck() -> Vec<VNCard> {
     deck
 }
 
-#[allow(clippy::vec_init_then_push)]
-pub(crate) fn load_narrative_deck() -> Result<Vec<VNCard>> {
-    let mut deck: Vec<VNCard> = vec![];
-
-    let mut file = File::open("assets/narrative-cards/cards.json")?;
-    let mut data = String::new();
-    file.read_to_string(&mut data)?;
-
-    let narrative_cards: Vec<NarrativeCard> = serde_json::from_str(&data)?;
-
-    for (i, narrative_card) in narrative_cards.iter().enumerate() {
-        deck.push(VNCard {
-            filename: format!("narrative-cards/card-{}.png", i + 1),
-            metadata: VNCardMetadata::Narrative(
-                i + 1,
-                narrative_card.card_type.clone(),
-                narrative_card.genre.clone(),
-                narrative_card.name.clone(),
-                narrative_card.effect.clone(),
-                narrative_card.price.clone(),
-            ),
-        });
-    }
-
-    Ok(deck)
+pub(crate) fn filter_initial_narrative_cards(deck: Vec<VNCard>) -> Vec<VNCard> {
+    deck.iter()
+        .filter(|card| card.metadata.price().unwrap_or_default() <= 30)
+        .cloned()
+        .collect()
 }
 
-fn load_narrative_cards_by_type(tp: String) -> Result<Vec<VNCard>> {
-    let narrative_deck = load_narrative_deck()?;
-    let cards: Vec<VNCard> = narrative_deck
+fn filter_narrative_cards_by_type(deck: Vec<VNCard>, tp: String) -> Result<Vec<VNCard>> {
+    let cards: Vec<VNCard> = deck
         .iter()
         .filter(|card| card.metadata.card_type().unwrap_or_default() == tp)
         .cloned()
@@ -230,16 +216,16 @@ fn load_narrative_cards_by_type(tp: String) -> Result<Vec<VNCard>> {
     Ok(cards)
 }
 
-pub fn load_narrative_setting_deck() -> Result<Vec<VNCard>> {
-    load_narrative_cards_by_type("setting".to_string())
+pub fn filer_narrative_setting_deck(deck: Vec<VNCard>) -> Result<Vec<VNCard>> {
+    filter_narrative_cards_by_type(deck, "setting".to_string())
 }
 
-pub fn load_narrative_plot_twist_deck() -> Result<Vec<VNCard>> {
-    load_narrative_cards_by_type("plot twist".to_string())
+pub fn filter_narrative_plot_twist_deck(deck: Vec<VNCard>) -> Result<Vec<VNCard>> {
+    filter_narrative_cards_by_type(deck, "plot twist".to_string())
 }
 
-pub fn load_narrative_conflict_deck() -> Result<Vec<VNCard>> {
-    load_narrative_cards_by_type("conflict".to_string())
+pub fn filter_narrative_conflict_deck(deck: Vec<VNCard>) -> Result<Vec<VNCard>> {
+    filter_narrative_cards_by_type(deck, "conflict".to_string())
 }
 
 impl CardMetadata for VNCard {
