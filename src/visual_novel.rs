@@ -1,9 +1,15 @@
-use bevy::prelude::*;
+use bevy::{
+    asset::RenderAssetUsages,
+    image::ImageType,
+    prelude::*,
+    render::render_resource::{Extent3d, TextureDimension, TextureFormat},
+};
 use bevy_novel::{
     events::{EventHandleNode, EventHideTextNode, EventStartScenario, EventSwitchNextNode},
     rpy_asset_loader::Rpy,
     NovelData, NovelSettings,
 };
+use image::DynamicImage;
 use renpy_parser::parsers::AST;
 use uuid::Uuid;
 
@@ -57,23 +63,36 @@ pub fn start_visual_novel(
 
 pub(crate) fn handle_text_2_image_response(
     novel_settings: Res<NovelSettings>,
-    game_state: Res<GameState>,
+    mut game_state: ResMut<GameState>,
     mut novel_data: ResMut<NovelData>,
     mut ew_switch_next_node: EventWriter<EventSwitchNextNode>,
     mut er_text_2_image_response: EventReader<EventText2ImageResponse>,
+    mut textures: ResMut<Assets<Image>>,
 ) {
     for event in er_text_2_image_response.read() {
         let image_name = Uuid::new_v4().to_string();
+        let dynamic_image: DynamicImage = event.image.clone();
+        let rgba_image = dynamic_image.to_rgba8();
+        let texture = Image::new_fill(
+            Extent3d {
+                width: rgba_image.width(),
+                height: rgba_image.height(),
+                depth_or_array_layers: 1,
+            },
+            TextureDimension::D2,
+            &rgba_image,
+            TextureFormat::Rgba8UnormSrgb,
+            RenderAssetUsages::all(),
+        );
 
-        event
-            .image
-            .save(format!(
-                "assets/{}/{}.png",
-                novel_settings.assets_path, image_name
-            ))
-            .unwrap();
+        let texture_handle = textures.add(texture);
+        let sprite = Sprite {
+            image: texture_handle.clone(),
+            ..Default::default()
+        };
 
-        novel_data.push_scene_node(image_name, game_state.n_vn_node_scene_request + 1);
+        novel_data.write_image_cache(image_name.clone(), sprite);
+        novel_data.push_scene_node(image_name.clone(), game_state.n_vn_node_scene_request + 1);
         ew_switch_next_node.send(EventSwitchNextNode {});
     }
 }
