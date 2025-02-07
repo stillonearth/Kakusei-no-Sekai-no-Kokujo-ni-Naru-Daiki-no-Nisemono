@@ -9,6 +9,8 @@ mod text2img;
 mod visual_novel;
 
 use bevy::asset::AssetMetaCheck;
+use bevy::color::palettes::css::ORANGE_RED;
+use bevy::color::palettes::css::WHITE;
 use bevy_wasm_tasks::*;
 
 use bevy::{input::common_conditions::input_toggle_active, prelude::*};
@@ -145,15 +147,10 @@ fn setup_camera_and_light(mut commands: Commands) {
         Transform::from_xyz(0.0, 18.2, 11.9).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
-    commands.spawn((
-        Name::new("Light"),
-        PointLight {
-            shadows_enabled: false,
-            intensity: 5000000.0,
-            ..default()
-        },
-        Transform::from_translation(Vec3::new(-0.5, 2.0, -2.5)),
-    ));
+    commands.insert_resource(AmbientLight {
+        color: WHITE.into(),
+        brightness: 1000.0,
+    });
 }
 
 // Initialization

@@ -39,7 +39,7 @@ pub fn start_visual_novel(
 
         let mut deck: Vec<VNCard> = vec![];
         for (i, narrative_card) in narrative_cards.iter().enumerate() {
-            if i > 39 {
+            if i > 63 {
                 break;
             }
             deck.push(VNCard {
