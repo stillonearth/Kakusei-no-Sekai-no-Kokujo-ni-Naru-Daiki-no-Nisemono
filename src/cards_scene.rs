@@ -1,4 +1,3 @@
-use std::time::Duration;
 
 use crate::cards_game::*;
 use crate::cards_ui::*;
@@ -335,25 +334,29 @@ pub(crate) fn handle_start_poker_game(
         game_state.game_type = GameType::Poker;
 
         // Deck
-        commands.spawn((
-            Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
-            MeshMaterial3d(materials.add(Color::BLACK)),
-            Transform::from_translation(Vec3::new(11.0, 0.0, 3.0))
-                .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
-            Visibility::Hidden,
-            DeckArea { marker: 1 },
-            Name::new("Deck 1 -- Play Cards"),
-        ));
+        let deck_play_cards = commands
+            .spawn((
+                Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+                MeshMaterial3d(materials.add(Color::BLACK)),
+                Transform::from_translation(Vec3::new(11.0, 0.0, 3.0))
+                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
+                Visibility::Hidden,
+                DeckArea { marker: 1 },
+                Name::new("Deck 1 -- Play Cards"),
+            ))
+            .id();
 
-        commands.spawn((
-            Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
-            MeshMaterial3d(materials.add(Color::BLACK)),
-            Transform::from_translation(Vec3::new(11.0, 0.0, -3.0))
-                .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
-            Visibility::Hidden,
-            DeckArea { marker: 2 },
-            Name::new("Deck 2 -- Discarded Cards"),
-        ));
+        let _ = commands
+            .spawn((
+                Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+                MeshMaterial3d(materials.add(Color::BLACK)),
+                Transform::from_translation(Vec3::new(11.0, 0.0, -3.0))
+                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
+                Visibility::Hidden,
+                DeckArea { marker: 2 },
+                Name::new("Deck 2 -- Discarded Cards"),
+            ))
+            .id();
 
         // Hand Area -- LaMesa Plugin Draws Cards from deck to Hand
         commands.spawn((
@@ -393,9 +396,8 @@ pub(crate) fn handle_start_poker_game(
         }
 
         ew_render_deck.send(RenderDeck::<VNCard> {
-            marker: 1,
+            deck_entity: deck_play_cards,
             deck: load_poker_deck(),
-            deck_folder: None,
         });
     }
 }
@@ -439,26 +441,30 @@ pub(crate) fn handle_start_card_shop(
         game_state.n_draws = 0;
 
         // Deck 1 - Shop Cards
-        commands.spawn((
-            Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
-            MeshMaterial3d(materials.add(Color::BLACK)),
-            Transform::from_translation(Vec3::new(8.5, 0.0, 0.0))
-                .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
-            Visibility::Hidden,
-            DeckArea { marker: 1 },
-            Name::new("Deck 1 -- Shop Cards"),
-        ));
+        let deck_shop_cards = commands
+            .spawn((
+                Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+                MeshMaterial3d(materials.add(Color::BLACK)),
+                Transform::from_translation(Vec3::new(8.5, 0.0, 0.0))
+                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
+                Visibility::Hidden,
+                DeckArea { marker: 1 },
+                Name::new("Deck 1 -- Shop Cards"),
+            ))
+            .id();
 
         // Deck 2 - All Cards
-        commands.spawn((
-            Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
-            MeshMaterial3d(materials.add(Color::BLACK)),
-            Transform::from_translation(Vec3::new(8.5, 0.0, 0.0))
-                .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
-            Visibility::Hidden,
-            DeckArea { marker: 2 },
-            Name::new("Deck -- Bought Cards"),
-        ));
+        let _ = commands
+            .spawn((
+                Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+                MeshMaterial3d(materials.add(Color::BLACK)),
+                Transform::from_translation(Vec3::new(8.5, 0.0, 0.0))
+                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
+                Visibility::Hidden,
+                DeckArea { marker: 2 },
+                Name::new("Deck -- Bought Cards"),
+            ))
+            .id();
 
         // Play Area
         for i in 0..5 {
@@ -515,9 +521,8 @@ pub(crate) fn handle_start_card_shop(
         }
 
         ew_render_deck.send(RenderDeck::<VNCard> {
-            marker: 1,
+            deck_entity: deck_shop_cards,
             deck,
-            deck_folder: None,
         });
     }
 }
@@ -534,25 +539,29 @@ pub(crate) fn handle_start_narrative_game(
         game_state.game_type = GameType::Narrative;
 
         // Deck
-        commands.spawn((
-            Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
-            MeshMaterial3d(materials.add(Color::BLACK)),
-            Transform::from_translation(Vec3::new(0.0, 0.0, 0.0))
-                .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
-            Visibility::Hidden,
-            DeckArea { marker: 1 },
-            Name::new("Deck 1 -- Play Cards"),
-        ));
+        let deck_play_cards = commands
+            .spawn((
+                Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+                MeshMaterial3d(materials.add(Color::BLACK)),
+                Transform::from_translation(Vec3::new(0.0, 0.0, 0.0))
+                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
+                Visibility::Hidden,
+                DeckArea { marker: 1 },
+                Name::new("Deck 1 -- Play Cards"),
+            ))
+            .id();
 
-        commands.spawn((
-            Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
-            MeshMaterial3d(materials.add(Color::BLACK)),
-            Transform::from_translation(Vec3::new(4.0, 0.0, 0.0))
-                .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
-            Visibility::Hidden,
-            DeckArea { marker: 1 },
-            Name::new("Deck 2 -- Play Cards"),
-        ));
+        let _ = commands
+            .spawn((
+                Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+                MeshMaterial3d(materials.add(Color::BLACK)),
+                Transform::from_translation(Vec3::new(4.0, 0.0, 0.0))
+                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
+                Visibility::Hidden,
+                DeckArea { marker: 1 },
+                Name::new("Deck 2 -- Play Cards"),
+            ))
+            .id();
 
         // Table
         commands.spawn((
@@ -627,26 +636,22 @@ pub(crate) fn handle_start_narrative_game(
         match event {
             EventStartNarrativeGame::Setting => {
                 ew_render_deck.send(RenderDeck::<VNCard> {
-                    deck_folder: None,
-                    marker: 1,
-
+                    deck_entity: deck_play_cards,
                     deck: filer_narrative_setting_deck(game_state.collected_deck.clone()).unwrap(),
                 });
             }
             EventStartNarrativeGame::PlotTwist => {
                 ew_render_deck.send(RenderDeck::<VNCard> {
-                    marker: 1,
+                    deck_entity: deck_play_cards,
                     deck: filter_narrative_plot_twist_deck(game_state.collected_deck.clone())
                         .unwrap(),
-                    deck_folder: None,
                 });
             }
             EventStartNarrativeGame::Conflict => {
                 ew_render_deck.send(RenderDeck::<VNCard> {
-                    marker: 1,
+                    deck_entity: deck_play_cards,
                     deck: filter_narrative_conflict_deck(game_state.collected_deck.clone())
                         .unwrap(),
-                    deck_folder: None,
                 });
             }
         }

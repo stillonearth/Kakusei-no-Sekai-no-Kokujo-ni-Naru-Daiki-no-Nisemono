@@ -5,13 +5,12 @@ label start:
 
 label chapter1_1:
 
-    game_mechanic "card shop"
-
     "PRESS SPACE"
 
     scene intro_2
     game_mechanic "card play poker"
-    
+    game_mechanic "card shop"
+
     "This world has lost all meaning."
     "All narratives are gone."
     "I am here to fix this world."

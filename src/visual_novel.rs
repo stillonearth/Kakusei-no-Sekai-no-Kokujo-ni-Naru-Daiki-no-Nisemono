@@ -1,6 +1,5 @@
 use bevy::{
     asset::RenderAssetUsages,
-    image::ImageType,
     prelude::*,
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
@@ -63,7 +62,7 @@ pub fn start_visual_novel(
 
 pub(crate) fn handle_text_2_image_response(
     novel_settings: Res<NovelSettings>,
-    mut game_state: ResMut<GameState>,
+    game_state: ResMut<GameState>,
     mut novel_data: ResMut<NovelData>,
     mut ew_switch_next_node: EventWriter<EventSwitchNextNode>,
     mut er_text_2_image_response: EventReader<EventText2ImageResponse>,

@@ -9,7 +9,6 @@ mod text2img;
 mod visual_novel;
 
 use bevy::asset::AssetMetaCheck;
-use bevy::color::palettes::css::ORANGE_RED;
 use bevy::color::palettes::css::WHITE;
 use bevy_wasm_tasks::*;
 
@@ -63,7 +62,7 @@ fn main() {
         )
         .add_systems(
             Update,
-            (
+            ((
                 handle_card_position_hover,
                 handle_card_position_out,
                 handle_card_position_press,
@@ -78,18 +77,29 @@ fn main() {
                 handle_new_vn_node,
                 handle_play_hand_effect,
                 handle_play_hand,
-                handle_start_card_shop,
-                handle_start_narrative_game,
-                handle_start_poker_game,
                 handle_text_2_image_response,
                 handle_ui_buttons,
-                handle_ui_update_game_state,
             )
-                .run_if(in_state(AppState::Novel)),
+                .chain())
+            .run_if(in_state(AppState::Novel)),
+        )
+        .add_systems(
+            Update,
+            ((
+                handle_start_card_shop,
+                apply_deferred,
+                handle_start_narrative_game,
+                apply_deferred,
+                handle_start_poker_game,
+                apply_deferred,
+            )
+                .chain())
+            .run_if(in_state(AppState::Novel)),
         )
         .add_systems(
             Update,
             (
+                handle_ui_update_game_state,
                 handle_card_on_table_hover.after(handle_card_on_table_out),
                 handle_card_on_table_out,
                 handle_card_press_cardshop,
