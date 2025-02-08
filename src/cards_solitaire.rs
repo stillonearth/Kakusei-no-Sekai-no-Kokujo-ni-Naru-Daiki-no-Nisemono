@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_defer::AsyncCommandsExtension;
 use bevy_defer::AsyncWorld;
+use bevy_la_mesa::DeckArea;
 use bevy_la_mesa::{
     events::{DrawToHand, PlaceCardOnTable},
     Card, Hand, PlayArea,
@@ -56,6 +57,7 @@ pub fn handle_card_position_press(
     q_cards_in_hand: Query<(Entity, &Card<VNCard>, &Hand)>,
     mut q_play_areas: Query<(Entity, &mut Visibility, &PlayArea)>,
     mut ew_update_game_state_ui: EventWriter<EventUpdateGameStateUI>,
+    q_decks: Query<(Entity, &DeckArea)>,
 ) {
     for event in card_position_press.read() {
         if q_cards_in_hand.iter().len() == 0 {
@@ -63,6 +65,7 @@ pub fn handle_card_position_press(
         }
 
         let (card_entity, _, _) = q_cards_in_hand.single();
+        let main_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
 
         if let Ok((_, mut visibility, area)) = q_play_areas.get_mut(event.entity) {
             ew_place_card_on_table.send(PlaceCardOnTable {
@@ -72,10 +75,10 @@ pub fn handle_card_position_press(
             });
 
             if game_state.n_draws < game_state.max_n_poker_draws {
-                commands.spawn_task(|| async move {
+                commands.spawn_task(move || async move {
                     AsyncWorld.sleep(0.5).await;
                     AsyncWorld.send_event(DrawToHand {
-                        deck_marker: 1,
+                        deck_entity: main_deck_entity,
                         num_cards: 1,
                         player: 1,
                     })?;

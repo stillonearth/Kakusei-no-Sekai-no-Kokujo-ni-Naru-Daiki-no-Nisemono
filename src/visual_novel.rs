@@ -20,7 +20,13 @@ use crate::{
     NarrativeCardsHandle, ScenarioHandle,
 };
 
-const PROMPT: &str = "You are narrator in a visual novel. Create a script for visual novel based on this setting. Respond only with story sentences. Do not include any instructions or explanations. Respond with at least 20 sentences each separated with new line. Each sentence no longer 10 words.";
+const PROMPT: &'static str = r#"
+You are narrator in a visual novel.
+Create a script for visual novel based on this setting.
+Respond only with story sentences.
+Do not include any instructions or explanations.
+Respond with at least 20 sentences each separated with new line. Each sentence no longer 10 words.
+"#;
 
 pub fn start_visual_novel(
     mut ew_start_scenario: EventWriter<EventStartScenario>,
@@ -61,7 +67,6 @@ pub fn start_visual_novel(
 }
 
 pub(crate) fn handle_text_2_image_response(
-    novel_settings: Res<NovelSettings>,
     game_state: ResMut<GameState>,
     mut novel_data: ResMut<NovelData>,
     mut ew_switch_next_node: EventWriter<EventSwitchNextNode>,
@@ -132,7 +137,6 @@ pub(crate) fn handle_llm_response(
                     Create prompt for text-to-image model based short story. 
                     Respond only with one prompt. 
                     Do not include any explanations. 
-                    THEME OF STORY: SECRETS.
                     Story:`{}`
                     "#,
                     sentences.join(" ")
@@ -211,24 +215,23 @@ pub(crate) fn handle_new_vn_node(
             ew_hide_vn_text_node.send(EventHideTextNode {});
             novel_settings.pause_handle_switch_node = true;
 
-            if mechanic == "card play poker" {
-                ew_start_poker_game.send(EventStartPokerGame {});
-            }
-
-            if mechanic == "card play narrative setting" {
-                ew_start_narrative_game.send(EventStartNarrativeGame::Setting);
-            }
-
-            if mechanic == "card play narrative conflict" {
-                ew_start_narrative_game.send(EventStartNarrativeGame::Conflict);
-            }
-
-            if mechanic == "card play narrative plot twist" {
-                ew_start_narrative_game.send(EventStartNarrativeGame::PlotTwist);
-            }
-
-            if mechanic == "card shop" {
-                ew_start_narrative_card_shop.send(EventStartNarrativeCardShop {});
+            match mechanic.as_str() {
+                "card play poker" => {
+                    ew_start_poker_game.send(EventStartPokerGame {});
+                }
+                "card play narrative setting" => {
+                    ew_start_narrative_game.send(EventStartNarrativeGame::Setting);
+                }
+                "card play narrative conflict" => {
+                    ew_start_narrative_game.send(EventStartNarrativeGame::Conflict);
+                }
+                "card play narrative plot twist" => {
+                    ew_start_narrative_game.send(EventStartNarrativeGame::PlotTwist);
+                }
+                "card shop" => {
+                    ew_start_narrative_card_shop.send(EventStartNarrativeCardShop {});
+                }
+                _ => (), // Handle unexpected mechanic if needed
             }
         }
     }

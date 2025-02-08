@@ -341,10 +341,14 @@ pub fn handle_ui_buttons(
     mut ew_draw_to_hand: EventWriter<DrawToHand>,
     mut ew_play_hand: EventWriter<EventPlayPokerHand>,
     mut ew_end_card_game: EventWriter<EventEndCardGame>,
+
+    q_decks: Query<(Entity, &DeckArea)>,
 ) {
     if decks.iter().count() == 0 {
         return;
     }
+
+    let main_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
 
     for (interaction, mut color, mut border_color, children, _) in &mut set.p0().iter_mut() {
         let mut _text = text_query.get_mut(children[0]).unwrap();
@@ -353,7 +357,9 @@ pub fn handle_ui_buttons(
                 *color = PRESSED_BUTTON.into();
                 border_color.0 = RED.into();
 
-                ew_shuffle.send(DeckShuffle { deck_marker: 1 });
+                ew_shuffle.send(DeckShuffle {
+                    deck_entity: main_deck_entity,
+                });
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
@@ -376,14 +382,14 @@ pub fn handle_ui_buttons(
                 match game_state.game_type {
                     GameType::Poker => {
                         ew_draw_to_hand.send(DrawToHand {
-                            deck_marker: 1,
+                            deck_entity: main_deck_entity,
                             num_cards: 1,
                             player: 1,
                         });
                     }
                     GameType::Narrative => {
                         ew_draw_to_hand.send(DrawToHand {
-                            deck_marker: 1,
+                            deck_entity: main_deck_entity,
                             num_cards: 6,
                             player: 1,
                         });
