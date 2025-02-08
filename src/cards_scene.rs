@@ -411,6 +411,7 @@ pub(crate) fn handle_start_poker_game(
                             player: 1,
                         },
                         Name::new(format!("Play Area {} {}", i, j)),
+                        RayCastPickable,
                     ))
                     .observe(on_card_position_press)
                     .observe(on_card_position_over)
@@ -508,7 +509,6 @@ pub(crate) fn handle_start_card_shop(
                         player: 1,
                     },
                     Name::new(format!("Play Area {} {}", i, j)),
-                    RayCastPickable {},
                 ));
             }
         }
