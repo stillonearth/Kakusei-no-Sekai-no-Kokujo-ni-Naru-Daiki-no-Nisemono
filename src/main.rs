@@ -91,7 +91,7 @@ fn main() {
                 handle_start_narrative_game,
                 apply_deferred,
                 handle_start_poker_game,
-                // apply_deferred,
+                apply_deferred,
             )
                 .chain())
             .run_if(in_state(AppState::Novel)),

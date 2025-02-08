@@ -508,6 +508,7 @@ pub(crate) fn handle_start_card_shop(
                         player: 1,
                     },
                     Name::new(format!("Play Area {} {}", i, j)),
+                    RayCastPickable {},
                 ));
             }
         }
