@@ -230,10 +230,10 @@ pub(crate) fn handle_deck_rendered_card_ui(
                         parent.spawn((
                             Text::new("draw hand"),
                             TextFont {
-                                font_size: 40.0,
+                                font_size: 20.0,
                                 ..default()
                             },
-                            BackgroundColor(Color::srgb(0.9, 0.9, 0.9)),
+                            // BackgroundColor(Color::srgb(0.9, 0.9, 0.9)),
                         ));
                     });
 
@@ -256,10 +256,10 @@ pub(crate) fn handle_deck_rendered_card_ui(
                         parent.spawn((
                             Text::new("play hand"),
                             TextFont {
-                                font_size: 40.0,
+                                font_size: 20.0,
                                 ..default()
                             },
-                            BackgroundColor(Color::srgb(0.9, 0.9, 0.9)),
+                            // BackgroundColor(Color::srgb(0.9, 0.9, 0.9)),
                         ));
                     });
 
@@ -281,10 +281,10 @@ pub(crate) fn handle_deck_rendered_card_ui(
                         parent.spawn((
                             Text::new("advance"),
                             TextFont {
-                                font_size: 40.0,
+                                font_size: 20.0,
                                 ..default()
                             },
-                            BackgroundColor(Color::srgb(0.9, 0.9, 0.9)),
+                            // BackgroundColor(Color::srgb(0.9, 0.9, 0.9)),
                         ));
                     });
             });

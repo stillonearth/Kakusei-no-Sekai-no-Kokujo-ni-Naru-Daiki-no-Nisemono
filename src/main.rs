@@ -91,7 +91,7 @@ fn main() {
                 handle_start_narrative_game,
                 apply_deferred,
                 handle_start_poker_game,
-                apply_deferred,
+                // apply_deferred,
             )
                 .chain())
             .run_if(in_state(AppState::Novel)),
@@ -132,6 +132,10 @@ fn main() {
             collected_deck: vec![],
             ..default()
         })
+        .insert_resource(MeshPickingSettings {
+            require_markers: true,
+            ray_cast_visibility: RayCastVisibility::Any,
+        })
         .init_state::<AppState>()
         .run();
 }
@@ -154,6 +158,7 @@ fn setup_camera_and_light(mut commands: Commands) {
             order: 2,
             ..default()
         },
+        RayCastPickable,
         Transform::from_xyz(0.0, 18.2, 11.9).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
