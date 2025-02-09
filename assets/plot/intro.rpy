@@ -7,6 +7,10 @@ label chapter1_1:
 
     game_mechanic "card shop"
 
+    jump chapter1_1
+
+
+label cycle:
     game_mechanic "card play narrative setting"
 
     llm_generate storyteller "{PROMPT} Setting of novel is: ```{SETTING}```."
@@ -22,4 +26,6 @@ label chapter1_1:
     llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a plot twist: ```{PLOT TWIST}```."
 
     llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Continue this story with a plot twist: ```{PLOT TWIST}```."
+
+    jump cycle
 

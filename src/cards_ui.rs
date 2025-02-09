@@ -80,7 +80,7 @@ pub(crate) fn handle_ui_update_game_state(
                 .collect::<Vec<String>>()
                 .join("\n");
 
-            *text = Text::new(format!("Score: {}", game_state.score,));
+            *text = Text::new(format!("${}", game_state.score,));
         }
 
         for (_, mut visibility, _) in paramset_buttons.p0().iter_mut() {
@@ -127,7 +127,7 @@ pub(crate) fn handle_play_hand_effect(
     for event in er_play_hand_effect.read() {
         if game_state.game_type == GameType::Poker {
             for (mut text, _) in q_ui.p0().iter_mut() {
-                *text = Text::new(format!("Score: {}", event.score));
+                *text = Text::new(format!("${}", event.score));
             }
 
             for (mut visibility, _) in q_ui.p1().iter_mut() {
@@ -148,24 +148,16 @@ pub(crate) fn handle_deck_rendered_card_ui(
             .spawn((
                 Name::new("UI Node Game State"),
                 Node {
-                    width: Val::Auto,
-                    height: Val::Auto,
-                    flex_direction: FlexDirection::Column,
-                    align_items: AlignItems::Start,
+                    position_type: PositionType::Absolute,
+                    top: Val::Px(20.0),
+                    left: Val::Px(20.0),
                     ..default()
                 },
                 UIRootNode {},
                 UINodeGameState {},
             ))
             .with_children(|parent| {
-                parent.spawn((
-                    Text::new(""),
-                    TextFont {
-                        font_size: 50.0,
-                        ..default()
-                    },
-                    UILabelGameState {},
-                ));
+                parent.spawn((Text::new(""), UILabelGameState {}));
             });
 
         commands
@@ -218,9 +210,6 @@ pub(crate) fn handle_deck_rendered_card_ui(
                             border: UiRect::all(Val::Px(5.0)),
                             justify_content: JustifyContent::Center,
                             align_items: AlignItems::Center,
-                            // border_color: BorderColor(Color::BLACK),
-                            // border_radius: BorderRadius::MAX,
-                            // background_color: NORMAL_BUTTON.into(),
                             ..default()
                         },
                         Visibility::Hidden,
@@ -233,7 +222,6 @@ pub(crate) fn handle_deck_rendered_card_ui(
                                 font_size: 20.0,
                                 ..default()
                             },
-                            // BackgroundColor(Color::srgb(0.9, 0.9, 0.9)),
                         ));
                     });
 
@@ -453,6 +441,7 @@ pub(crate) fn handle_end_card_game(
     q_ui_root_nodes: Query<(Entity, &UIRootNode)>,
     q_cards: Query<(Entity, &Card<VNCard>)>,
     q_play_areas: Query<(Entity, &PlayArea)>,
+    q_deck_areas: Query<(Entity, &DeckArea)>,
     mut er_end_game: EventReader<EventEndCardGame>,
     mut ew_switch_next_vn_node: EventWriter<EventSwitchNextNode>,
 ) {
@@ -469,6 +458,17 @@ pub(crate) fn handle_end_card_game(
             commands.entity(entity).despawn_recursive();
         }
 
+        for (entity, _) in q_deck_areas.iter() {
+            commands.entity(entity).despawn_recursive();
+        }
+
         ew_switch_next_vn_node.send(EventSwitchNextNode {});
     }
+}
+
+pub(crate) fn handle_buttons_visibility(
+    mut game_state: ResMut<GameState>,
+    mut ew_update_game_state_ui: EventWriter<EventUpdateGameStateUI>,
+) {
+    ew_update_game_state_ui.send(EventUpdateGameStateUI {});
 }

@@ -4,7 +4,10 @@ use bevy::{
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
 use bevy_novel::{
-    events::{EventHandleNode, EventHideTextNode, EventStartScenario, EventSwitchNextNode},
+    events::{
+        EventHandleNode, EventHideTextNode, EventShowTextNode, EventStartScenario,
+        EventSwitchNextNode,
+    },
     rpy_asset_loader::Rpy,
     NovelData, NovelSettings,
 };
@@ -135,6 +138,7 @@ pub(crate) fn handle_llm_response(
                 let text_2_image_prompt = format!(
                     r#"
                     Create prompt for text-to-image model based short story. 
+                    Image style: realistic.
                     Respond only with one prompt. 
                     Do not include any explanations. 
                     Story:`{}`
@@ -171,6 +175,7 @@ pub(crate) fn handle_new_vn_node(
     mut ew_start_narrative_game: EventWriter<EventStartNarrativeGame>,
     mut ew_start_narrative_card_shop: EventWriter<EventStartNarrativeCardShop>,
     mut ew_hide_vn_text_node: EventWriter<EventHideTextNode>,
+    mut ew_show_vn_text_node: EventWriter<EventShowTextNode>,
 ) {
     for event in er_handle_node.read() {
         game_state.n_vn_node = event.ast.index();
@@ -231,8 +236,10 @@ pub(crate) fn handle_new_vn_node(
                 "card shop" => {
                     ew_start_narrative_card_shop.send(EventStartNarrativeCardShop {});
                 }
-                _ => (), // Handle unexpected mechanic if needed
+                _ => (),
             }
+        } else {
+            ew_show_vn_text_node.send(EventShowTextNode {});
         }
     }
 }

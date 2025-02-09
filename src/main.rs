@@ -67,7 +67,7 @@ fn main() {
                 handle_card_position_out,
                 handle_card_position_press,
                 handle_card_press_cardplay,
-                handle_deck_rendered_card_game,
+                handle_deck_rendered,
                 handle_deck_rendered_card_ui,
                 handle_draw_to_hand,
                 handle_draw_to_table,
@@ -100,9 +100,10 @@ fn main() {
             Update,
             (
                 handle_ui_update_game_state,
-                handle_card_on_table_hover.after(handle_card_on_table_out),
+                handle_card_on_table_hover,
                 handle_card_on_table_out,
                 handle_card_press_cardshop,
+                handle_buttons_visibility,
             )
                 .run_if(in_state(AppState::Novel)),
         )

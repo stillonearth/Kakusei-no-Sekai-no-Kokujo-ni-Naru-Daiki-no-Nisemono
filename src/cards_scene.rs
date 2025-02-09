@@ -1,14 +1,20 @@
+use std::time::Duration;
+
+use bevy::prelude::*;
+use bevy_defer::AsyncCommandsExtension;
+use bevy_defer::AsyncWorld;
+use bevy_la_mesa::events::*;
+use bevy_la_mesa::*;
+use bevy_tweening::lens::TransformPositionLens;
+use bevy_tweening::Animator;
+use bevy_tweening::Tween;
+
 use crate::cards_game::*;
 use crate::cards_ui::*;
 use crate::EventCardPositionHover;
 use crate::EventCardPositionOut;
 use crate::EventCardPositionPress;
 use crate::NarrativeCardsHandle;
-use bevy::prelude::*;
-use bevy_defer::AsyncCommandsExtension;
-use bevy_defer::AsyncWorld;
-use bevy_la_mesa::events::*;
-use bevy_la_mesa::*;
 
 // ---------
 // Resources
@@ -136,8 +142,6 @@ pub fn handle_card_press_cardshop(
             let graveyard_deck_entity =
                 q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
 
-            game_state.ui_show_advance_button = true;
-
             let card = q_cards_on_table.get(event.entity).unwrap().1;
             let card_price = card.data.metadata.price().unwrap_or_default();
 
@@ -169,13 +173,9 @@ pub(crate) fn handle_draw_to_hand(
 pub(crate) fn handle_draw_to_table(
     mut er_draw_table: EventReader<DrawToTable>,
     mut game_state: ResMut<GameState>,
-    mut ew_update_game_state_ui: EventWriter<EventUpdateGameStateUI>,
 ) {
     for _ in er_draw_table.read() {
         game_state.n_draws += 1;
-        game_state.ui_enable_play_hand = false;
-        game_state.ui_show_advance_button = false;
-        ew_update_game_state_ui.send(EventUpdateGameStateUI {});
     }
 }
 
@@ -187,7 +187,6 @@ pub(crate) fn handle_play_hand(
     mut er_play_hand: EventReader<EventPlayPokerHand>,
     mut ew_discard_card_to_deck: EventWriter<DiscardCardToDeck>,
     mut ew_align_cards_in_hand: EventWriter<AlignCardsInHand>,
-    mut ew_update_game_state_ui: EventWriter<EventUpdateGameStateUI>,
     mut ew_play_hand_effect: EventWriter<EventPlayPokerHandEffect>,
     mut game_state: ResMut<GameState>,
     q_decks: Query<(Entity, &DeckArea)>,
@@ -238,8 +237,6 @@ pub(crate) fn handle_play_hand(
                 });
             }
 
-            game_state.ui_show_advance_button = true;
-
             for (entity, _, _) in q_cards.p1().iter() {
                 ew_discard_card_to_deck.send(DiscardCardToDeck {
                     card_entity: entity,
@@ -249,8 +246,6 @@ pub(crate) fn handle_play_hand(
         }
 
         if game_state.game_type == GameType::Narrative {
-            game_state.ui_show_advance_button = true;
-
             for (entity, _, _) in q_cards.p1().iter() {
                 ew_discard_card_to_deck.send(DiscardCardToDeck {
                     card_entity: entity,
@@ -268,12 +263,11 @@ pub(crate) fn handle_play_hand(
             }
         }
 
-        ew_update_game_state_ui.send(EventUpdateGameStateUI {});
         ew_align_cards_in_hand.send(AlignCardsInHand { player: 1 });
     }
 }
 
-pub(crate) fn handle_deck_rendered_card_game(
+pub(crate) fn handle_deck_rendered(
     mut commands: Commands,
     mut game_state: ResMut<GameState>,
     mut er_deck_rendered: EventReader<DeckRendered>,
@@ -290,11 +284,9 @@ pub(crate) fn handle_deck_rendered_card_game(
             .iter()
             .filter(|(_, _, deck)| deck.marker == 1)
             .count();
-        let shuffle_animation_time = ((n_cards_on_table * 20) as f32) * 0.001;
+        let shuffle_animation_time = ((n_cards_on_table * 75) as f32) * 0.001;
 
         game_state.n_draws = 0;
-        game_state.ui_show_advance_button = false;
-        game_state.ui_enable_play_hand = false;
         ew_shuffle.send(DeckShuffle {
             deck_entity: main_deck_entity.clone(),
         });
@@ -341,7 +333,6 @@ pub(crate) fn handle_deck_rendered_card_game(
                 });
             }
         }
-        ew_update_game_state_ui.send(EventUpdateGameStateUI {});
     }
 }
 
@@ -462,6 +453,7 @@ pub(crate) fn handle_start_card_shop(
 ) {
     for _ in er_start_card_shop.read() {
         game_state.game_type = GameType::CardShop;
+        game_state.ui_show_advance_button = true;
         game_state.n_draws = 0;
 
         // Deck 1 - Shop Cards
@@ -676,7 +668,7 @@ pub(crate) fn handle_start_narrative_game(
 pub(crate) fn handle_card_on_table_hover(
     game_state: Res<GameState>,
     asset_server: Res<AssetServer>,
-    // mut commands: Commands,
+    mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut hover: EventReader<CardHover>,
     mut cards_in_on_table: Query<(Entity, &mut Card<VNCard>, &CardOnTable, &Transform)>,
@@ -689,8 +681,22 @@ pub(crate) fn handle_card_on_table_hover(
 ) {
     hover.read().for_each(|hover| {
         if game_state.game_type == GameType::CardShop {
-            if let Ok((_, card, _hand, _transform)) = cards_in_on_table.get_mut(hover.entity) {
+            if let Ok((_, card, hand, _transform)) = cards_in_on_table.get_mut(hover.entity) {
                 if card.pickable && card.transform.is_some() {
+                    let start_translation = card.transform.unwrap().translation;
+                    let tween = Tween::new(
+                        EaseFunction::QuadraticIn,
+                        Duration::from_millis(100),
+                        TransformPositionLens {
+                            start: start_translation,
+                            end: start_translation
+                                + match hand.player {
+                                    1 => Vec3::new(0., 0.7, 0.7),
+                                    _ => Vec3::new(0., 0.7, 0.0),
+                                },
+                        },
+                    );
+
                     for (_, mut visibility, _, mut material) in q_card_showcase.iter_mut() {
                         let face_texture = asset_server.load(card.data.front_image_filename());
                         let face_material = materials.add(StandardMaterial {
@@ -700,6 +706,8 @@ pub(crate) fn handle_card_on_table_hover(
                         *material = MeshMaterial3d(face_material);
                         visibility.set_if_neq(Visibility::Visible);
                     }
+
+                    commands.entity(hover.entity).insert(Animator::new(tween));
                 }
             }
         }
@@ -708,18 +716,29 @@ pub(crate) fn handle_card_on_table_hover(
 
 pub(crate) fn handle_card_on_table_out(
     game_state: Res<GameState>,
-    // mut commands: Commands,
+    mut commands: Commands,
     mut out: EventReader<CardOut>,
     mut cards_in_on_table: Query<(Entity, &mut Card<VNCard>, &CardOnTable, &Transform)>,
     mut q_card_showcase: Query<(Entity, &mut Visibility, &CardShowcase)>,
 ) {
     out.read().for_each(|hover| {
         if game_state.game_type == GameType::CardShop {
-            if let Ok((_, card, _, _transform)) = cards_in_on_table.get_mut(hover.entity) {
+            if let Ok((_, card, _, transform)) = cards_in_on_table.get_mut(hover.entity) {
                 if card.pickable && card.transform.is_some() {
+                    let tween = Tween::new(
+                        EaseFunction::QuadraticIn,
+                        Duration::from_millis(100),
+                        TransformPositionLens {
+                            start: transform.translation,
+                            end: card.transform.unwrap().translation,
+                        },
+                    );
+
                     for (_, mut visibility, _) in q_card_showcase.iter_mut() {
                         visibility.set_if_neq(Visibility::Hidden);
                     }
+
+                    commands.entity(hover.entity).insert(Animator::new(tween));
                 }
             }
         }
