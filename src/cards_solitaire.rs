@@ -7,7 +7,7 @@ use bevy_la_mesa::{
     Card, Hand, PlayArea,
 };
 
-use crate::{cards_game::VNCard, EventUpdateGameStateUI, GameState};
+use crate::{cards_game::VNCard, GameState};
 
 #[derive(Event)]
 pub struct EventCardPositionHover {
@@ -56,7 +56,6 @@ pub fn handle_card_position_press(
     mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
     q_cards_in_hand: Query<(Entity, &Card<VNCard>, &Hand)>,
     mut q_play_areas: Query<(Entity, &mut Visibility, &PlayArea)>,
-    mut ew_update_game_state_ui: EventWriter<EventUpdateGameStateUI>,
     q_decks: Query<(Entity, &DeckArea)>,
 ) {
     for event in card_position_press.read() {
@@ -73,6 +72,7 @@ pub fn handle_card_position_press(
                 player: 1,
                 marker: area.marker,
             });
+            game_state.n_turns += 1;
 
             if game_state.n_draws < game_state.max_n_poker_draws {
                 commands.spawn_task(move || async move {
@@ -84,9 +84,6 @@ pub fn handle_card_position_press(
                     })?;
                     Ok(())
                 });
-            } else {
-                game_state.ui_enable_play_hand = true;
-                ew_update_game_state_ui.send(EventUpdateGameStateUI {});
             }
 
             *visibility = Visibility::Hidden;

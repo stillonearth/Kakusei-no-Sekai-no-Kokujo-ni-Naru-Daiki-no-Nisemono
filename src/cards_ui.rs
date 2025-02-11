@@ -95,8 +95,7 @@ pub(crate) fn handle_ui_update_game_state(
         }
 
         for (_, mut visibility, _) in paramset_buttons.p2().iter_mut() {
-            *visibility = match !game_state.ui_show_advance_button && game_state.ui_enable_play_hand
-            {
+            *visibility = match game_state.ui_enable_play_hand {
                 true => Visibility::Visible,
                 false => Visibility::Hidden,
             }
@@ -116,7 +115,7 @@ pub(crate) fn handle_hide_ui_overlay(
 }
 
 pub(crate) fn handle_play_hand_effect(
-    game_state: Res<GameState>,
+    mut game_state: ResMut<GameState>,
     mut er_play_hand_effect: EventReader<EventPlayPokerHandEffect>,
     mut q_ui: ParamSet<(
         Query<(&mut Text, &UILabelCenterScreen)>,
@@ -134,6 +133,8 @@ pub(crate) fn handle_play_hand_effect(
                 *visibility = Visibility::Visible;
                 ew_hide_ui_overlay.send(EventHideUIOverlay {});
             }
+
+            game_state.is_turn_over = true;
         }
     }
 }
@@ -470,5 +471,30 @@ pub(crate) fn handle_buttons_visibility(
     mut game_state: ResMut<GameState>,
     mut ew_update_game_state_ui: EventWriter<EventUpdateGameStateUI>,
 ) {
+    match game_state.game_type {
+        GameType::Poker => {
+            if game_state.n_draws == game_state.max_n_poker_draws
+                && game_state.n_turns == game_state.max_n_poker_draws
+            {
+                game_state.ui_enable_play_hand = true;
+            }
+
+            if game_state.is_turn_over {
+                game_state.ui_enable_play_hand = false;
+                game_state.ui_show_advance_button = true;
+            }
+        }
+        GameType::Narrative => {
+            game_state.ui_show_advance_button = true;
+
+            if game_state.n_turns > 0 {
+                game_state.ui_enable_play_hand = true;
+            }
+        }
+        GameType::CardShop => {
+            game_state.ui_show_advance_button = true;
+        }
+    }
+
     ew_update_game_state_ui.send(EventUpdateGameStateUI {});
 }

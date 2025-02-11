@@ -102,7 +102,7 @@ pub(crate) fn load_poker_deck() -> Vec<VNCard> {
     let mut deck: Vec<VNCard> = vec![];
 
     // Hearts
-    for value in 2..10 {
+    for value in 2..11 {
         let filename = format!("poker-cards/Hearts_{}.png", value);
         let metadata = VNCardMetadata::Poker(value, "Hearts".to_string());
         deck.push(VNCard { filename, metadata });
@@ -243,12 +243,19 @@ impl CardMetadata for VNCard {
     }
 }
 
+// -----------------------
+// Poker Combination Tests
+// -----------------------
+
 fn is_flush(cards: &[VNCard]) -> bool {
     let suit = &cards[0].metadata.suit();
     if suit.is_none() {
         return false;
     }
-    cards.iter().all(|card| card.metadata.suit() == *suit) && cards.length() == 5
+
+    let is_sorted = cards.is_sorted_by_key(|card| card.metadata.value().unwrap_or_default());
+
+    is_sorted && cards.iter().all(|card| card.metadata.suit() == *suit) && cards.length() == 5
 }
 
 fn is_straight(values: &[u8]) -> bool {
@@ -257,18 +264,15 @@ fn is_straight(values: &[u8]) -> bool {
 }
 
 fn is_royal_flush(cards: &[VNCard]) -> bool {
-    if !is_flush(cards) {
+    if !is_flush(cards) || cards.len() != 5 {
         return false;
     }
     let values: Vec<u8> = cards
         .iter()
         .map(|card| card.metadata.value().unwrap_or_default())
         .collect();
-    values.contains(&10)
-        && values.contains(&11)
-        && values.contains(&12)
-        && values.contains(&13)
-        && values.contains(&14)
+
+    values[0] == 10 && values[1] == 11 && values[2] == 12 && values[3] == 13 && values[4] == 14
 }
 
 fn is_straight_flush(cards: &[VNCard]) -> bool {
@@ -289,13 +293,14 @@ fn four_of_a_kind(cards: &[VNCard]) -> (bool, u8) {
             .entry(card.metadata.value().unwrap_or_default())
             .or_insert(0) += 1;
     }
-    let mut score = 0;
-    if let Some(&value) = counts.values().find(|&&v| v == 4) {
-        score = value;
-        (true, score)
-    } else {
-        (false, score)
+
+    for (key, value) in counts.iter() {
+        if *value == 4 {
+            return (true, *key as u8);
+        }
     }
+
+    return (false, 0);
 }
 
 fn full_house(cards: &[VNCard]) -> (bool, u8) {
@@ -307,7 +312,10 @@ fn full_house(cards: &[VNCard]) -> (bool, u8) {
     }
     let values: Vec<_> = counts.values().collect();
     if values.contains(&&3) && values.contains(&&2) {
-        (true, *counts.keys().max().unwrap())
+        let keys: Vec<u8> = counts.keys().map(|c| c.clone()).collect();
+        let score: u8 = keys.iter().sum();
+
+        (true, score)
     } else {
         (false, 0)
     }
@@ -329,25 +337,37 @@ fn three_of_a_kind(cards: &[VNCard]) -> (bool, u8) {
             .entry(card.metadata.value().unwrap_or_default())
             .or_insert(0) += 1;
     }
-    let mut score = 0;
-    if let Some(&value) = counts.values().find(|&&v| v == 3) {
-        score = value;
-        (true, score)
-    } else {
-        (false, score)
+
+    for (key, value) in counts.iter() {
+        if *value == 3 {
+            return (true, *key as u8);
+        }
     }
+
+    return (false, 0);
 }
 
 fn two_pair(cards: &[VNCard]) -> (bool, u8) {
     let mut counts = HashMap::new();
+
+    // Count occurrences of each card value
     for card in cards {
         *counts
             .entry(card.metadata.value().unwrap_or_default())
             .or_insert(0) += 1;
     }
-    let values: Vec<_> = counts.values().collect();
-    if values.iter().filter(|&&v| *v == 2).count() == 2 {
-        (true, *counts.keys().max().unwrap())
+
+    // Filter values that occur exactly twice and sort them
+    let two_pairs: Vec<_> = counts
+        .iter()
+        .filter(|&(_, &v)| v == 2)
+        .map(|(&k, _)| k)
+        .collect();
+
+    // Check if there are exactly two pairs
+    if two_pairs.len() == 2 {
+        // Return true and the sum of the two pair values
+        (true, two_pairs.iter().sum())
     } else {
         (false, 0)
     }
@@ -355,14 +375,26 @@ fn two_pair(cards: &[VNCard]) -> (bool, u8) {
 
 fn one_pair(cards: &[VNCard]) -> (bool, u8) {
     let mut counts = HashMap::new();
+
+    // Count occurrences of each card value
     for card in cards {
         *counts
             .entry(card.metadata.value().unwrap_or_default())
             .or_insert(0) += 1;
     }
+
+    // Find the value that occurs exactly twice
     let mut score = 0;
-    if let Some(&value) = counts.values().find(|&&v| v == 2) {
-        score = value;
+    let has_one_pair = counts.values().any(|&v| v == 2);
+
+    if has_one_pair {
+        // Find the first key with a value of 2 and set it as the score
+        for (&key, &val) in &counts {
+            if val == 2 {
+                score = key;
+                break;
+            }
+        }
         (true, score)
     } else {
         (false, score)
@@ -520,4 +552,312 @@ pub(crate) fn check_poker_hand(cards: Vec<VNCard>) -> (PokerCombination, u8) {
     }
 
     (PokerCombination::HighCard, high_card(&sorted_cards))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rand::prelude::SliceRandom;
+    use rand::thread_rng;
+
+    #[test]
+    fn test_royal_flush() {
+        let deck: Vec<VNCard> = load_poker_deck();
+
+        let hearts: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.suit() == Some("Hearts".to_string()))
+            .map(|card| card.clone())
+            .collect();
+
+        assert_eq!(hearts.len(), 13);
+
+        let mut royal_flush_set: Vec<_> = hearts
+            .iter()
+            .filter(|card| card.metadata.value().unwrap() >= 10)
+            .map(|card| card.clone())
+            .collect();
+
+        assert_eq!(royal_flush_set.len(), 5);
+
+        assert!(is_royal_flush(&royal_flush_set));
+
+        let mut rng = thread_rng();
+        royal_flush_set.shuffle(&mut rng);
+
+        assert!(!is_royal_flush(&royal_flush_set));
+    }
+
+    #[test]
+    fn test_straight_flush() {
+        let deck: Vec<VNCard> = load_poker_deck();
+
+        let hearts: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.suit() == Some("Hearts".to_string()))
+            .map(|card| card.clone())
+            .collect();
+
+        assert_eq!(hearts.len(), 13);
+
+        let mut straight_flush_set: Vec<_> = hearts
+            .iter()
+            .filter(|card| card.metadata.value().unwrap() < 10)
+            .map(|card| card.clone())
+            .take(5)
+            .collect();
+
+        assert!(is_straight_flush(&straight_flush_set));
+
+        let mut rng = thread_rng();
+        straight_flush_set.shuffle(&mut rng);
+
+        assert!(!is_straight_flush(&straight_flush_set));
+    }
+
+    #[test]
+    fn test_four_of_kind() {
+        let deck: Vec<VNCard> = load_poker_deck();
+
+        let mut cards: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.value() == Some(5))
+            .map(|card| card.clone())
+            .collect();
+
+        assert_eq!(cards.len(), 4);
+        let extra_card = deck[0].clone();
+
+        cards.push(extra_card);
+        assert_eq!(cards.len(), 5);
+
+        let (is_four_of_a_kind, score) = four_of_a_kind(&cards);
+
+        assert!(is_four_of_a_kind);
+        assert_eq!(score, 5);
+
+        let mut rng = thread_rng();
+        cards.shuffle(&mut rng);
+
+        let (is_four_of_a_kind, score) = four_of_a_kind(&cards);
+
+        assert!(is_four_of_a_kind);
+        assert_eq!(score, 5);
+    }
+
+    #[test]
+    fn test_full_house() {
+        let deck: Vec<VNCard> = load_poker_deck();
+
+        let fours: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.value() == Some(4))
+            .map(|card| card.clone())
+            .take(3)
+            .collect();
+
+        assert_eq!(fours.len(), 3);
+        let twos: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.value() == Some(2))
+            .map(|card| card.clone())
+            .take(2)
+            .collect();
+
+        assert_eq!(twos.len(), 2);
+
+        let mut cards = [fours, twos].concat();
+        assert_eq!(cards.len(), 5);
+
+        let (is_full_house, score) = full_house(&cards);
+        assert!(is_full_house);
+        assert_eq!(score, 4 + 2);
+
+        let mut rng = thread_rng();
+        cards.shuffle(&mut rng);
+
+        let (is_full_house, score) = full_house(&cards);
+        assert!(is_full_house);
+        assert_eq!(score, 4 + 2);
+    }
+
+    #[test]
+    fn test_flush() {
+        let deck: Vec<VNCard> = load_poker_deck();
+
+        let hearts: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.suit() == Some("Hearts".to_string()))
+            .map(|card| card.clone())
+            .collect();
+
+        assert_eq!(hearts.len(), 13);
+
+        let mut flush_set: Vec<_> = hearts
+            .iter()
+            .filter(|card| card.metadata.value().unwrap() > 2)
+            .map(|card| card.clone())
+            .take(5)
+            .collect();
+
+        assert_eq!(flush_set.len(), 5);
+
+        assert!(is_flush(&flush_set));
+
+        let mut rng = thread_rng();
+        flush_set.shuffle(&mut rng);
+
+        assert!(!is_flush(&flush_set));
+    }
+
+    #[test]
+    fn test_straight() {
+        // i don't select different suits in this test
+
+        let deck: Vec<VNCard> = load_poker_deck();
+
+        let hearts: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.suit() == Some("Hearts".to_string()))
+            .map(|card| card.clone())
+            .collect();
+
+        assert_eq!(hearts.len(), 13);
+
+        let mut straight_flush_set: Vec<_> = hearts
+            .iter()
+            .filter(|card| card.metadata.value().unwrap() < 10)
+            .map(|card| card.clone())
+            .take(5)
+            .collect();
+
+        assert!(straight(&straight_flush_set));
+
+        let mut rng = thread_rng();
+        straight_flush_set.shuffle(&mut rng);
+
+        assert!(!straight(&straight_flush_set));
+    }
+
+    #[test]
+    fn test_three_of_kind() {
+        let deck: Vec<VNCard> = load_poker_deck();
+
+        let mut cards: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.value() == Some(4))
+            .map(|card| card.clone())
+            .take(3)
+            .collect();
+
+        assert_eq!(cards.len(), 3);
+        let extra_card = deck[0].clone();
+
+        cards.push(extra_card);
+
+        let extra_card = deck[1].clone();
+
+        cards.push(extra_card);
+
+        assert_eq!(cards.len(), 5);
+
+        let (is_three_of_a_kind, score) = three_of_a_kind(&cards);
+
+        assert!(is_three_of_a_kind);
+        assert_eq!(score, 4);
+
+        let mut rng = thread_rng();
+        cards.shuffle(&mut rng);
+
+        let (is_three_of_a_kind, score) = three_of_a_kind(&cards);
+
+        assert!(is_three_of_a_kind);
+        assert_eq!(score, 4);
+    }
+
+    #[test]
+    fn test_two_pair() {
+        let deck: Vec<VNCard> = load_poker_deck();
+
+        let pair_1: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.value() == Some(6))
+            .map(|card| card.clone())
+            .take(2)
+            .collect();
+        assert_eq!(pair_1.len(), 2);
+
+        let pair_2: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.value() == Some(7))
+            .map(|card| card.clone())
+            .take(2)
+            .collect();
+        assert_eq!(pair_2.len(), 2);
+
+        let mut cards = [pair_1, pair_2].concat();
+        assert_eq!(cards.len(), 4);
+
+        let extra_card = deck[0].clone();
+        cards.push(extra_card);
+        assert_eq!(cards.len(), 5);
+
+        let (is_two_pair, score) = two_pair(&cards);
+        assert!(is_two_pair);
+        assert_eq!(score, 6 + 7);
+
+        let mut rng = thread_rng();
+        cards.shuffle(&mut rng);
+
+        let (is_two_pair, score) = two_pair(&cards);
+        assert!(is_two_pair);
+        assert_eq!(score, 6 + 7);
+    }
+
+    #[test]
+    fn test_one_pair() {
+        let deck: Vec<VNCard> = load_poker_deck();
+
+        let pair_1: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.value() == Some(6))
+            .map(|card| card.clone())
+            .take(2)
+            .collect();
+        assert_eq!(pair_1.len(), 2);
+
+        let pair_2: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.value() == Some(8))
+            .map(|card| card.clone())
+            .take(1)
+            .collect();
+        assert_eq!(pair_2.len(), 1);
+
+        let pair_3: Vec<_> = deck
+            .iter()
+            .filter(|card| card.metadata.value() == Some(9))
+            .map(|card| card.clone())
+            .take(1)
+            .collect();
+        assert_eq!(pair_3.len(), 1);
+
+        let mut cards = [pair_1, pair_2, pair_3].concat();
+        assert_eq!(cards.len(), 4);
+
+        let extra_card = deck[0].clone();
+        cards.push(extra_card);
+        assert_eq!(cards.len(), 5);
+
+        let (is_one_pair, score) = one_pair(&cards);
+        assert!(is_one_pair);
+        assert_eq!(score, 6);
+
+        let mut rng = thread_rng();
+        cards.shuffle(&mut rng);
+
+        let (is_one_pair, score) = one_pair(&cards);
+        assert!(is_one_pair);
+        assert_eq!(score, 6);
+    }
 }

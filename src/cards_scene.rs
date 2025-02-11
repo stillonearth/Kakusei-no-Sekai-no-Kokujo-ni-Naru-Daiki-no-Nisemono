@@ -35,6 +35,8 @@ pub(crate) struct GameState {
     pub game_type: GameType,
     pub max_n_poker_draws: usize,
     pub n_draws: usize,
+    pub n_turns: usize,
+    pub is_turn_over: bool,
     pub n_vn_node_scene_request: usize,
     pub n_vn_node: usize,
     pub narrative_conflicts: Vec<String>,
@@ -81,7 +83,6 @@ pub fn handle_card_press_cardplay(
     mut game_state: ResMut<GameState>,
     mut card_press: EventReader<CardPress>,
     mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
-    mut ew_handle_update_ui_game_state: EventWriter<EventUpdateGameStateUI>,
     mut q_cards: ParamSet<(
         Query<(Entity, &Card<VNCard>, &CardOnTable)>,
         Query<(Entity, &Card<VNCard>, &Hand)>,
@@ -96,7 +97,7 @@ pub fn handle_card_press_cardplay(
 
         let p1 = q_cards.p1();
 
-        if game_state.game_type == GameType::Narrative && n_cards_on_table < 2 {
+        if game_state.game_type == GameType::Narrative && n_cards_on_table < 1 {
             let card = p1.get(event.entity).unwrap().1;
             let card_type = card.data.metadata.card_type().unwrap_or_default();
             let effect = card.data.metadata.effect().unwrap_or_default();
@@ -120,11 +121,7 @@ pub fn handle_card_press_cardplay(
                 marker: n_cards_on_table + 1,
             });
 
-            if n_cards_on_table > 0 {
-                game_state.ui_enable_play_hand = true;
-            }
-
-            ew_handle_update_ui_game_state.send(EventUpdateGameStateUI {});
+            game_state.n_turns = n_cards_on_table + 1;
         }
     }
 }
@@ -272,7 +269,6 @@ pub(crate) fn handle_deck_rendered(
     mut game_state: ResMut<GameState>,
     mut er_deck_rendered: EventReader<DeckRendered>,
     mut ew_shuffle: EventWriter<DeckShuffle>,
-    mut ew_update_game_state_ui: EventWriter<EventUpdateGameStateUI>,
     q_decks: Query<(Entity, &DeckArea)>,
     q_cards: Query<(Entity, &Card<VNCard>, &Deck)>,
 ) {
@@ -346,6 +342,7 @@ pub(crate) fn handle_start_poker_game(
 ) {
     for _ in er_start_poker_game.read() {
         game_state.game_type = GameType::Poker;
+        game_state.n_turns = 0;
 
         // Deck
         let deck_play_cards = commands
@@ -453,7 +450,6 @@ pub(crate) fn handle_start_card_shop(
 ) {
     for _ in er_start_card_shop.read() {
         game_state.game_type = GameType::CardShop;
-        game_state.ui_show_advance_button = true;
         game_state.n_draws = 0;
 
         // Deck 1 - Shop Cards
@@ -553,6 +549,8 @@ pub(crate) fn handle_start_narrative_game(
 ) {
     for event in er_start_narrative_game.read() {
         game_state.game_type = GameType::Narrative;
+        game_state.n_draws = 0;
+        game_state.n_turns = 0;
 
         // Deck
         let deck_play_cards = commands
