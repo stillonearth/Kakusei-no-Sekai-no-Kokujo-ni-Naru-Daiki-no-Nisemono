@@ -77,6 +77,9 @@ impl VNCardMetadata {
         if let VNCardMetadata::Narrative(_index, card_type, _genre, _name, _effect, _price) = self {
             return Some(card_type.clone());
         }
+        if let VNCardMetadata::Character(_, _, _, _) = self {
+            return Some("character".to_string());
+        }
         None
     }
 
@@ -97,6 +100,16 @@ impl VNCardMetadata {
     pub(crate) fn name(&self) -> Option<String> {
         if let VNCardMetadata::Narrative(_index, _card_type, _genre, name, _effect, _price) = self {
             return Some(name.clone());
+        }
+        if let VNCardMetadata::Character(_, name, _description, _price) = self {
+            return Some(name.clone());
+        }
+        None
+    }
+
+    pub(crate) fn description(&self) -> Option<String> {
+        if let VNCardMetadata::Character(_, _name, description, _price) = self {
+            return Some(description.clone());
         }
         None
     }

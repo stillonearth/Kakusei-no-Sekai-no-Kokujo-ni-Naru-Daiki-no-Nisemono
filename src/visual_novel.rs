@@ -29,8 +29,9 @@ use crate::{
 const PROMPT: &'static str = r#"
 You are narrator in a visual novel.
 Create a script for visual novel based on this setting.
-Respond only with story sentences.
+Respond only with story sentences and character lines.
 Do not include any instructions or explanations.
+Include dialogues for provived characters in format: "Character -> line". If character description is not provided make dialogue third person.
 Respond with at least 20 sentences each separated with new line. Each sentence no longer 10 words.
 "#;
 
@@ -226,7 +227,10 @@ pub(crate) fn handle_new_vn_node(
                 .replace("{PLOT TWIST}", &game_state.narrative_plot_twists.join(" "))
                 .replace("{CONFLICT}", &game_state.narrative_conflicts.join(" "))
                 .replace("{STORY}", &game_state.narrative_story_so_far.join(" "))
+                .replace("{CHARACTERS}", &game_state.characters.join(" "))
                 .replace("{PROMPT}", PROMPT);
+
+            println!("prompt: {}", prompt);
 
             ew_llm_request.send(EventLLMRequest {
                 prompt,

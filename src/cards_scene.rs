@@ -42,6 +42,7 @@ pub(crate) struct GameState {
     pub narrative_conflicts: Vec<String>,
     pub narrative_plot_twists: Vec<String>,
     pub narrative_settings: Vec<String>,
+    pub characters: Vec<String>,
     pub narrative_story_so_far: Vec<String>,
     pub poker_combinations: Vec<PokerCombination>,
     pub score: isize,
@@ -68,7 +69,7 @@ pub(crate) enum EventStartNarrativeGame {
 }
 
 #[derive(Event)]
-pub(crate) struct EventPlayPokerHand {}
+pub(crate) struct EventPlayHand {}
 
 #[derive(Event)]
 pub(crate) struct EventEndCardGame {}
@@ -102,6 +103,8 @@ pub fn handle_card_press_cardplay(
             let card = p1.get(event.entity).unwrap().1;
             let card_type = card.data.metadata.card_type().unwrap_or_default();
             let effect = card.data.metadata.effect().unwrap_or_default();
+            let name = card.data.metadata.name().unwrap_or_default();
+            let description = card.data.metadata.description().unwrap_or_default();
 
             match card_type.as_str() {
                 "setting" => {
@@ -112,6 +115,12 @@ pub fn handle_card_press_cardplay(
                 }
                 "conflict" => {
                     game_state.narrative_conflicts.push(effect);
+                }
+                "character" => {
+                    game_state.characters.push(format!(
+                        "Character name: {}; Character description: {}",
+                        name, description
+                    ));
                 }
                 _ => {}
             }
@@ -182,7 +191,7 @@ pub(crate) fn handle_play_hand(
         Query<(Entity, &Card<VNCard>, &CardOnTable)>,
         Query<(Entity, &Card<VNCard>, &Hand)>,
     )>,
-    mut er_play_hand: EventReader<EventPlayPokerHand>,
+    mut er_play_hand: EventReader<EventPlayHand>,
     mut ew_discard_card_to_deck: EventWriter<DiscardCardToDeck>,
     mut ew_align_cards_in_hand: EventWriter<AlignCardsInHand>,
     mut ew_play_hand_effect: EventWriter<EventPlayPokerHandEffect>,
@@ -520,6 +529,7 @@ pub(crate) fn handle_start_card_shop(
             if i > 63 {
                 break;
             }
+
             deck.push(VNCard {
                 filename: format!("narrative-cards/card-{}.png", i + 1),
                 metadata: VNCardMetadata::Narrative(

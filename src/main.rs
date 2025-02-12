@@ -121,7 +121,7 @@ fn main() {
         .add_event::<EventCardPositionPress>()
         .add_event::<EventEndCardGame>()
         .add_event::<EventHideUIOverlay>()
-        .add_event::<EventPlayPokerHand>()
+        .add_event::<EventPlayHand>()
         .add_event::<EventPlayPokerHandEffect>()
         .add_event::<EventStartNarrativeGame>()
         .add_event::<EventStartPokerGame>()

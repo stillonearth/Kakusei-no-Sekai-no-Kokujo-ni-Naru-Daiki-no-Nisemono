@@ -4,7 +4,7 @@ use bevy_la_mesa::*;
 
 use bevy_novel::events::EventSwitchNextNode;
 
-use crate::{cards_game::*, EventEndCardGame, EventPlayPokerHand, GameState, GameType};
+use crate::{cards_game::*, EventEndCardGame, EventPlayHand, GameState, GameType};
 
 // UI
 const NORMAL_BUTTON: Color = Color::srgb(0.15, 0.15, 0.15);
@@ -328,7 +328,7 @@ pub fn handle_ui_buttons(
     mut text_query: Query<&mut Text>,
     mut ew_shuffle: EventWriter<DeckShuffle>,
     mut ew_draw_to_hand: EventWriter<DrawToHand>,
-    mut ew_play_hand: EventWriter<EventPlayPokerHand>,
+    mut ew_play_hand: EventWriter<EventPlayHand>,
     mut ew_end_card_game: EventWriter<EventEndCardGame>,
 
     q_decks: Query<(Entity, &DeckArea)>,
@@ -403,7 +403,7 @@ pub fn handle_ui_buttons(
             Interaction::Pressed => {
                 *color = PRESSED_BUTTON.into();
                 border_color.0 = RED.into();
-                ew_play_hand.send(EventPlayPokerHand {});
+                ew_play_hand.send(EventPlayHand {});
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
