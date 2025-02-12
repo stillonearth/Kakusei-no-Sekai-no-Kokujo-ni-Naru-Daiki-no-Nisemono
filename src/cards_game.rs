@@ -16,7 +16,6 @@ pub(crate) struct VNCard {
     pub(crate) metadata: VNCardMetadata,
 }
 
-#[allow(dead_code)]
 #[derive(Deserialize, Clone)]
 pub struct NarrativeCard {
     pub name: String,
@@ -27,16 +26,29 @@ pub struct NarrativeCard {
     pub price: u16,
 }
 
+#[derive(Deserialize, Clone)]
+pub struct CharacterCard {
+    pub name: String,
+    pub description: String,
+    pub flavor_text: String,
+    pub price: u16,
+    pub filename: String,
+}
+
+#[derive(Deserialize, Asset, TypePath, Deref, DerefMut)]
+pub struct CharacterCards(pub Vec<CharacterCard>);
+
 #[derive(Deserialize, Asset, TypePath, Deref, DerefMut)]
 pub struct NarrativeCards(pub Vec<NarrativeCard>);
 
-#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub(crate) enum VNCardMetadata {
     // value, suit
     Poker(u8, String),
     // index, card_type, genre, name, effect, price
     Narrative(usize, String, String, String, String, u16),
+    // index, name, description, price
+    Character(usize, String, String, u16),
 }
 
 impl Default for VNCardMetadata {
@@ -94,6 +106,21 @@ impl VNCardMetadata {
             return Some(*price);
         }
         None
+    }
+
+    pub(crate) fn is_narrative(&self) -> bool {
+        if let VNCardMetadata::Narrative(_index, _card_type, _genre, _name, _effect, _price) = self
+        {
+            return true;
+        }
+        false
+    }
+
+    pub(crate) fn is_character(&self) -> bool {
+        if let VNCardMetadata::Character(_index, _name, _description, _price) = self {
+            return true;
+        }
+        false
     }
 }
 
@@ -202,7 +229,18 @@ pub(crate) fn load_poker_deck() -> Vec<VNCard> {
 
 pub(crate) fn filter_initial_narrative_cards(deck: Vec<VNCard>) -> Vec<VNCard> {
     deck.iter()
-        .filter(|card| card.metadata.price().unwrap_or_default() <= 30)
+        .filter(|card| {
+            card.metadata.is_narrative() && card.metadata.price().unwrap_or_default() <= 30
+        })
+        .cloned()
+        .collect()
+}
+
+pub(crate) fn filter_initial_character_cards(deck: Vec<VNCard>) -> Vec<VNCard> {
+    deck.iter()
+        .filter(|card| {
+            card.metadata.is_character() && card.metadata.price().unwrap_or_default() <= 30
+        })
         .cloned()
         .collect()
 }
@@ -210,7 +248,9 @@ pub(crate) fn filter_initial_narrative_cards(deck: Vec<VNCard>) -> Vec<VNCard> {
 fn filter_narrative_cards_by_type(deck: Vec<VNCard>, tp: String) -> Result<Vec<VNCard>> {
     let cards: Vec<VNCard> = deck
         .iter()
-        .filter(|card| card.metadata.card_type().unwrap_or_default() == tp)
+        .filter(|card| {
+            card.metadata.is_narrative() && card.metadata.card_type().unwrap_or_default() == tp
+        })
         .cloned()
         .collect();
     Ok(cards)
@@ -228,6 +268,14 @@ pub fn filter_narrative_conflict_deck(deck: Vec<VNCard>) -> Result<Vec<VNCard>> 
     filter_narrative_cards_by_type(deck, "conflict".to_string())
 }
 
+pub fn filter_character_deck(deck: Vec<VNCard>) -> Result<Vec<VNCard>> {
+    Ok(deck
+        .iter()
+        .filter(|card| card.metadata.is_character())
+        .cloned()
+        .collect())
+}
+
 impl CardMetadata for VNCard {
     type Output = VNCard;
 
@@ -239,6 +287,7 @@ impl CardMetadata for VNCard {
         match self.metadata {
             VNCardMetadata::Poker(_, _) => "poker-cards/Back_1.png".into(),
             VNCardMetadata::Narrative(_, _, _, _, _, _) => "poker-cards/Back_2.png".into(),
+            VNCardMetadata::Character(_, _, _, _) => "poker-cards/Back_3.png".into(),
         }
     }
 }

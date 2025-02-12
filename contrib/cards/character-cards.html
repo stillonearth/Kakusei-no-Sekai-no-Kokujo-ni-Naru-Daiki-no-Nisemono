@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale" />
+    <title>Card Game</title>
+    <style>
+      .card {
+        width: 230px;
+        height: 336px;
+        border: 1px solid #ccc;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        margin: 10px;
+        display: inline-block;
+        text-align: center;
+        overflow: hidden;
+      }
+      .card-title {
+        background-color: #f8f9fa;
+        padding: 10px;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .card-info {
+        padding: 10px;
+        text-align: left;
+        font-family: monospace;
+        font-weight: bold;
+      }
+      .card-type,
+      .card-price,
+      .card-genre {
+        color: #6c757d;
+        font-style: italic;
+      }
+      .card-effect {
+        /* margin-top: 10px; */
+        text-align: justify;
+        padding: 8px;
+        font-size: 12px;
+      }
+      .card-flavorText {
+        /* margin-top: 30px; */
+        padding: 8px;
+        font-size: 11px;
+        color: #6c757d;
+        font-style: italic;
+      }
+      .card-image {
+        /* background-color: red; */
+        /* width: 100%; */
+        /* height: 100px; */
+        width: 230px;
+        position: relative;
+        z-index: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card" id="cardTemplate" style="display: none">
+      <div class="card-title">{{name}}</div>
+      <img class="card-image"></img>
+      <div class="card-info">
+        <span class="card-price">Price: {{price}}</span>
+      </div>
+      <div class="card-flavorText">{{flavorText}}</div>
+    </div>
+
+    <script src="./html2canvas.js"></script>
+    <script>
+
+      let cards = [
+        {
+          "name": "Igor",
+          "description": "A schizophrenic intelelctual propher from Kherson. Wears mustache. Believes that people around him can change appearance. He calls it transmutation of personality.",
+          "flavor_text": "This is a transmission from my flat on peisakh.",
+          "price": 10,
+          "filename": "igor.png"
+        },
+        {
+          "name": "Komarito",
+          "description": "A sentien mosquito. Dog sized. Good humour. Might be somebodys a hallucination.",
+          "flavor_text": "I'm just a regular mosquito. But I can also talk.",
+          "price": 10,
+          "filename": "komarito.png"
+        },
+        {
+          "name": "Madonna",
+          "description": "A singer-songwriter. A star. A legend. Madonna Luiza Chicone.",
+          "flavor_text": "Famous rockstar singer",
+          "price": 10,
+          "filename": "madonna.png"
+        }
+      ];
+
+      // Function to create a card element
+      function createCard(card, index) {
+        const template = document.getElementById("cardTemplate");
+        const clone = template.cloneNode(true);
+
+        clone.style.display = "block";
+        let imageFile = "characters/" + card.filename;
+        console.log(imageFile)
+
+        // clone.querySelector('.card-image').setAttribute("crossorigin", "anonymous")
+        clone.querySelector('.card-image').src = imageFile
+        clone.querySelector(".card-title").textContent = card.name;
+        clone.querySelector(".card-price").textContent = `Price: ${card.price}`;
+        clone.querySelector(".card-flavorText").textContent = card.flavor_text;
+
+        return clone;
+      }
+
+      function renderCards() {
+        document.querySelectorAll(".card").forEach((cardElement, index) => {
+          if (index == 0) {
+            return;
+          }
+          html2canvas(cardElement).then((canvas) => {
+            const imgData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+
+            // Optionally download the image (if you want it saved locally)
+            const link = document.createElement("a");
+            link.href = imgData;
+            link.download = `card-${index}.png`;
+            link.click();
+          });
+        });
+      }
+
+
+      // Append the card to the body
+      var index = 0;
+      var sliceCards = cards.slice(0, 64);
+
+      sliceCards.forEach((cardData) => {
+        document.body.appendChild(createCard(cardData, index));
+        index += 1;
+      });
+
+      setTimeout(renderCards, 1000);
+    </script>
+  </body>
+</html>

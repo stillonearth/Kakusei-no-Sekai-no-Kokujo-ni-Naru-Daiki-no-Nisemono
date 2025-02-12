@@ -16,11 +16,14 @@ use renpy_parser::parsers::AST;
 use uuid::Uuid;
 
 use crate::{
-    cards_game::{filter_initial_narrative_cards, NarrativeCards, VNCard, VNCardMetadata},
+    cards_game::{
+        filter_initial_character_cards, filter_initial_narrative_cards, CharacterCards,
+        NarrativeCards, VNCard, VNCardMetadata,
+    },
     llm::*,
     text2img::{EventText2ImageRequest, EventText2ImageResponse},
-    AppState, EventStartNarrativeCardShop, EventStartNarrativeGame, EventStartPokerGame, GameState,
-    NarrativeCardsHandle, ScenarioHandle,
+    AppState, CharacterCardsHandle, EventStartNarrativeCardShop, EventStartNarrativeGame,
+    EventStartPokerGame, GameState, NarrativeCardsHandle, ScenarioHandle,
 };
 
 const PROMPT: &'static str = r#"
@@ -37,11 +40,14 @@ pub fn start_visual_novel(
     rpy_assets: Res<Assets<Rpy>>,
     narrative_cards_handle: Res<NarrativeCardsHandle>,
     narrative_cards_assets: Res<Assets<NarrativeCards>>,
+    character_cards_handle: Res<CharacterCardsHandle>,
+    character_cards_assets: Res<Assets<CharacterCards>>,
     mut app_state: ResMut<NextState<AppState>>,
     mut game_state: ResMut<GameState>,
 ) {
     if let Some(rpy) = rpy_assets.get(scenario_handle.id())
         && let Some(narrative_cards) = narrative_cards_assets.get(narrative_cards_handle.id())
+        && let Some(character_cards) = character_cards_assets.get(character_cards_handle.id())
     {
         ew_start_scenario.send(EventStartScenario { ast: rpy.0.clone() });
 
@@ -63,8 +69,24 @@ pub fn start_visual_novel(
             });
         }
 
+        for (i, narrative_card) in character_cards.iter().enumerate() {
+            deck.push(VNCard {
+                filename: format!("character-cards/card-{}.png", i + 1),
+                metadata: VNCardMetadata::Character(
+                    i + 1,
+                    narrative_card.name.clone(),
+                    narrative_card.description.clone(),
+                    narrative_card.price,
+                ),
+            });
+        }
+
         game_state.game_deck = deck.clone();
-        game_state.collected_deck = filter_initial_narrative_cards(deck.clone());
+        game_state.collected_deck = [
+            filter_initial_narrative_cards(deck.clone()),
+            filter_initial_character_cards(deck.clone()),
+        ]
+        .concat();
         app_state.set(AppState::Novel);
     }
 }
@@ -137,10 +159,10 @@ pub(crate) fn handle_llm_response(
 
                 let text_2_image_prompt = format!(
                     r#"
-                    Create prompt for text-to-image model based short story. 
+                    Create prompt for text-to-image model based short story.
                     Image style: realistic.
-                    Respond only with one prompt. 
-                    Do not include any explanations. 
+                    Respond only with one prompt.
+                    Do not include any explanations.
                     Story:`{}`
                     "#,
                     sentences.join(" ")
@@ -158,7 +180,6 @@ pub(crate) fn handle_llm_response(
                 ew_text_2_image_reqeust.send(EventText2ImageRequest {
                     prompt: event.response.clone(),
                 });
-                // ew_switch_next_node.send(EventSwitchNextNode {});
             }
         }
     }
@@ -226,6 +247,9 @@ pub(crate) fn handle_new_vn_node(
                 }
                 "card play narrative setting" => {
                     ew_start_narrative_game.send(EventStartNarrativeGame::Setting);
+                }
+                "card play narrative characters" => {
+                    ew_start_narrative_game.send(EventStartNarrativeGame::Characters);
                 }
                 "card play narrative conflict" => {
                     ew_start_narrative_game.send(EventStartNarrativeGame::Conflict);

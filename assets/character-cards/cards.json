@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Igor",
+    "description": "A schizophrenic intelelctual propher from Kherson. Wears mustache. Believes that people around him can change appearance. He calls it transmutation of personality.",
+    "flavor_text": "This is a transmission from my flat on peisakh.",
+    "price": 10,
+    "filename": "igor.png"
+  },
+  {
+    "name": "Komarito",
+    "description": "A sentien mosquito. Dog sized. Good humour. Might be somebodys a hallucination.",
+    "flavor_text": "I'm just a regular mosquito. But I can also talk.",
+    "price": 10,
+    "filename": "komarito.png"
+  },
+  {
+    "name": "Madonna",
+    "description": "A singer-songwriter. A star. A legend. Madonna Luiza Chicone.",
+    "flavor_text": "Famous rockstar singer",
+    "price": 10,
+    "filename": "madonna.png"
+  }
+]

@@ -18,6 +18,7 @@ use bevy_defer::AsyncPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_la_mesa::*;
 use bevy_novel::*;
+use cards_game::CharacterCards;
 use cards_game::NarrativeCards;
 use rpy_asset_loader::Rpy;
 use text2img::Text2ImagePlugin;
@@ -48,6 +49,7 @@ fn main() {
                 }),
             AsyncPlugin::default_settings(),
             JsonAssetPlugin::<NarrativeCards>::new(&["json"]),
+            JsonAssetPlugin::<CharacterCards>::new(&["json"]),
             LaMesaPlugin::<cards_game::VNCard>::default(),
             LLMPlugin {},
             MeshPickingPlugin,
@@ -179,15 +181,26 @@ enum AppState {
     Novel,
 }
 
+// --------------
+// Card Resources
+// --------------
+
 #[derive(Resource, Deref, DerefMut)]
 struct ScenarioHandle(Handle<Rpy>);
 
 #[derive(Resource, Deref, DerefMut)]
 struct NarrativeCardsHandle(Handle<NarrativeCards>);
 
+#[derive(Resource, Deref, DerefMut)]
+struct CharacterCardsHandle(Handle<CharacterCards>);
+
 fn load_resources(mut commands: Commands, asset_server: Res<AssetServer>) {
     let scenario_handle = ScenarioHandle(asset_server.load("plot/intro.rpy"));
     commands.insert_resource(scenario_handle);
+
+    let character_cards_handle =
+        CharacterCardsHandle(asset_server.load("character-cards/cards.json"));
+    commands.insert_resource(character_cards_handle);
 
     let narrative_cards_handle =
         NarrativeCardsHandle(asset_server.load("narrative-cards/cards.json"));

@@ -64,6 +64,7 @@ pub(crate) enum EventStartNarrativeGame {
     Setting,
     PlotTwist,
     Conflict,
+    Characters,
 }
 
 #[derive(Event)]
@@ -215,7 +216,7 @@ pub(crate) fn handle_play_hand(
             for r in 0..5 {
                 let mut row_cards = poker_cards_on_table
                     .iter()
-                    .filter(|(_, row, _)| *row == r)
+                    .filter(|(_, _row, col)| *col == r)
                     .map(|(card, _, col)| (card.clone(), *col))
                     .collect::<Vec<(VNCard, usize)>>();
                 // sort by position
@@ -657,6 +658,9 @@ pub(crate) fn handle_start_narrative_game(
                 }
                 EventStartNarrativeGame::Conflict => {
                     filter_narrative_conflict_deck(game_state.collected_deck.clone()).unwrap()
+                }
+                EventStartNarrativeGame::Characters => {
+                    filter_character_deck(game_state.collected_deck.clone()).unwrap()
                 }
             },
         });
