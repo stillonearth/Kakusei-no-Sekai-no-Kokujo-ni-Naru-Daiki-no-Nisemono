@@ -181,9 +181,7 @@ enum AppState {
     Novel,
 }
 
-// --------------
 // Card Resources
-// --------------
 
 #[derive(Resource, Deref, DerefMut)]
 struct ScenarioHandle(Handle<Rpy>);

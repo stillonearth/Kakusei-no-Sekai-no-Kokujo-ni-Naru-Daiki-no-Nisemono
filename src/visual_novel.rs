@@ -17,8 +17,8 @@ use uuid::Uuid;
 
 use crate::{
     cards_game::{
-        filter_initial_character_cards, filter_initial_narrative_cards, CharacterCards,
-        NarrativeCards, VNCard, VNCardMetadata,
+        filter_character_deck, filter_initial_character_cards, filter_initial_narrative_cards,
+        CharacterCards, NarrativeCards, VNCard, VNCardMetadata,
     },
     llm::*,
     text2img::{EventText2ImageRequest, EventText2ImageResponse},
@@ -134,6 +134,7 @@ pub(crate) fn handle_llm_response(
     mut er_llm_response: EventReader<EventLLMResponse>,
     mut ew_llm_request: EventWriter<EventLLMRequest>,
     mut ew_text_2_image_reqeust: EventWriter<EventText2ImageRequest>,
+    assets: Res<AssetServer>,
 ) {
     for event in er_llm_response.read() {
         match event.request_type {
@@ -145,15 +146,67 @@ pub(crate) fn handle_llm_response(
                     .filter(|s| !s.is_empty())
                     .collect::<Vec<_>>();
 
+                let mut ast_position: usize = 0;
                 for (i, sentence) in sentences.iter().enumerate() {
                     let sentence = sentence.to_string();
                     game_state.narrative_story_so_far.push(sentence.clone());
 
-                    novel_data.push_text_node(
-                        event.who.clone(),
-                        sentence.clone(),
-                        game_state.n_vn_node + 1 + i,
-                    );
+                    if sentence.contains("->") {
+                        let parts: Vec<_> = sentence.split("->").collect();
+                        let who = parts[0];
+                        let who = who.trim().to_string();
+                        let what = parts[1].replace("\"", "");
+                        let what = what.trim().to_string();
+
+                        // find appropriate image
+                        let character_cards =
+                            filter_character_deck(game_state.game_deck.clone()).unwrap();
+                        if let Some(character_card) = character_cards
+                            .iter()
+                            .find(|card| card.metadata.name().unwrap() == who)
+                        {
+                            let character_name = character_card.metadata.name().unwrap();
+                            let image_path = format!("character-cards/{}.png", character_name);
+                            let sprite = Sprite::from_image(assets.load(image_path));
+
+                            println!("{:?}", sprite);
+
+                            novel_data.write_image_cache(character_name.clone(), sprite);
+
+                            novel_data.push_show_node(
+                                character_name.clone(),
+                                game_state.n_vn_node + 1 + ast_position,
+                            );
+                            ast_position += 1;
+
+                            novel_data.push_text_node(
+                                Some(who),
+                                what,
+                                game_state.n_vn_node + 1 + ast_position,
+                            );
+                            ast_position += 1;
+
+                            novel_data.push_hide_node(
+                                character_name.clone(),
+                                game_state.n_vn_node + 1 + ast_position,
+                            );
+                            ast_position += 1;
+                        } else {
+                            novel_data.push_text_node(
+                                Some(who),
+                                what,
+                                game_state.n_vn_node + 1 + i,
+                            );
+                        }
+                    } else {
+                        novel_data.push_text_node(
+                            None,
+                            sentence.clone(),
+                            game_state.n_vn_node + 1 + ast_position,
+                        );
+
+                        ast_position += 1;
+                    }
 
                     novel_settings.pause_handle_switch_node = false;
                 }
