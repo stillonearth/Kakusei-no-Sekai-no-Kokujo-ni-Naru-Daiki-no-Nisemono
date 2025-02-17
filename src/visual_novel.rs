@@ -147,7 +147,7 @@ pub(crate) fn handle_llm_response(
                     .collect::<Vec<_>>();
 
                 let mut ast_position: usize = 0;
-                for (i, sentence) in sentences.iter().enumerate() {
+                for (_, sentence) in sentences.iter().enumerate() {
                     let sentence = sentence.to_string();
                     game_state.narrative_story_so_far.push(sentence.clone());
 
@@ -195,8 +195,10 @@ pub(crate) fn handle_llm_response(
                             novel_data.push_text_node(
                                 Some(who),
                                 what,
-                                game_state.n_vn_node + 1 + i,
+                                game_state.n_vn_node + 1 + ast_position,
                             );
+
+                            ast_position += 1;
                         }
                     } else {
                         novel_data.push_text_node(
@@ -282,8 +284,6 @@ pub(crate) fn handle_new_vn_node(
                 .replace("{STORY}", &game_state.narrative_story_so_far.join(" "))
                 .replace("{CHARACTERS}", &game_state.characters.join(" "))
                 .replace("{PROMPT}", PROMPT);
-
-            println!("prompt: {}", prompt);
 
             ew_llm_request.send(EventLLMRequest {
                 prompt,
