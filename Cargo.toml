@@ -7,31 +7,41 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 anyhow = "1.0"
 bevy = { version = "0.15.2", default-features = false, features = [
-    "animation",
-    "bevy_asset",
-    "bevy_color",
-    "bevy_core_pipeline",
-    "bevy_gilrs",
-    "bevy_gizmos",
-    "bevy_gltf",
-    "bevy_pbr",
-    "bevy_render",
-    "bevy_scene",
-    "bevy_sprite",
-    "bevy_state",
-    "bevy_text",
-    "bevy_ui",
-    "bevy_winit",
-    "default_font",
-    "hdr",
-    "jpeg",
-    "multi_threaded",
-    "png",
-    "smaa_luts",
-    "sysinfo_plugin",
-    "tonemapping_luts",
-    "webgl2",
-    "x11",
+  "android-game-activity",
+  "android-game-activity",
+  "android_shared_stdcxx",
+  "animation",
+  "bevy_asset",
+#   "bevy_audio",
+  "bevy_color",
+  "bevy_core_pipeline",
+  "bevy_gilrs",
+  "bevy_gizmos",
+  "bevy_gltf",
+  "bevy_mesh_picking_backend",
+  "bevy_pbr",
+  "bevy_picking",
+  "bevy_render",
+  "bevy_scene",
+  "bevy_sprite",
+  "bevy_sprite_picking_backend",
+  "bevy_state",
+  "bevy_text",
+  "bevy_ui",
+  "bevy_ui_picking_backend",
+  "bevy_window",
+  "bevy_winit",
+  "custom_cursor",
+  "default_font",
+  "hdr",
+  "multi_threaded",
+  "png",
+  "smaa_luts",
+  "sysinfo_plugin",
+  "tonemapping_luts",
+#   "vorbis",
+  "webgl2",
+  "x11",
 ] }
 bevy_asset_loader = "0.22"
 bevy_common_assets = {version="0.12.0", features = ["json"]}
@@ -39,7 +49,7 @@ bevy_defer = "0.13"
 bevy_la_mesa = { path = "../bevy_la_mesa" }
 bevy_novel = { path = "../bevy_novel" }
 bevy_tweening = "0.12"
-bevy-inspector-egui = "0.28"
+bevy-inspector-egui = "0.29"
 image = "0.25"
 rand = "0.8"
 renpy_parser = "0.0.9"
@@ -47,6 +57,9 @@ reqwest = "0.12.9"
 serde = "1.0"
 serde_json = "1.0"
 url = "2.5.4"
+bevy_hui = "0.3"
+bevy_hui_widgets = "0.2"
+bevy_kira_audio = { version = "0.22", features = ["ogg", "mp3"]}
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 bevy-wasm-tasks = {git="https://github.com/stillonearth/bevy-wasm-tasks.git", rev="09060af", features=["tokio"]}
