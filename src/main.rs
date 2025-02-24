@@ -5,6 +5,7 @@ mod cards_scene;
 mod cards_solitaire;
 mod cards_ui;
 mod llm;
+mod main_menu;
 mod text2img;
 mod visual_novel;
 
@@ -27,6 +28,7 @@ use crate::cards_scene::*;
 use crate::cards_solitaire::*;
 use crate::cards_ui::*;
 use crate::llm::*;
+use crate::main_menu::*;
 use crate::visual_novel::*;
 
 fn main() {
@@ -56,13 +58,14 @@ fn main() {
             NovelPlugin {},
             TasksPlugin::default(),
             Text2ImagePlugin {},
+            MainMenuPlugin {},
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         ))
         .add_systems(Startup, (setup_camera_and_light, load_resources))
-        .add_systems(
-            Update,
-            (start_visual_novel,).run_if(in_state(AppState::Loading)),
-        )
+        // .add_systems(
+        //     Update,
+        //     (start_visual_novel,).run_if(in_state(AppState::Loading)),
+        // )
         .add_systems(
             Update,
             ((
@@ -179,6 +182,7 @@ enum AppState {
     #[default]
     Loading,
     Novel,
+    MainMenu,
 }
 
 // Card Resources
