@@ -14,7 +14,6 @@ use crate::cards_ui::*;
 use crate::EventCardPositionHover;
 use crate::EventCardPositionOut;
 use crate::EventCardPositionPress;
-use crate::NarrativeCardsHandle;
 
 // ---------
 // Resources
@@ -53,6 +52,9 @@ pub(crate) struct GameState {
 // ------
 // Events
 // ------
+
+#[derive(Event)]
+pub(crate) struct EventStartGame {}
 
 #[derive(Event)]
 pub(crate) struct EventStartPokerGame {}
@@ -295,6 +297,7 @@ pub(crate) fn handle_deck_rendered(
         game_state.n_draws = 0;
         ew_shuffle.send(DeckShuffle {
             deck_entity: main_deck_entity.clone(),
+            duration: 75,
         });
         match game_state.game_type {
             GameType::Narrative => {
@@ -320,6 +323,7 @@ pub(crate) fn handle_deck_rendered(
                         deck_entity: main_deck_entity.clone(),
                         play_area_markers,
                         player: 1,
+                        duration: 75,
                     })?;
 
                     Ok(())
@@ -455,8 +459,6 @@ pub(crate) fn handle_start_card_shop(
     mut game_state: ResMut<GameState>,
     mut er_start_card_shop: EventReader<EventStartNarrativeCardShop>,
     mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
-    narrative_cards: Res<Assets<NarrativeCards>>,
-    cards_handle: Res<NarrativeCardsHandle>,
 ) {
     for _ in er_start_card_shop.read() {
         game_state.game_type = GameType::CardShop;
@@ -523,29 +525,9 @@ pub(crate) fn handle_start_card_shop(
             Name::new("Card Show Case".to_string()),
         ));
 
-        let narrative_cards = narrative_cards.get(cards_handle.id()).unwrap();
-        let mut deck: Vec<VNCard> = vec![];
-        for (i, narrative_card) in narrative_cards.iter().enumerate() {
-            if i > 63 {
-                break;
-            }
-
-            deck.push(VNCard {
-                filename: format!("narrative-cards/card-{}.png", i + 1),
-                metadata: VNCardMetadata::Narrative(
-                    i + 1,
-                    narrative_card.card_type.clone(),
-                    narrative_card.genre.clone(),
-                    narrative_card.name.clone(),
-                    narrative_card.effect.clone(),
-                    narrative_card.price,
-                ),
-            });
-        }
-
         ew_render_deck.send(RenderDeck::<VNCard> {
             deck_entity: deck_shop_cards,
-            deck,
+            deck: filter_narrative_cards(game_state.game_deck.clone()).unwrap(),
         });
     }
 }

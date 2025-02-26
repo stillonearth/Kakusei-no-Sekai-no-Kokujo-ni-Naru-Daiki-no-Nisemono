@@ -64,6 +64,7 @@ fn main() {
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         ))
         .add_systems(Startup, (setup_camera_and_light, load_resources))
+        .add_systems(Update, (load_cards,).run_if(in_state(AppState::Loading2)))
         .add_systems(
             Update,
             ((
@@ -102,6 +103,10 @@ fn main() {
         )
         .add_systems(
             Update,
+            ((start_visual_novel,).chain()).run_if(in_state(AppState::MainMenu)),
+        )
+        .add_systems(
+            Update,
             (
                 handle_ui_update_game_state,
                 handle_card_on_table_hover,
@@ -120,6 +125,7 @@ fn main() {
         .add_event::<EventCardPositionHover>()
         .add_event::<EventCardPositionOut>()
         .add_event::<EventCardPositionPress>()
+        .add_event::<EventStartGame>()
         .add_event::<EventEndCardGame>()
         .add_event::<EventHideUIOverlay>()
         .add_event::<EventPlayHand>()
@@ -150,7 +156,7 @@ fn setup_camera_and_light(mut commands: Commands) {
         Name::new("Camera 2d"),
         Camera2d,
         Camera {
-            order: 2,
+            order: 1,
             ..default()
         },
         Transform::from_xyz(0.0, 0.0, 1000.0),
@@ -160,7 +166,7 @@ fn setup_camera_and_light(mut commands: Commands) {
         Name::new("Camera 3d"),
         Camera3d::default(),
         Camera {
-            order: 1,
+            order: 2,
             ..default()
         },
         RayCastPickable,
@@ -178,7 +184,8 @@ fn setup_camera_and_light(mut commands: Commands) {
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 enum AppState {
     #[default]
-    Loading,
+    Loading1,
+    Loading2,
     Novel,
     MainMenu,
 }

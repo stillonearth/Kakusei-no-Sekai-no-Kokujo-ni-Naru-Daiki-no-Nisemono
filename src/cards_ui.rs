@@ -324,16 +324,14 @@ pub fn handle_ui_buttons(
             (Changed<Interaction>, With<Button>),
         >,
     )>,
-    decks: Query<(Entity, &DeckArea)>,
     mut text_query: Query<&mut Text>,
     mut ew_shuffle: EventWriter<DeckShuffle>,
     mut ew_draw_to_hand: EventWriter<DrawToHand>,
     mut ew_play_hand: EventWriter<EventPlayHand>,
     mut ew_end_card_game: EventWriter<EventEndCardGame>,
-
     q_decks: Query<(Entity, &DeckArea)>,
 ) {
-    if decks.iter().count() == 0 {
+    if q_decks.iter().count() == 0 {
         return;
     }
 
@@ -348,6 +346,7 @@ pub fn handle_ui_buttons(
 
                 ew_shuffle.send(DeckShuffle {
                     deck_entity: main_deck_entity,
+                    duration: 75,
                 });
             }
             Interaction::Hovered => {

@@ -5,10 +5,19 @@ use bevy::{
     render::render_resource::{AsBindGroup, ShaderRef},
 };
 use bevy_asset_loader::prelude::*;
+use bevy_defer::AsyncCommandsExtension;
+use bevy_defer::AsyncWorld;
 use bevy_hui::{prelude::*, HuiPlugin};
 use bevy_kira_audio::*;
+use bevy_la_mesa::{
+    events::{DeckRendered, DeckShuffle, DrawToTable, RenderDeck},
+    Card, CardOnTable, DeckArea, PlayArea,
+};
 
-use crate::AppState;
+use crate::{
+    cards_game::{filter_narrative_cards, VNCard},
+    AppState, EventStartGame, GameState,
+};
 
 pub struct MainMenuPlugin;
 
@@ -17,18 +26,35 @@ const SHADER_ASSET_PATH: &str = "shaders/balatro.wgsl";
 impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
         app.add_loading_state(
-            LoadingState::new(AppState::Loading)
-                .continue_to_state(AppState::MainMenu)
+            LoadingState::new(AppState::Loading1)
+                .continue_to_state(AppState::Loading2)
                 .load_collection::<MainMenuAssets>(),
         )
+        .add_event::<StartCardAnimation>()
         .add_plugins((MaterialPlugin::<CustomMaterial>::default(), HuiPlugin))
-        // .add_systems(Startup, render_menu)
-        .add_systems(OnEnter(AppState::MainMenu), show_menu);
+        .add_systems(
+            Update,
+            (shuffle_deck, handle_start_card_animation, animate_card)
+                .run_if(in_state(AppState::MainMenu)),
+        )
+        .add_systems(OnEnter(AppState::MainMenu), show_menu)
+        .add_systems(OnExit(AppState::MainMenu), despawn_menu);
     }
 }
 
+#[derive(Component)]
+pub struct MainMenuResource {}
+
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 pub struct CustomMaterial {}
+
+#[derive(Component)]
+pub struct AnimatedCard {
+    pub animation_start: f32,
+}
+
+#[derive(Event)]
+pub struct StartCardAnimation {}
 
 impl Material for CustomMaterial {
     fn fragment_shader() -> ShaderRef {
@@ -37,34 +63,37 @@ impl Material for CustomMaterial {
 }
 
 #[derive(AssetCollection, Resource)]
-struct MainMenuAssets {
+pub struct MainMenuAssets {
     #[asset(path = "music/balatro_theme.ogg")]
     balatro_theme: Handle<bevy_kira_audio::AudioSource>,
 }
 
 pub fn show_menu(
-    // mut app_state: ResMut<NextState<AppState>>,
     main_menu_assets: Res<MainMenuAssets>,
     audio: Res<Audio>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<CustomMaterial>>,
+    mut custom_materials: ResMut<Assets<CustomMaterial>>,
+    mut standard_materials: ResMut<Assets<StandardMaterial>>,
     asset_server: Res<AssetServer>,
+    mut html_funcs: HtmlFunctions,
+    game_state: Res<GameState>,
+    mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
 ) {
-    // background
+    // table
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::default())),
-        MeshMaterial3d(materials.add(CustomMaterial {})),
-        Transform::default()
-            .with_scale(Vec3::ONE * 35.0)
-            .with_rotation(Quat::from_rotation_x(0.7)),
+        MeshMaterial3d(custom_materials.add(CustomMaterial {})),
+        Transform::from_translation(Vec3::new(0.0, -1.0, 0.0)).with_scale(Vec3::ONE * 50.0),
         ZIndex(2),
+        MainMenuResource {},
     ));
 
     // menu
     commands.spawn((
         HtmlNode(asset_server.load("menu/menu.html")),
         TemplateProperties::default(), //.with("title", "Test-title"),
+        MainMenuResource {},
     ));
 
     audio
@@ -74,4 +103,150 @@ pub fn show_menu(
             Duration::from_secs(2),
             AudioEasing::OutPowi(2),
         ));
+
+    // main menu handler
+    html_funcs.register(
+        "start_game",
+        |In(_), mut ew_start_game: EventWriter<EventStartGame>| {
+            ew_start_game.send(EventStartGame {});
+        },
+    );
+
+    // deck
+    let deck_shop_cards = commands
+        .spawn((
+            Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+            MeshMaterial3d(standard_materials.add(Color::BLACK)),
+            Transform::from_translation(Vec3::new(0.0, 2.1, 0.5))
+                .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
+            Visibility::Hidden,
+            DeckArea { marker: 1 },
+            Name::new("Deck 1 -- Shop Cards"),
+            MainMenuResource {},
+        ))
+        .id();
+
+    // Play Area
+    for i in 0..7 {
+        for j in 0..7 {
+            let material = MeshMaterial3d(standard_materials.add(Color::srgb_u8(124, 144, 255)));
+
+            commands.spawn((
+                Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+                material,
+                Transform::from_translation(Vec3::new(
+                    -10.0 + 3.0 * (i as f32),
+                    3.0,
+                    10.0 - 4.0 * (j as f32),
+                )),
+                Visibility::Hidden,
+                PlayArea {
+                    marker: i * 7 + j,
+                    player: 1,
+                },
+                Name::new(format!("Play Area {} {}", i, j)),
+                RayCastPickable,
+                MainMenuResource {},
+            ));
+        }
+    }
+
+    ew_render_deck.send(RenderDeck::<VNCard> {
+        deck_entity: deck_shop_cards,
+        deck: filter_narrative_cards(game_state.game_deck.clone()).unwrap(),
+    });
+}
+
+pub fn despawn_menu(
+    mut commands: Commands,
+    q_main_menu_entities: Query<(Entity, &MainMenuResource)>,
+    audio: Res<Audio>,
+) {
+    for (entity, _) in q_main_menu_entities.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+
+    audio.stop();
+}
+
+pub fn handle_start_card_animation(
+    mut commands: Commands,
+    mut er_start_card_animation: EventReader<StartCardAnimation>,
+    q_cards_on_table: Query<(Entity, &CardOnTable)>,
+    time: Res<Time>,
+) {
+    for _ in er_start_card_animation.read() {
+        for (entity, _) in q_cards_on_table.iter() {
+            commands.entity(entity).insert(AnimatedCard {
+                animation_start: time.elapsed_secs(),
+            });
+        }
+    }
+}
+
+pub fn animate_card(
+    mut commands: Commands,
+    // q_cards: Query<(Entity, &Card<VNCard>)>,
+    mut q_cards_on_table: Query<(Entity, &mut Transform, &AnimatedCard)>,
+    time: Res<Time>,
+) {
+    for (i, (_, mut transform, ac)) in q_cards_on_table.iter_mut().enumerate() {
+        if i % 2 == 0 {
+            transform.rotate_local_x((time.elapsed_secs() - ac.animation_start).cos() / 50.0);
+            transform.rotate_local_y((time.elapsed_secs() - ac.animation_start).sin() / 50.0);
+        }
+        if i % 2 != 0 {
+            transform.rotate_local_x((time.elapsed_secs() - ac.animation_start).sin() / 50.0);
+            transform.rotate_local_y((time.elapsed_secs() - ac.animation_start).cos() / 50.0);
+        }
+    }
+
+    // for (entity, _) in q_cards.iter() {
+    //     if q_cards_on_table.get(entity).is_err() {
+    //         commands.entity(entity).despawn_recursive();
+    //     }
+    // }
+}
+
+pub fn shuffle_deck(
+    mut commands: Commands,
+    mut er_deck_rendered: EventReader<DeckRendered>,
+    mut ew_shuffle: EventWriter<DeckShuffle>,
+    q_decks: Query<(Entity, &DeckArea)>,
+    q_cards: Query<(Entity, &Card<VNCard>)>,
+) {
+    let deck_idle_time = 1.0;
+    let main_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
+    for _ in er_deck_rendered.read() {
+        ew_shuffle.send(DeckShuffle {
+            deck_entity: main_deck_entity.clone(),
+            duration: 20,
+        });
+
+        for (entity, _) in q_cards.iter() {
+            commands.entity(entity).insert(MainMenuResource {});
+        }
+
+        let main_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
+        let n_cards_on_table = q_cards.iter().count();
+        let shuffle_animation_time = ((n_cards_on_table * 10) as f32) * 0.001;
+
+        commands.spawn_task(move || async move {
+            AsyncWorld.sleep(deck_idle_time).await;
+            AsyncWorld.sleep(shuffle_animation_time).await;
+
+            let play_area_markers: Vec<usize> = (0..49).collect();
+            AsyncWorld.send_event(DrawToTable {
+                deck_entity: main_deck_entity.clone(),
+                play_area_markers,
+                player: 1,
+                duration: 30,
+            })?;
+
+            AsyncWorld.sleep(6).await;
+            AsyncWorld.send_event(StartCardAnimation {})?;
+
+            Ok(())
+        });
+    }
 }

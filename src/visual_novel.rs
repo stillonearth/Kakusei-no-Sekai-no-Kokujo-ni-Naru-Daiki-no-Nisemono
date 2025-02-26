@@ -22,8 +22,8 @@ use crate::{
     },
     llm::*,
     text2img::{EventText2ImageRequest, EventText2ImageResponse},
-    AppState, CharacterCardsHandle, EventStartNarrativeCardShop, EventStartNarrativeGame,
-    EventStartPokerGame, GameState, NarrativeCardsHandle, ScenarioHandle,
+    AppState, CharacterCardsHandle, EventStartGame, EventStartNarrativeCardShop,
+    EventStartNarrativeGame, EventStartPokerGame, GameState, NarrativeCardsHandle, ScenarioHandle,
 };
 
 const PROMPT: &'static str = r#"
@@ -36,27 +36,40 @@ Respond with at least 20 sentences each separated with new line. Each sentence n
 "#;
 
 pub fn start_visual_novel(
+    mut er_event_start_game: EventReader<EventStartGame>,
     mut ew_start_scenario: EventWriter<EventStartScenario>,
     scenario_handle: Res<ScenarioHandle>,
     rpy_assets: Res<Assets<Rpy>>,
+    mut app_state: ResMut<NextState<AppState>>,
+    mut game_state: ResMut<GameState>,
+) {
+    for _ in er_event_start_game.read() {
+        if let Some(rpy) = rpy_assets.get(scenario_handle.id()) {
+            ew_start_scenario.send(EventStartScenario { ast: rpy.0.clone() });
+
+            game_state.collected_deck = [
+                filter_initial_narrative_cards(game_state.game_deck.clone()),
+                filter_initial_character_cards(game_state.game_deck.clone()),
+            ]
+            .concat();
+            app_state.set(AppState::Novel);
+        }
+    }
+}
+
+pub fn load_cards(
     narrative_cards_handle: Res<NarrativeCardsHandle>,
     narrative_cards_assets: Res<Assets<NarrativeCards>>,
     character_cards_handle: Res<CharacterCardsHandle>,
     character_cards_assets: Res<Assets<CharacterCards>>,
-    mut app_state: ResMut<NextState<AppState>>,
     mut game_state: ResMut<GameState>,
+    mut app_state: ResMut<NextState<AppState>>,
 ) {
-    if let Some(rpy) = rpy_assets.get(scenario_handle.id())
-        && let Some(narrative_cards) = narrative_cards_assets.get(narrative_cards_handle.id())
+    if let Some(narrative_cards) = narrative_cards_assets.get(narrative_cards_handle.id())
         && let Some(character_cards) = character_cards_assets.get(character_cards_handle.id())
     {
-        ew_start_scenario.send(EventStartScenario { ast: rpy.0.clone() });
-
         let mut deck: Vec<VNCard> = vec![];
         for (i, narrative_card) in narrative_cards.iter().enumerate() {
-            if i > 63 {
-                break;
-            }
             deck.push(VNCard {
                 filename: format!("narrative-cards/card-{}.png", i + 1),
                 metadata: VNCardMetadata::Narrative(
@@ -83,12 +96,7 @@ pub fn start_visual_novel(
         }
 
         game_state.game_deck = deck.clone();
-        game_state.collected_deck = [
-            filter_initial_narrative_cards(deck.clone()),
-            filter_initial_character_cards(deck.clone()),
-        ]
-        .concat();
-        app_state.set(AppState::Novel);
+        app_state.set(AppState::MainMenu);
     }
 }
 

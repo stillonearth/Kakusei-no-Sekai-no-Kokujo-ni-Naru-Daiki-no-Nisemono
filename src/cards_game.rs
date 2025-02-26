@@ -258,6 +258,15 @@ pub(crate) fn filter_initial_character_cards(deck: Vec<VNCard>) -> Vec<VNCard> {
         .collect()
 }
 
+pub(crate) fn filter_narrative_cards(deck: Vec<VNCard>) -> Result<Vec<VNCard>> {
+    let cards: Vec<VNCard> = deck
+        .iter()
+        .filter(|card| card.metadata.is_narrative())
+        .cloned()
+        .collect();
+    Ok(cards)
+}
+
 fn filter_narrative_cards_by_type(deck: Vec<VNCard>, tp: String) -> Result<Vec<VNCard>> {
     let cards: Vec<VNCard> = deck
         .iter()
