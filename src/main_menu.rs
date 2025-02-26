@@ -13,6 +13,7 @@ use bevy_la_mesa::{
     events::{DeckRendered, DeckShuffle, DrawToTable, RenderDeck},
     Card, CardOnTable, DeckArea, PlayArea,
 };
+use rand::Rng;
 
 use crate::{
     cards_game::{filter_narrative_cards, VNCard},
@@ -51,6 +52,7 @@ pub struct CustomMaterial {}
 #[derive(Component)]
 pub struct AnimatedCard {
     pub animation_start: f32,
+    pub animation_speed: f32,
 }
 
 #[derive(Event)]
@@ -127,21 +129,21 @@ pub fn show_menu(
         .id();
 
     // Play Area
-    for i in 0..7 {
-        for j in 0..7 {
+    for i in 0..8 {
+        for j in 0..8 {
             let material = MeshMaterial3d(standard_materials.add(Color::srgb_u8(124, 144, 255)));
 
             commands.spawn((
                 Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
                 material,
                 Transform::from_translation(Vec3::new(
-                    -10.0 + 3.0 * (i as f32),
+                    -13.0 + 3.7 * (i as f32),
                     3.0,
-                    10.0 - 4.0 * (j as f32),
+                    15.0 - 4.2 * (j as f32),
                 )),
                 Visibility::Hidden,
                 PlayArea {
-                    marker: i * 7 + j,
+                    marker: i * 8 + j,
                     player: 1,
                 },
                 Name::new(format!("Play Area {} {}", i, j)),
@@ -176,36 +178,41 @@ pub fn handle_start_card_animation(
     time: Res<Time>,
 ) {
     for _ in er_start_card_animation.read() {
+        let mut rng = rand::thread_rng();
         for (entity, _) in q_cards_on_table.iter() {
+            let random_number: f32 = rng.gen_range(30.0..120.0);
             commands.entity(entity).insert(AnimatedCard {
                 animation_start: time.elapsed_secs(),
+                animation_speed: random_number,
             });
         }
     }
 }
 
 pub fn animate_card(
-    mut commands: Commands,
+    // mut commands: Commands,
     // q_cards: Query<(Entity, &Card<VNCard>)>,
     mut q_cards_on_table: Query<(Entity, &mut Transform, &AnimatedCard)>,
     time: Res<Time>,
 ) {
     for (i, (_, mut transform, ac)) in q_cards_on_table.iter_mut().enumerate() {
-        if i % 2 == 0 {
-            transform.rotate_local_x((time.elapsed_secs() - ac.animation_start).cos() / 50.0);
-            transform.rotate_local_y((time.elapsed_secs() - ac.animation_start).sin() / 50.0);
+        if i % 3 == 0 {
+            transform.rotate_local_x(
+                (time.elapsed_secs() - ac.animation_start).cos() / ac.animation_speed,
+            );
+            transform.rotate_local_y(
+                (time.elapsed_secs() - ac.animation_start).sin() / ac.animation_speed,
+            );
         }
-        if i % 2 != 0 {
-            transform.rotate_local_x((time.elapsed_secs() - ac.animation_start).sin() / 50.0);
-            transform.rotate_local_y((time.elapsed_secs() - ac.animation_start).cos() / 50.0);
+        if i % 3 != 0 {
+            transform.rotate_local_x(
+                (time.elapsed_secs() - ac.animation_start).sin() / ac.animation_speed,
+            );
+            transform.rotate_local_y(
+                (time.elapsed_secs() - ac.animation_start).cos() / ac.animation_speed,
+            );
         }
     }
-
-    // for (entity, _) in q_cards.iter() {
-    //     if q_cards_on_table.get(entity).is_err() {
-    //         commands.entity(entity).despawn_recursive();
-    //     }
-    // }
 }
 
 pub fn shuffle_deck(
@@ -235,7 +242,7 @@ pub fn shuffle_deck(
             AsyncWorld.sleep(deck_idle_time).await;
             AsyncWorld.sleep(shuffle_animation_time).await;
 
-            let play_area_markers: Vec<usize> = (0..49).collect();
+            let play_area_markers: Vec<usize> = (0..64).collect();
             AsyncWorld.send_event(DrawToTable {
                 deck_entity: main_deck_entity.clone(),
                 play_area_markers,
@@ -243,7 +250,7 @@ pub fn shuffle_deck(
                 duration: 30,
             })?;
 
-            AsyncWorld.sleep(6).await;
+            AsyncWorld.sleep(10).await;
             AsyncWorld.send_event(StartCardAnimation {})?;
 
             Ok(())
