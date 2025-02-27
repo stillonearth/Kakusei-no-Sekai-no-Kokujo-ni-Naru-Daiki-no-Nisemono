@@ -10,7 +10,7 @@ use bevy_tweening::Animator;
 use bevy_tweening::Tween;
 
 use crate::cards_game::*;
-use crate::cards_ui::*;
+use crate::game_menu_old::*;
 use crate::EventCardPositionHover;
 use crate::EventCardPositionOut;
 use crate::EventCardPositionPress;
@@ -52,9 +52,6 @@ pub(crate) struct GameState {
 // ------
 // Events
 // ------
-
-#[derive(Event)]
-pub(crate) struct EventStartGame {}
 
 #[derive(Event)]
 pub(crate) struct EventStartPokerGame {}
@@ -249,7 +246,7 @@ pub(crate) fn handle_play_hand(
             for (entity, _, _) in q_cards.p1().iter() {
                 ew_discard_card_to_deck.send(DiscardCardToDeck {
                     card_entity: entity,
-                    deck_entity: main_deck_entity.clone(),
+                    deck_entity: main_deck_entity,
                 });
             }
         }
@@ -258,7 +255,7 @@ pub(crate) fn handle_play_hand(
             for (entity, _, _) in q_cards.p1().iter() {
                 ew_discard_card_to_deck.send(DiscardCardToDeck {
                     card_entity: entity,
-                    deck_entity: main_deck_entity.clone(),
+                    deck_entity: main_deck_entity,
                 });
             }
         }
@@ -267,7 +264,7 @@ pub(crate) fn handle_play_hand(
             for (entity, _, _) in q_cards.p0().iter() {
                 ew_discard_card_to_deck.send(DiscardCardToDeck {
                     card_entity: entity,
-                    deck_entity: graveyard_deck_entity.clone(),
+                    deck_entity: graveyard_deck_entity,
                 });
             }
         }
@@ -296,7 +293,7 @@ pub(crate) fn handle_deck_rendered(
 
         game_state.n_draws = 0;
         ew_shuffle.send(DeckShuffle {
-            deck_entity: main_deck_entity.clone(),
+            deck_entity: main_deck_entity,
             duration: 75,
         });
         match game_state.game_type {
@@ -305,7 +302,7 @@ pub(crate) fn handle_deck_rendered(
                     AsyncWorld.sleep(deck_idle_time).await;
                     AsyncWorld.sleep(shuffle_animation_time).await;
                     AsyncWorld.send_event(DrawToHand {
-                        deck_entity: main_deck_entity.clone(),
+                        deck_entity: main_deck_entity,
                         num_cards: 6,
                         player: 1,
                     })?;
@@ -320,7 +317,7 @@ pub(crate) fn handle_deck_rendered(
 
                     let play_area_markers: Vec<usize> = (0..25).collect();
                     AsyncWorld.send_event(DrawToTable {
-                        deck_entity: main_deck_entity.clone(),
+                        deck_entity: main_deck_entity,
                         play_area_markers,
                         player: 1,
                         duration: 75,
@@ -334,7 +331,7 @@ pub(crate) fn handle_deck_rendered(
                     AsyncWorld.sleep(deck_idle_time).await;
                     AsyncWorld.sleep(shuffle_animation_time).await;
                     AsyncWorld.send_event(DrawToHand {
-                        deck_entity: main_deck_entity.clone(),
+                        deck_entity: main_deck_entity,
                         num_cards: 1,
                         player: 1,
                     })?;

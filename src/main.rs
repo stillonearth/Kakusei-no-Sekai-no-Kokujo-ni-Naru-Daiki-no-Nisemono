@@ -3,7 +3,8 @@
 mod cards_game;
 mod cards_scene;
 mod cards_solitaire;
-mod cards_ui;
+mod game_menu_new;
+mod game_menu_old;
 mod llm;
 mod main_menu;
 mod text2img;
@@ -11,6 +12,7 @@ mod visual_novel;
 
 use bevy::asset::AssetMetaCheck;
 use bevy::color::palettes::css::WHITE;
+use bevy_hui::HuiPlugin;
 use bevy_kira_audio::AudioPlugin;
 use bevy_wasm_tasks::*;
 
@@ -27,7 +29,8 @@ use text2img::Text2ImagePlugin;
 
 use crate::cards_scene::*;
 use crate::cards_solitaire::*;
-use crate::cards_ui::*;
+use crate::game_menu_new::GameMenuPlugin;
+use crate::game_menu_old::*;
 use crate::llm::*;
 use crate::main_menu::*;
 use crate::visual_novel::*;
@@ -60,11 +63,14 @@ fn main() {
             TasksPlugin::default(),
             Text2ImagePlugin {},
             MainMenuPlugin {},
+            GameMenuPlugin,
             AudioPlugin,
+            HuiPlugin,
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         ))
         .add_systems(Startup, (setup_camera_and_light, load_resources))
         .add_systems(Update, (load_cards,).run_if(in_state(AppState::Loading2)))
+        .add_systems(OnEnter(AppState::Novel), start_visual_novel)
         .add_systems(
             Update,
             ((
@@ -125,7 +131,6 @@ fn main() {
         .add_event::<EventCardPositionHover>()
         .add_event::<EventCardPositionOut>()
         .add_event::<EventCardPositionPress>()
-        .add_event::<EventStartGame>()
         .add_event::<EventEndCardGame>()
         .add_event::<EventHideUIOverlay>()
         .add_event::<EventPlayHand>()

@@ -9,7 +9,7 @@ use bevy_novel::{
         EventSwitchNextNode,
     },
     rpy_asset_loader::Rpy,
-    NovelData, NovelSettings,
+    NovelData, NovelSettings, NovelText,
 };
 use image::DynamicImage;
 use renpy_parser::parsers::AST;
@@ -22,11 +22,11 @@ use crate::{
     },
     llm::*,
     text2img::{EventText2ImageRequest, EventText2ImageResponse},
-    AppState, CharacterCardsHandle, EventStartGame, EventStartNarrativeCardShop,
-    EventStartNarrativeGame, EventStartPokerGame, GameState, NarrativeCardsHandle, ScenarioHandle,
+    AppState, CharacterCardsHandle, EventStartNarrativeCardShop, EventStartNarrativeGame,
+    EventStartPokerGame, GameState, NarrativeCardsHandle, ScenarioHandle,
 };
 
-const PROMPT: &'static str = r#"
+const PROMPT: &str = r#"
 You are narrator in a visual novel.
 Create a script for visual novel based on this setting.
 Respond only with story sentences and character lines.
@@ -36,24 +36,25 @@ Respond with at least 20 sentences each separated with new line. Each sentence n
 "#;
 
 pub fn start_visual_novel(
-    mut er_event_start_game: EventReader<EventStartGame>,
     mut ew_start_scenario: EventWriter<EventStartScenario>,
     scenario_handle: Res<ScenarioHandle>,
     rpy_assets: Res<Assets<Rpy>>,
-    mut app_state: ResMut<NextState<AppState>>,
     mut game_state: ResMut<GameState>,
+    mut q_novel_text: Query<(Entity, &mut Node, &NovelText)>,
 ) {
-    for _ in er_event_start_game.read() {
-        if let Some(rpy) = rpy_assets.get(scenario_handle.id()) {
-            ew_start_scenario.send(EventStartScenario { ast: rpy.0.clone() });
+    if let Some(rpy) = rpy_assets.get(scenario_handle.id()) {
+        ew_start_scenario.send(EventStartScenario { ast: rpy.0.clone() });
 
-            game_state.collected_deck = [
-                filter_initial_narrative_cards(game_state.game_deck.clone()),
-                filter_initial_character_cards(game_state.game_deck.clone()),
-            ]
-            .concat();
-            app_state.set(AppState::Novel);
-        }
+        game_state.collected_deck = [
+            filter_initial_narrative_cards(game_state.game_deck.clone()),
+            filter_initial_character_cards(game_state.game_deck.clone()),
+        ]
+        .concat();
+    }
+
+    for (_, mut node, _) in q_novel_text.iter_mut() {
+        node.left = Val::Percent(20.0);
+        node.margin = UiRect::new(Val::Px(20.0), Val::Px(0.0), Val::Px(0.0), Val::Px(0.0));
     }
 }
 
@@ -96,7 +97,7 @@ pub fn load_cards(
         }
 
         game_state.game_deck = deck.clone();
-        app_state.set(AppState::MainMenu);
+        app_state.set(AppState::Novel);
     }
 }
 
@@ -155,7 +156,7 @@ pub(crate) fn handle_llm_response(
                     .collect::<Vec<_>>();
 
                 let mut ast_position: usize = 0;
-                for (_, sentence) in sentences.iter().enumerate() {
+                for sentence in sentences.iter() {
                     let sentence = sentence.to_string();
                     game_state.narrative_story_so_far.push(sentence.clone());
 

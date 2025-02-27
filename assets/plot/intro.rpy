@@ -34,7 +34,7 @@ label chapter1_1:
     game_mechanic "card play narrative conflict"
 
     llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Characters are: ```{CHARACTERS}. Continue this story with a conflict: ```{CONFLICT}```."
-yo
+
     game_mechanic "card play narrative plot twist"
 
     llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Characters are: ```{CHARACTERS}. Continue this story with a plot twist: ```{PLOT TWIST}```."
@@ -82,4 +82,3 @@ yo
     llm_generate storyteller "{PROMPT} Story so far ```{STORY}```. Characters are: ```{CHARACTERS}. Continue this story with a plot twist: ```{PLOT TWIST}```."
 
     "THE END OF DEMO VERSION"
-    

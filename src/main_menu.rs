@@ -7,7 +7,7 @@ use bevy::{
 use bevy_asset_loader::prelude::*;
 use bevy_defer::AsyncCommandsExtension;
 use bevy_defer::AsyncWorld;
-use bevy_hui::{prelude::*, HuiPlugin};
+use bevy_hui::prelude::*;
 use bevy_kira_audio::*;
 use bevy_la_mesa::{
     events::{DeckRendered, DeckShuffle, DrawToTable, RenderDeck},
@@ -17,7 +17,7 @@ use rand::Rng;
 
 use crate::{
     cards_game::{filter_narrative_cards, VNCard},
-    AppState, EventStartGame, GameState,
+    AppState, GameState,
 };
 
 pub struct MainMenuPlugin;
@@ -32,7 +32,7 @@ impl Plugin for MainMenuPlugin {
                 .load_collection::<MainMenuAssets>(),
         )
         .add_event::<StartCardAnimation>()
-        .add_plugins((MaterialPlugin::<CustomMaterial>::default(), HuiPlugin))
+        .add_plugins(MaterialPlugin::<CustomMaterial>::default())
         .add_systems(
             Update,
             (shuffle_deck, handle_start_card_animation, animate_card)
@@ -93,7 +93,7 @@ pub fn show_menu(
 
     // menu
     commands.spawn((
-        HtmlNode(asset_server.load("menu/menu.html")),
+        HtmlNode(asset_server.load("menu/main_menu.html")),
         TemplateProperties::default(), //.with("title", "Test-title"),
         MainMenuResource {},
     ));
@@ -109,8 +109,9 @@ pub fn show_menu(
     // main menu handler
     html_funcs.register(
         "start_game",
-        |In(_), mut ew_start_game: EventWriter<EventStartGame>| {
-            ew_start_game.send(EventStartGame {});
+        |In(_), mut app_state: ResMut<NextState<AppState>>| {
+            app_state.set(AppState::Novel);
+            // ew_start_game.send(EventStartGame {});
         },
     );
 
@@ -226,7 +227,7 @@ pub fn shuffle_deck(
     let main_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
     for _ in er_deck_rendered.read() {
         ew_shuffle.send(DeckShuffle {
-            deck_entity: main_deck_entity.clone(),
+            deck_entity: main_deck_entity,
             duration: 20,
         });
 
@@ -244,7 +245,7 @@ pub fn shuffle_deck(
 
             let play_area_markers: Vec<usize> = (0..64).collect();
             AsyncWorld.send_event(DrawToTable {
-                deck_entity: main_deck_entity.clone(),
+                deck_entity: main_deck_entity,
                 play_area_markers,
                 player: 1,
                 duration: 30,
