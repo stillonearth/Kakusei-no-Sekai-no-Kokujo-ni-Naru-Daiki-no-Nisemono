@@ -3,8 +3,7 @@
 mod cards_game;
 mod cards_scene;
 mod cards_solitaire;
-mod game_menu_new;
-mod game_menu_old;
+mod game_menu;
 mod llm;
 mod main_menu;
 mod splashscreen;
@@ -34,8 +33,7 @@ use text2img::Text2ImagePlugin;
 
 use crate::cards_scene::*;
 use crate::cards_solitaire::*;
-use crate::game_menu_new::GameMenuPlugin;
-use crate::game_menu_old::*;
+use crate::game_menu::GameMenuPlugin;
 use crate::llm::*;
 use crate::main_menu::*;
 use crate::visual_novel::*;
@@ -87,17 +85,13 @@ fn main() {
                 handle_card_position_press,
                 handle_card_press_cardplay,
                 handle_deck_rendered,
-                handle_deck_rendered_card_ui,
                 handle_draw_to_hand,
                 handle_draw_to_table,
-                handle_end_card_game,
-                handle_hide_ui_overlay,
                 handle_llm_response,
                 handle_new_vn_node,
-                handle_play_hand_effect,
                 handle_play_hand,
                 handle_text_2_image_response,
-                handle_ui_buttons,
+                handle_end_card_game,
             )
                 .chain())
             .run_if(in_state(AppState::Game)),
@@ -122,11 +116,9 @@ fn main() {
         .add_systems(
             Update,
             (
-                handle_ui_update_game_state,
                 handle_card_on_table_hover,
                 handle_card_on_table_out,
                 handle_card_press_cardshop,
-                handle_buttons_visibility,
             )
                 .run_if(in_state(AppState::Game)),
         )
@@ -140,18 +132,13 @@ fn main() {
         .add_event::<EventCardPositionOut>()
         .add_event::<EventCardPositionPress>()
         .add_event::<EventEndCardGame>()
-        .add_event::<EventHideUIOverlay>()
         .add_event::<EventPlayHand>()
-        .add_event::<EventPlayPokerHandEffect>()
         .add_event::<EventStartNarrativeGame>()
         .add_event::<EventStartPokerGame>()
         .add_event::<EventStartNarrativeCardShop>()
-        .add_event::<EventUpdateGameStateUI>()
         // Resources
         .insert_resource(GameState {
             max_n_poker_draws: 25,
-            ui_show_advance_button: false,
-            ui_enable_play_hand: false,
             score: 0,
             collected_deck: vec![],
             ..default()
@@ -172,10 +159,10 @@ fn setup_camera_and_light(mut commands: Commands) {
             order: 1,
             ..default()
         },
-        PixelZoom::FitSize {
-            width: 320,
-            height: 180,
-        },
+        // PixelZoom::FitSize {
+        //     width: 320,
+        //     height: 180,
+        // },
         Transform::from_xyz(0.0, 0.0, 1000.0),
     ));
 

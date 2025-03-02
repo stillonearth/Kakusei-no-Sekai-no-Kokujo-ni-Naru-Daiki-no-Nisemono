@@ -7,6 +7,8 @@ use bevy_la_mesa::{
     Card, Hand, PlayArea,
 };
 
+use crate::game_menu::EventRefreshUI;
+use crate::game_menu::PokerMenuSettings;
 use crate::{cards_game::VNCard, GameState};
 
 #[derive(Event)]
@@ -57,6 +59,7 @@ pub fn handle_card_position_press(
     q_cards_in_hand: Query<(Entity, &Card<VNCard>, &Hand)>,
     mut q_play_areas: Query<(Entity, &mut Visibility, &PlayArea)>,
     q_decks: Query<(Entity, &DeckArea)>,
+    mut ew_refresh_ui: EventWriter<EventRefreshUI>,
 ) {
     for event in card_position_press.read() {
         if q_cards_in_hand.iter().len() == 0 {
@@ -88,6 +91,17 @@ pub fn handle_card_position_press(
                     })?;
                     Ok(())
                 });
+                ew_refresh_ui.send(EventRefreshUI::PokerMenu(PokerMenuSettings {
+                    show_advance_button: false,
+                    show_score: false,
+                    score: game_state.score as usize,
+                }));
+            } else {
+                ew_refresh_ui.send(EventRefreshUI::PokerMenu(PokerMenuSettings {
+                    show_advance_button: true,
+                    show_score: false,
+                    score: game_state.score as usize,
+                }));
             }
 
             *visibility = Visibility::Hidden;

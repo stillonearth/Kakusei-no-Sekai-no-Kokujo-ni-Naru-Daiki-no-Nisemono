@@ -191,8 +191,6 @@ pub fn handle_start_card_animation(
 }
 
 pub fn animate_card(
-    // mut commands: Commands,
-    // q_cards: Query<(Entity, &Card<VNCard>)>,
     mut q_cards_on_table: Query<(Entity, &mut Transform, &AnimatedCard)>,
     time: Res<Time>,
 ) {

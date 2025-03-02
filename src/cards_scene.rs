@@ -5,12 +5,14 @@ use bevy_defer::AsyncCommandsExtension;
 use bevy_defer::AsyncWorld;
 use bevy_la_mesa::events::*;
 use bevy_la_mesa::*;
+use bevy_novel::events::EventSwitchNextNode;
 use bevy_tweening::lens::TransformPositionLens;
 use bevy_tweening::Animator;
 use bevy_tweening::Tween;
 
 use crate::cards_game::*;
-use crate::game_menu_old::*;
+use crate::game_menu::EventRefreshUI;
+use crate::game_menu::PokerMenuSettings;
 use crate::EventCardPositionHover;
 use crate::EventCardPositionOut;
 use crate::EventCardPositionPress;
@@ -22,6 +24,7 @@ use crate::EventCardPositionPress;
 #[derive(Resource, Default, Debug, PartialEq, Eq)]
 pub(crate) enum GameType {
     #[default]
+    VisualNovel,
     Poker,
     Narrative,
     CardShop,
@@ -35,7 +38,6 @@ pub(crate) struct GameState {
     pub max_n_poker_draws: usize,
     pub n_draws: usize,
     pub n_turns: usize,
-    pub is_turn_over: bool,
     pub n_vn_node_scene_request: usize,
     pub n_vn_node: usize,
     pub narrative_conflicts: Vec<String>,
@@ -45,8 +47,6 @@ pub(crate) struct GameState {
     pub narrative_story_so_far: Vec<String>,
     pub poker_combinations: Vec<PokerCombination>,
     pub score: isize,
-    pub ui_enable_play_hand: bool,
-    pub ui_show_advance_button: bool,
 }
 
 // ------
@@ -140,7 +140,6 @@ pub fn handle_card_press_cardshop(
     mut card_press: EventReader<CardPress>,
     mut ew_discard_card_to_deck: EventWriter<DiscardCardToDeck>,
     q_cards_on_table: Query<(Entity, &Card<VNCard>, &CardOnTable)>,
-    mut ew_update_game_state_ui: EventWriter<EventUpdateGameStateUI>,
     q_decks: Query<(Entity, &DeckArea)>,
 ) {
     for event in card_press.read() {
@@ -158,7 +157,6 @@ pub fn handle_card_press_cardshop(
                     deck_entity: graveyard_deck_entity,
                 });
                 game_state.collected_deck.push(card.data.clone());
-                ew_update_game_state_ui.send(EventUpdateGameStateUI {});
             }
         }
     }
@@ -167,12 +165,9 @@ pub fn handle_card_press_cardshop(
 pub(crate) fn handle_draw_to_hand(
     mut er_draw_deck: EventReader<DrawToHand>,
     mut game_state: ResMut<GameState>,
-    mut ew_update_game_state_ui: EventWriter<EventUpdateGameStateUI>,
 ) {
     for _ in er_draw_deck.read() {
         game_state.n_draws += 1;
-        // game_state.ui_enable_play_hand = true;
-        ew_update_game_state_ui.send(EventUpdateGameStateUI {});
     }
 }
 
@@ -193,7 +188,6 @@ pub(crate) fn handle_play_hand(
     mut er_play_hand: EventReader<EventPlayHand>,
     mut ew_discard_card_to_deck: EventWriter<DiscardCardToDeck>,
     mut ew_align_cards_in_hand: EventWriter<AlignCardsInHand>,
-    mut ew_play_hand_effect: EventWriter<EventPlayPokerHandEffect>,
     mut game_state: ResMut<GameState>,
     q_decks: Query<(Entity, &DeckArea)>,
 ) {
@@ -220,7 +214,7 @@ pub(crate) fn handle_play_hand(
                 continue;
             }
 
-            let mut total_score = 0;
+            // let mut total_score = 0;
             for r in 0..5 {
                 let mut row_cards = poker_cards_on_table
                     .iter()
@@ -236,11 +230,8 @@ pub(crate) fn handle_play_hand(
 
                 let (_combination, score) = check_poker_hand(row_cards);
 
-                total_score += score;
+                // total_score += score;
                 game_state.score += score as isize;
-                ew_play_hand_effect.send(EventPlayPokerHandEffect {
-                    score: total_score as isize,
-                });
             }
 
             for (entity, _, _) in q_cards.p1().iter() {
@@ -339,6 +330,7 @@ pub(crate) fn handle_deck_rendered(
                     Ok(())
                 });
             }
+            GameType::VisualNovel => {}
         }
     }
 }
@@ -350,6 +342,7 @@ pub(crate) fn handle_start_poker_game(
     mut game_state: ResMut<GameState>,
     mut er_start_poker_game: EventReader<EventStartPokerGame>,
     mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
+    mut ew_refresh_ui: EventWriter<EventRefreshUI>,
 ) {
     for _ in er_start_poker_game.read() {
         game_state.game_type = GameType::Poker;
@@ -410,6 +403,12 @@ pub(crate) fn handle_start_poker_game(
             deck_entity: deck_play_cards,
             deck: load_poker_deck(),
         });
+
+        ew_refresh_ui.send(EventRefreshUI::PokerMenu(PokerMenuSettings {
+            show_advance_button: false,
+            show_score: false,
+            score: 100,
+        }));
     }
 }
 
@@ -444,6 +443,7 @@ pub(crate) fn handle_start_card_shop(
     mut game_state: ResMut<GameState>,
     mut er_start_card_shop: EventReader<EventStartNarrativeCardShop>,
     mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
+    mut ew_refresh_ui: EventWriter<EventRefreshUI>,
 ) {
     for _ in er_start_card_shop.read() {
         game_state.game_type = GameType::CardShop;
@@ -514,6 +514,8 @@ pub(crate) fn handle_start_card_shop(
             deck_entity: deck_shop_cards,
             deck: filter_narrative_cards(game_state.game_deck.clone()).unwrap(),
         });
+
+        ew_refresh_ui.send(EventRefreshUI::NovelMenu);
     }
 }
 
@@ -722,4 +724,29 @@ pub(crate) fn handle_card_on_table_out(
             }
         }
     });
+}
+
+pub(crate) fn handle_end_card_game(
+    mut commands: Commands,
+    q_cards: Query<(Entity, &Card<VNCard>)>,
+    q_play_areas: Query<(Entity, &PlayArea)>,
+    q_deck_areas: Query<(Entity, &DeckArea)>,
+    mut er_end_game: EventReader<EventEndCardGame>,
+    mut ew_switch_next_vn_node: EventWriter<EventSwitchNextNode>,
+) {
+    for _ in er_end_game.read() {
+        for (entity, _) in q_cards.iter() {
+            commands.entity(entity).despawn_recursive();
+        }
+
+        for (entity, _) in q_play_areas.iter() {
+            commands.entity(entity).despawn_recursive();
+        }
+
+        for (entity, _) in q_deck_areas.iter() {
+            commands.entity(entity).despawn_recursive();
+        }
+
+        ew_switch_next_vn_node.send(EventSwitchNextNode {});
+    }
 }

@@ -18,13 +18,12 @@ use uuid::Uuid;
 use crate::{
     cards_game::{
         filter_character_deck, filter_initial_character_cards, filter_initial_narrative_cards,
-        CharacterCards, NarrativeCards, VNCard, VNCardMetadata,
     },
-    game_menu_new::{EventRefreshUI, PokerMenuSettings},
+    game_menu::EventRefreshUI,
     llm::*,
     text2img::{EventText2ImageRequest, EventText2ImageResponse},
-    AppState, CharacterCardsHandle, EventStartNarrativeCardShop, EventStartNarrativeGame,
-    EventStartPokerGame, GameState, NarrativeCardsHandle, ScenarioHandle,
+    EventStartNarrativeCardShop, EventStartNarrativeGame, EventStartPokerGame, GameState, GameType,
+    ScenarioHandle,
 };
 
 const PROMPT: &str = r#"
@@ -256,6 +255,8 @@ pub(crate) fn handle_new_vn_node(
                 who: Some(who),
                 request_type: LLMRequestType::Story,
             });
+            ew_refresh_ui.send(EventRefreshUI::LoadingMenu);
+            game_state.game_type = GameType::VisualNovel;
         } else {
             novel_settings.pause_handle_switch_node = false;
         }
@@ -267,10 +268,6 @@ pub(crate) fn handle_new_vn_node(
             match mechanic.as_str() {
                 "card play poker" => {
                     ew_start_poker_game.send(EventStartPokerGame {});
-                    ew_refresh_ui.send(EventRefreshUI::PokerMenu(PokerMenuSettings {
-                        show_advance_button: false,
-                        score: 666,
-                    }));
                 }
                 "card play narrative setting" => {
                     ew_start_narrative_game.send(EventStartNarrativeGame::Setting);
@@ -291,6 +288,8 @@ pub(crate) fn handle_new_vn_node(
             }
         } else {
             ew_show_vn_text_node.send(EventShowTextNode {});
+            ew_refresh_ui.send(EventRefreshUI::NovelMenu);
+            game_state.game_type = GameType::VisualNovel;
         }
     }
 }
