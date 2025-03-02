@@ -7,6 +7,7 @@ mod game_menu_new;
 mod game_menu_old;
 mod llm;
 mod main_menu;
+mod splashscreen;
 mod text2img;
 mod visual_novel;
 
@@ -21,10 +22,14 @@ use bevy_common_assets::json::JsonAssetPlugin;
 use bevy_defer::AsyncPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_la_mesa::*;
+use bevy_modern_pixel_camera::prelude::*;
 use bevy_novel::*;
 use cards_game::CharacterCards;
 use cards_game::NarrativeCards;
+use cards_game::VNCard;
+use cards_game::VNCardMetadata;
 use rpy_asset_loader::Rpy;
+use splashscreen::SplashscreenPlugin;
 use text2img::Text2ImagePlugin;
 
 use crate::cards_scene::*;
@@ -37,7 +42,6 @@ use crate::visual_novel::*;
 
 fn main() {
     App::new()
-        .add_plugins(())
         .add_plugins((
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
@@ -57,20 +61,24 @@ fn main() {
             JsonAssetPlugin::<NarrativeCards>::new(&["json"]),
             JsonAssetPlugin::<CharacterCards>::new(&["json"]),
             LaMesaPlugin::<cards_game::VNCard>::default(),
-            LLMPlugin {},
             MeshPickingPlugin,
             NovelPlugin {},
             TasksPlugin::default(),
-            Text2ImagePlugin {},
-            MainMenuPlugin {},
-            GameMenuPlugin,
             AudioPlugin,
             HuiPlugin,
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
+            PixelCameraPlugin,
+        ))
+        .add_plugins((
+            SplashscreenPlugin,
+            LLMPlugin,
+            Text2ImagePlugin,
+            MainMenuPlugin,
+            GameMenuPlugin,
         ))
         .add_systems(Startup, (setup_camera_and_light, load_resources))
         .add_systems(Update, (load_cards,).run_if(in_state(AppState::Loading2)))
-        .add_systems(OnEnter(AppState::Novel), start_visual_novel)
+        .add_systems(OnEnter(AppState::Game), start_visual_novel)
         .add_systems(
             Update,
             ((
@@ -92,7 +100,7 @@ fn main() {
                 handle_ui_buttons,
             )
                 .chain())
-            .run_if(in_state(AppState::Novel)),
+            .run_if(in_state(AppState::Game)),
         )
         .add_systems(
             Update,
@@ -105,7 +113,7 @@ fn main() {
                 apply_deferred,
             )
                 .chain())
-            .run_if(in_state(AppState::Novel)),
+            .run_if(in_state(AppState::Game)),
         )
         .add_systems(
             Update,
@@ -120,7 +128,7 @@ fn main() {
                 handle_card_press_cardshop,
                 handle_buttons_visibility,
             )
-                .run_if(in_state(AppState::Novel)),
+                .run_if(in_state(AppState::Game)),
         )
         // Plugin Settings
         .insert_resource(NovelSettings {
@@ -164,6 +172,10 @@ fn setup_camera_and_light(mut commands: Commands) {
             order: 1,
             ..default()
         },
+        PixelZoom::FitSize {
+            width: 320,
+            height: 180,
+        },
         Transform::from_xyz(0.0, 0.0, 1000.0),
     ));
 
@@ -191,7 +203,7 @@ enum AppState {
     #[default]
     Loading1,
     Loading2,
-    Novel,
+    Game,
     MainMenu,
 }
 
@@ -217,4 +229,47 @@ fn load_resources(mut commands: Commands, asset_server: Res<AssetServer>) {
     let narrative_cards_handle =
         NarrativeCardsHandle(asset_server.load("narrative-cards/cards.json"));
     commands.insert_resource(narrative_cards_handle);
+}
+
+fn load_cards(
+    narrative_cards_handle: Res<NarrativeCardsHandle>,
+    narrative_cards_assets: Res<Assets<NarrativeCards>>,
+    character_cards_handle: Res<CharacterCardsHandle>,
+    character_cards_assets: Res<Assets<CharacterCards>>,
+    mut game_state: ResMut<GameState>,
+    mut app_state: ResMut<NextState<AppState>>,
+) {
+    if let Some(narrative_cards) = narrative_cards_assets.get(narrative_cards_handle.id())
+        && let Some(character_cards) = character_cards_assets.get(character_cards_handle.id())
+    {
+        let mut deck: Vec<VNCard> = vec![];
+        for (i, narrative_card) in narrative_cards.iter().enumerate() {
+            deck.push(VNCard {
+                filename: format!("narrative-cards/card-{}.png", i + 1),
+                metadata: VNCardMetadata::Narrative(
+                    i + 1,
+                    narrative_card.card_type.clone(),
+                    narrative_card.genre.clone(),
+                    narrative_card.name.clone(),
+                    narrative_card.effect.clone(),
+                    narrative_card.price,
+                ),
+            });
+        }
+
+        for (i, narrative_card) in character_cards.iter().enumerate() {
+            deck.push(VNCard {
+                filename: format!("character-cards/card-{}.png", i + 1),
+                metadata: VNCardMetadata::Character(
+                    i + 1,
+                    narrative_card.name.clone(),
+                    narrative_card.description.clone(),
+                    narrative_card.price,
+                ),
+            });
+        }
+
+        game_state.game_deck = deck.clone();
+        app_state.set(AppState::Game);
+    }
 }

@@ -7,7 +7,8 @@ use serde::{Deserialize, Serialize};
 
 const API_ENDPOINT: &str = "http://167.88.162.83/api";
 
-pub struct LLMPlugin {}
+#[derive(Default)]
+pub struct LLMPlugin;
 
 #[derive(Serialize)]
 struct LLMRequest {

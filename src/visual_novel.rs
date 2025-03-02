@@ -20,6 +20,7 @@ use crate::{
         filter_character_deck, filter_initial_character_cards, filter_initial_narrative_cards,
         CharacterCards, NarrativeCards, VNCard, VNCardMetadata,
     },
+    game_menu_new::{EventRefreshUI, PokerMenuSettings},
     llm::*,
     text2img::{EventText2ImageRequest, EventText2ImageResponse},
     AppState, CharacterCardsHandle, EventStartNarrativeCardShop, EventStartNarrativeGame,
@@ -55,49 +56,6 @@ pub fn start_visual_novel(
     for (_, mut node, _) in q_novel_text.iter_mut() {
         node.left = Val::Percent(20.0);
         node.margin = UiRect::new(Val::Px(20.0), Val::Px(0.0), Val::Px(0.0), Val::Px(0.0));
-    }
-}
-
-pub fn load_cards(
-    narrative_cards_handle: Res<NarrativeCardsHandle>,
-    narrative_cards_assets: Res<Assets<NarrativeCards>>,
-    character_cards_handle: Res<CharacterCardsHandle>,
-    character_cards_assets: Res<Assets<CharacterCards>>,
-    mut game_state: ResMut<GameState>,
-    mut app_state: ResMut<NextState<AppState>>,
-) {
-    if let Some(narrative_cards) = narrative_cards_assets.get(narrative_cards_handle.id())
-        && let Some(character_cards) = character_cards_assets.get(character_cards_handle.id())
-    {
-        let mut deck: Vec<VNCard> = vec![];
-        for (i, narrative_card) in narrative_cards.iter().enumerate() {
-            deck.push(VNCard {
-                filename: format!("narrative-cards/card-{}.png", i + 1),
-                metadata: VNCardMetadata::Narrative(
-                    i + 1,
-                    narrative_card.card_type.clone(),
-                    narrative_card.genre.clone(),
-                    narrative_card.name.clone(),
-                    narrative_card.effect.clone(),
-                    narrative_card.price,
-                ),
-            });
-        }
-
-        for (i, narrative_card) in character_cards.iter().enumerate() {
-            deck.push(VNCard {
-                filename: format!("character-cards/card-{}.png", i + 1),
-                metadata: VNCardMetadata::Character(
-                    i + 1,
-                    narrative_card.name.clone(),
-                    narrative_card.description.clone(),
-                    narrative_card.price,
-                ),
-            });
-        }
-
-        game_state.game_deck = deck.clone();
-        app_state.set(AppState::Novel);
     }
 }
 
@@ -177,8 +135,6 @@ pub(crate) fn handle_llm_response(
                             let character_name = character_card.metadata.name().unwrap();
                             let image_path = format!("character-cards/{}.png", character_name);
                             let sprite = Sprite::from_image(assets.load(image_path));
-
-                            println!("{:?}", sprite);
 
                             novel_data.write_image_cache(character_name.clone(), sprite);
 
@@ -262,6 +218,7 @@ pub(crate) fn handle_new_vn_node(
     mut ew_start_narrative_card_shop: EventWriter<EventStartNarrativeCardShop>,
     mut ew_hide_vn_text_node: EventWriter<EventHideTextNode>,
     mut ew_show_vn_text_node: EventWriter<EventShowTextNode>,
+    mut ew_refresh_ui: EventWriter<EventRefreshUI>,
 ) {
     for event in er_handle_node.read() {
         game_state.n_vn_node = event.ast.index();
@@ -310,6 +267,10 @@ pub(crate) fn handle_new_vn_node(
             match mechanic.as_str() {
                 "card play poker" => {
                     ew_start_poker_game.send(EventStartPokerGame {});
+                    ew_refresh_ui.send(EventRefreshUI::PokerMenu(PokerMenuSettings {
+                        show_advance_button: false,
+                        score: 666,
+                    }));
                 }
                 "card play narrative setting" => {
                     ew_start_narrative_game.send(EventStartNarrativeGame::Setting);

@@ -14,12 +14,17 @@
         display: inline-block;
         text-align: center;
         overflow: hidden;
+        background: #000;
       }
       .card-title {
-        background-color: #f8f9fa;
         padding: 10px;
-        font-size: 18px;
+        font-size: 14px;
         font-weight: bold;
+        color: #fff !important;
+        padding-left: 57px;
+        text-align: left;
+        margin-top: -23px;
+
       }
       .card-info {
         padding: 10px;
@@ -32,6 +37,16 @@
       .card-genre {
         color: #6c757d;
         font-style: italic;
+      }
+      .card-price {
+        position: absolute;
+        top: 210px;
+        left: 30px;
+        background: red;
+        border-radius: 20px;
+        padding: 10px;
+        color: white;
+        font-weight: bold;
       }
       .card-effect {
         /* margin-top: 10px; */
@@ -49,7 +64,7 @@
       .card-image {
         background-color: red;
         width: 100%;
-        height: 100px;
+        height: 220px;
         width: 230px;
         z-index: 0;
       }
@@ -57,12 +72,13 @@
   </head>
   <body>
     <div class="card" id="cardTemplate" style="display: none">
-      <div class="card-title">{{name}}</div>
       <img class="card-image"></img>
+      <span class="card-price">{{price}}</span>
+      <div class="card-title">{{name}}</div>
       <div class="card-info">
-        <span class="card-type">Type: {{type}}</span><br />
-        <span class="card-genre">Genre: {{genre}}</span><br />
-        <span class="card-price">Price: {{price}}</span>
+        <span class="card-type">{{type}}</span>
+        <span>|</span>
+        <span class="card-genre">{{genre}}</span>
       </div>
       <div class="card-effect">{{effect}}</div>
       <div class="card-flavorText">{{flavorText}}</div>
@@ -1773,9 +1789,9 @@
         // clone.querySelector('.card-image').setAttribute("crossorigin", "anonymous")
         clone.querySelector('.card-image').src = imageFile
         clone.querySelector(".card-title").textContent = card.name;
-        clone.querySelector(".card-price").textContent = `Price: ${card.price}`;
-        clone.querySelector(".card-type").textContent = `Type: ${card.card_type}`;
-        clone.querySelector(".card-genre").textContent = `Genre: ${card.genre}`;
+        clone.querySelector(".card-price").textContent = `${card.price}`;
+        clone.querySelector(".card-type").textContent = `${card.card_type}`;
+        clone.querySelector(".card-genre").textContent = `${card.genre}`;
         clone.querySelector(".card-effect").textContent = card.effect;
         clone.querySelector(".card-flavorText").textContent = card.flavor_text;
 
@@ -1802,14 +1818,14 @@
 
       // Append the card to the body
       var index = 0;
-      var sliceCards = cards.slice(0, 64);
+      var sliceCards = cards.slice(0, 1);
 
       sliceCards.forEach((cardData) => {
         document.body.appendChild(createCard(cardData, index));
         index += 1;
       });
 
-      setTimeout(renderCards, 1000);
+      // setTimeout(renderCards, 1000);
     </script>
   </body>
 </html>

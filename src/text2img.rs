@@ -8,7 +8,8 @@ use url::{form_urlencoded, Url};
 
 const API_ENDPOINT: &str = "http://167.88.162.83/api";
 
-pub struct Text2ImagePlugin {}
+#[derive(Default)]
+pub struct Text2ImagePlugin;
 
 #[derive(Event)]
 pub struct EventText2ImageRequest {

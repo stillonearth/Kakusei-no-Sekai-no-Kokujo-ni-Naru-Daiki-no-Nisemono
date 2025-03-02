@@ -94,7 +94,7 @@ pub fn show_menu(
     // menu
     commands.spawn((
         HtmlNode(asset_server.load("menu/main_menu.html")),
-        TemplateProperties::default(), //.with("title", "Test-title"),
+        TemplateProperties::default(),
         MainMenuResource {},
     ));
 
@@ -110,7 +110,7 @@ pub fn show_menu(
     html_funcs.register(
         "start_game",
         |In(_), mut app_state: ResMut<NextState<AppState>>| {
-            app_state.set(AppState::Novel);
+            app_state.set(AppState::Game);
             // ew_start_game.send(EventStartGame {});
         },
     );

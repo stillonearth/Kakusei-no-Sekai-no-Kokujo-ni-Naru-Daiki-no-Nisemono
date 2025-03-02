@@ -360,7 +360,7 @@ pub(crate) fn handle_start_poker_game(
             .spawn((
                 Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
                 MeshMaterial3d(materials.add(Color::BLACK)),
-                Transform::from_translation(Vec3::new(11.0, 0.0, 3.0))
+                Transform::from_translation(Vec3::new(9.0, 0.0, 6.5))
                     .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
                 Visibility::Hidden,
                 DeckArea { marker: 1 },
@@ -368,22 +368,10 @@ pub(crate) fn handle_start_poker_game(
             ))
             .id();
 
-        let _ = commands
-            .spawn((
-                Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
-                MeshMaterial3d(materials.add(Color::BLACK)),
-                Transform::from_translation(Vec3::new(11.0, 0.0, -3.0))
-                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
-                Visibility::Hidden,
-                DeckArea { marker: 2 },
-                Name::new("Deck 2 -- Discarded Cards"),
-            ))
-            .id();
-
         // Hand Area -- LaMesa Plugin Draws Cards from deck to Hand
         commands.spawn((
             Name::new("HandArea - Player 1"),
-            Transform::from_translation(Vec3::new(-0.5, 5.5, 5.8))
+            Transform::from_translation(Vec3::new(-0.5 + 2.5 * 6.0 - 1.0, 5.4, 4.4))
                 .with_rotation(Quat::from_rotation_x(std::f32::consts::PI / 4.0)),
             HandArea { player: 1 },
         ));
@@ -400,7 +388,7 @@ pub(crate) fn handle_start_poker_game(
                         ),
                         material,
                         Transform::from_translation(Vec3::new(
-                            -6.0 + 2.6 * (i as f32),
+                            -5.0 + 2.6 * (i as f32),
                             0.0,
                             6.0 - 3.6 * (j as f32),
                         )),

@@ -57,9 +57,10 @@ reqwest = "0.12.9"
 serde = "1.0"
 serde_json = "1.0"
 url = "2.5.4"
-bevy_hui = "0.3"
-bevy_hui_widgets = "0.2"
+bevy_hui = {git="https://github.com/Lommix/bevy_hui.git", rev="08f8f6f"}
+# bevy_hui_widgets = "0.2"
 bevy_kira_audio = { version = "0.22", features = ["ogg", "mp3"]}
+bevy_modern_pixel_camera = "0.2.1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 bevy-wasm-tasks = {git="https://github.com/stillonearth/bevy-wasm-tasks.git", rev="09060af", features=["tokio"]}

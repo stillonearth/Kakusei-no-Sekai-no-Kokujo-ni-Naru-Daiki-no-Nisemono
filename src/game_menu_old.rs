@@ -145,6 +145,8 @@ pub(crate) fn handle_deck_rendered_card_ui(
     asset_server: Res<AssetServer>,
 ) {
     for _ in er_deck_rendered.read() {
+        return;
+
         commands
             .spawn((
                 Name::new("UI Node Game State"),

@@ -67,6 +67,10 @@ pub fn handle_card_position_press(
         let main_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
 
         if let Ok((_, mut visibility, area)) = q_play_areas.get_mut(event.entity) {
+            if *visibility == Visibility::Hidden {
+                continue;
+            }
+
             ew_place_card_on_table.send(PlaceCardOnTable {
                 card_entity,
                 player: 1,
