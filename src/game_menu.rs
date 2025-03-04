@@ -34,6 +34,7 @@ pub enum EventRefreshUI {
     NovelMenu,
     ShopMenu,
     LoadingMenu,
+    Narrative,
 }
 
 #[derive(Event, PartialEq, Eq)]
@@ -67,7 +68,9 @@ pub fn show_menu(
          mut ew_play_hand: EventWriter<EventPlayHand>,
          mut ew_end_game: EventWriter<EventEndCardGame>,
          game_state: ResMut<GameState>| {
-            if game_state.game_type == GameType::CardShop || game_state.game_type == GameType::Poker
+            if game_state.game_type == GameType::CardShop
+                || game_state.game_type == GameType::Poker
+                || game_state.game_type == GameType::Narrative
             {
                 ew_play_hand.send(EventPlayHand {});
                 ew_end_game.send(EventEndCardGame {});
@@ -155,6 +158,17 @@ fn refresh_ui(
                         .with("score_display", "none")
                         .with("score", &format!("{}", game_state.score))
                         .with("title", "GENERATING CHAPTER"),
+                    GameMenu {},
+                ));
+            }
+            EventRefreshUI::Narrative => {
+                commands.spawn((
+                    HtmlNode(asset_server.load("menu/novel_menu.html")),
+                    TemplateProperties::default()
+                        .with("advance_button_display", "none")
+                        .with("score_display", "none")
+                        .with("score", &format!("{}", game_state.score))
+                        .with("title", "Narrative"),
                     GameMenu {},
                 ));
             }

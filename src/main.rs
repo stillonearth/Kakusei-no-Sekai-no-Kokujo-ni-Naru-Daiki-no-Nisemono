@@ -9,6 +9,7 @@ mod main_menu;
 mod splashscreen;
 mod text2img;
 mod visual_novel;
+mod wasm;
 
 use bevy::asset::AssetMetaCheck;
 use bevy::color::palettes::css::WHITE;
@@ -139,7 +140,7 @@ fn main() {
         // Resources
         .insert_resource(GameState {
             max_n_poker_draws: 25,
-            score: 0,
+            score: 400,
             collected_deck: vec![],
             ..default()
         })
@@ -257,6 +258,6 @@ fn load_cards(
         }
 
         game_state.game_deck = deck.clone();
-        app_state.set(AppState::Game);
+        app_state.set(AppState::MainMenu);
     }
 }

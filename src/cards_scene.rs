@@ -454,11 +454,23 @@ pub(crate) fn handle_start_card_shop(
             .spawn((
                 Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
                 MeshMaterial3d(materials.add(Color::BLACK)),
-                Transform::from_translation(Vec3::new(8.5, 0.0, 0.0))
+                Transform::from_translation(Vec3::new(9.0, 0.0, 6.5))
                     .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
                 Visibility::Hidden,
                 DeckArea { marker: 1 },
-                Name::new("Deck 1 -- Shop Cards"),
+                Name::new("Deck 1 -- Play Cards"),
+            ))
+            .id();
+
+        let _deck_bought_cards_ = commands
+            .spawn((
+                Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+                MeshMaterial3d(materials.add(Color::BLACK)),
+                Transform::from_translation(Vec3::new(9.0, 0.0, 6.5 + 6.5))
+                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
+                Visibility::Hidden,
+                DeckArea { marker: 2 },
+                Name::new("Deck 2 -- Bought Cards"),
             ))
             .id();
 
@@ -503,7 +515,7 @@ pub(crate) fn handle_start_card_shop(
         commands.spawn((
             Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
             material,
-            Transform::from_translation(Vec3::new(-5.3, 9.8, 5.8))
+            Transform::from_translation(Vec3::new(5.3, 9.8, 5.8))
                 .with_rotation(Quat::from_rotation_x(0.6)),
             Visibility::Hidden,
             CardShowcase {},
@@ -515,7 +527,7 @@ pub(crate) fn handle_start_card_shop(
             deck: filter_narrative_cards(game_state.game_deck.clone()).unwrap(),
         });
 
-        ew_refresh_ui.send(EventRefreshUI::NovelMenu);
+        ew_refresh_ui.send(EventRefreshUI::ShopMenu);
     }
 }
 
@@ -729,6 +741,7 @@ pub(crate) fn handle_card_on_table_out(
 pub(crate) fn handle_end_card_game(
     mut commands: Commands,
     q_cards: Query<(Entity, &Card<VNCard>)>,
+    q_hand_areas: Query<(Entity, &HandArea)>,
     q_play_areas: Query<(Entity, &PlayArea)>,
     q_deck_areas: Query<(Entity, &DeckArea)>,
     mut er_end_game: EventReader<EventEndCardGame>,

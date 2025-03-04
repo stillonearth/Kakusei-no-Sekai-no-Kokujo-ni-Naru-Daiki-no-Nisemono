@@ -3,6 +3,8 @@ label start:
 
 label chapter1_1:
 
+    "PRESS SPACE"
+
     scene intro_1
 
     "This world has lost all meaning."
