@@ -12,6 +12,7 @@ use bevy_tweening::Tween;
 
 use crate::cards_game::*;
 use crate::game_menu::EventRefreshUI;
+use crate::game_menu::EventRenderUI;
 use crate::game_menu::PokerMenuSettings;
 use crate::EventCardPositionHover;
 use crate::EventCardPositionOut;
@@ -342,7 +343,7 @@ pub(crate) fn handle_start_poker_game(
     mut game_state: ResMut<GameState>,
     mut er_start_poker_game: EventReader<EventStartPokerGame>,
     mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
-    mut ew_refresh_ui: EventWriter<EventRefreshUI>,
+    mut ew_render_ui: EventWriter<EventRenderUI>,
 ) {
     for _ in er_start_poker_game.read() {
         game_state.game_type = GameType::Poker;
@@ -404,7 +405,7 @@ pub(crate) fn handle_start_poker_game(
             deck: load_poker_deck(),
         });
 
-        ew_refresh_ui.send(EventRefreshUI::PokerMenu(PokerMenuSettings {
+        ew_render_ui.send(EventRenderUI::PokerMenu(PokerMenuSettings {
             show_advance_button: false,
             show_score: false,
             score: 100,

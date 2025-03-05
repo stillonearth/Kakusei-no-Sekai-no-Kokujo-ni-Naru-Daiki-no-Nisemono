@@ -12,10 +12,14 @@ impl Plugin for GameMenuPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(AppState::Game), show_menu)
             .add_systems(OnExit(AppState::Game), despawn_menu)
-            .add_systems(Update, (refresh_ui).run_if(in_state(AppState::Game)))
+            .add_systems(
+                Update,
+                (render_ui, refresh_ui).run_if(in_state(AppState::Game)),
+            )
             .add_event::<EventHideMainMenu>()
             .add_event::<EventShowMainMenu>()
-            .add_event::<EventRefreshUI>();
+            .add_event::<EventRefreshUI>()
+            .add_event::<EventRenderUI>();
     }
 }
 
@@ -28,8 +32,19 @@ pub struct EventHideMainMenu {}
 #[derive(Event)]
 pub struct EventShowMainMenu {}
 
+/// Update Menu disaply variables
 #[derive(Event, PartialEq, Eq)]
 pub enum EventRefreshUI {
+    PokerMenu(PokerMenuSettings),
+    NovelMenu,
+    ShopMenu,
+    LoadingMenu,
+    Narrative,
+}
+
+/// Despawn previous menu template and render a new one
+#[derive(Event, PartialEq, Eq)]
+pub enum EventRenderUI {
     PokerMenu(PokerMenuSettings),
     NovelMenu,
     ShopMenu,
@@ -92,9 +107,9 @@ fn despawn_menu(
     audio.stop();
 }
 
-fn refresh_ui(
+fn render_ui(
     mut commands: Commands,
-    mut er_refresh_ui: EventReader<EventRefreshUI>,
+    mut er_refresh_ui: EventReader<EventRenderUI>,
     q_game_menu: Query<(Entity, &GameMenu)>,
     asset_server: Res<AssetServer>,
     game_state: Res<GameState>,
@@ -105,30 +120,15 @@ fn refresh_ui(
         }
 
         match event {
-            EventRefreshUI::PokerMenu(poker_menu_settings) => {
-                let advance_button_display = if poker_menu_settings.show_advance_button {
-                    "flex"
-                } else {
-                    "none"
-                };
-
-                let score_display = if poker_menu_settings.show_score {
-                    "flex"
-                } else {
-                    "none"
-                };
-
+            EventRenderUI::PokerMenu(_) => {
                 commands.spawn((
-                    HtmlNode(asset_server.load("menu/novel_menu.html")),
-                    TemplateProperties::default()
-                        .with("advance_button_display", advance_button_display)
-                        .with("score_display", score_display)
-                        .with("score", &format!("{}", poker_menu_settings.score))
-                        .with("title", "POKER SOLITARE"),
+                    HtmlNode(asset_server.load("menu/poker_menu.html")),
+                    TemplateProperties::default(),
                     GameMenu {},
+                    Name::new("poker menu"),
                 ));
             }
-            EventRefreshUI::NovelMenu => {
+            EventRenderUI::NovelMenu => {
                 commands.spawn((
                     HtmlNode(asset_server.load("menu/novel_menu.html")),
                     TemplateProperties::default()
@@ -139,7 +139,7 @@ fn refresh_ui(
                     GameMenu {},
                 ));
             }
-            EventRefreshUI::ShopMenu => {
+            EventRenderUI::ShopMenu => {
                 commands.spawn((
                     HtmlNode(asset_server.load("menu/novel_menu.html")),
                     TemplateProperties::default()
@@ -150,7 +150,7 @@ fn refresh_ui(
                     GameMenu {},
                 ));
             }
-            EventRefreshUI::LoadingMenu => {
+            EventRenderUI::LoadingMenu => {
                 commands.spawn((
                     HtmlNode(asset_server.load("menu/novel_menu.html")),
                     TemplateProperties::default()
@@ -161,7 +161,7 @@ fn refresh_ui(
                     GameMenu {},
                 ));
             }
-            EventRefreshUI::Narrative => {
+            EventRenderUI::Narrative => {
                 commands.spawn((
                     HtmlNode(asset_server.load("menu/novel_menu.html")),
                     TemplateProperties::default()
@@ -172,6 +172,28 @@ fn refresh_ui(
                     GameMenu {},
                 ));
             }
+        }
+    }
+}
+
+fn refresh_ui(
+    // mut commands: Commands,
+    mut er_refresh_ui: EventReader<EventRefreshUI>,
+    mut q_text_labels: Query<(Entity, &mut Text, &Tags)>,
+    // game_state: Res<GameState>,
+) {
+    for event in er_refresh_ui.read() {
+        match event {
+            EventRefreshUI::PokerMenu(poker_menu_settings) => {
+                for (_, mut text, tags) in q_text_labels.iter_mut() {
+                    if let Some(marker) = tags.get("marker")
+                        && marker == "text_score"
+                    {
+                        *text = Text::new(format!("${}", poker_menu_settings.score));
+                    }
+                }
+            }
+            _ => {}
         }
     }
 }
