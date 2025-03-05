@@ -760,6 +760,10 @@ pub(crate) fn handle_end_card_game(
             commands.entity(entity).despawn_recursive();
         }
 
+        for (entity, _) in q_hand_areas.iter() {
+            commands.entity(entity).despawn_recursive();
+        }
+
         ew_switch_next_vn_node.send(EventSwitchNextNode {});
     }
 }
