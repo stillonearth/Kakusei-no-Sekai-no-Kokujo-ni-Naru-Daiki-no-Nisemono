@@ -13,6 +13,7 @@ use bevy_tweening::Tween;
 use crate::cards_game::*;
 use crate::game_menu::EventRefreshUI;
 use crate::game_menu::EventRenderUI;
+use crate::game_menu::NarrativeMenuSettings;
 use crate::game_menu::PokerMenuSettings;
 use crate::EventCardPositionHover;
 use crate::EventCardPositionOut;
@@ -86,6 +87,7 @@ pub fn handle_card_press_cardplay(
     mut game_state: ResMut<GameState>,
     mut card_press: EventReader<CardPress>,
     mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
+    mut er_refresh_ui: EventWriter<EventRefreshUI>,
     mut q_cards: ParamSet<(
         Query<(Entity, &Card<VNCard>, &CardOnTable)>,
         Query<(Entity, &Card<VNCard>, &Hand)>,
@@ -131,6 +133,10 @@ pub fn handle_card_press_cardplay(
                 player: 1,
                 marker: n_cards_on_table + 1,
             });
+
+            er_refresh_ui.send(EventRefreshUI::Narrative(NarrativeMenuSettings {
+                show_advance_button: true,
+            }));
 
             game_state.n_turns = n_cards_on_table + 1;
         }

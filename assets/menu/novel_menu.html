@@ -13,7 +13,10 @@
             width="500px"
             position="absolute"
             >
-                <text font_size="55">{title}</text>
+                <text 
+                    font_size="55" 
+                    tag:marker="text_title"
+                >{title}</text>
             </node>
 
             <button
@@ -34,25 +37,5 @@
                 <text font_size="25">ADVANCE</text>
             </button>
 
-            <text 
-                width="100%" 
-                font_size="25" 
-                bottom="60px" 
-                position="absolute" 
-                align_content="center" 
-                font_color="#000"
-                display="{score_display}"
-            >
-            round score</text>
-
-            <text 
-                width="100%" 
-                font_size="50" 
-                bottom="0px" 
-                position="absolute" 
-                align_content="center" 
-                display="{score_display}"
-                tag:marker="text_score"
-            >$0</text>
     </node>
 </template>

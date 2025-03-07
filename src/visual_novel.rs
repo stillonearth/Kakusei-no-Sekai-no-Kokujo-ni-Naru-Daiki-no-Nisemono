@@ -218,6 +218,7 @@ pub(crate) fn handle_new_vn_node(
     mut ew_hide_vn_text_node: EventWriter<EventHideTextNode>,
     mut ew_show_vn_text_node: EventWriter<EventShowTextNode>,
     mut ew_render_ui: EventWriter<EventRenderUI>,
+    mut ew_refresh_ui: EventWriter<EventRefreshUI>,
 ) {
     for event in er_handle_node.read() {
         game_state.n_vn_node = event.ast.index();
@@ -298,6 +299,8 @@ pub(crate) fn handle_new_vn_node(
             if game_state.current_menu_type != EventRenderUI::Novel {
                 ew_render_ui.send(EventRenderUI::Novel);
                 game_state.current_menu_type = EventRenderUI::Novel;
+            } else {
+                ew_refresh_ui.send(EventRefreshUI::NovelMenu("".to_string()));
             }
             game_state.game_type = GameType::VisualNovel;
         }

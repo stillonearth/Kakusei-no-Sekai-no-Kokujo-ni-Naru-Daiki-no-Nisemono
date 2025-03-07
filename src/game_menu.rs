@@ -38,14 +38,14 @@ pub struct EventShowMainMenu {}
 #[derive(Event, PartialEq, Eq)]
 pub enum EventRefreshUI {
     PokerMenu(PokerMenuSettings),
-    NovelMenu,
+    NovelMenu(String),
     ShopMenu,
     LoadingMenu,
-    Narrative,
+    Narrative(NarrativeMenuSettings),
 }
 
 /// Despawn previous menu template and render a new one
-#[derive(Event, PartialEq, Eq, Default)]
+#[derive(Event, PartialEq, Eq, Default, Debug)]
 pub enum EventRenderUI {
     Poker(PokerMenuSettings),
     #[default]
@@ -55,11 +55,16 @@ pub enum EventRenderUI {
     Narrative,
 }
 
-#[derive(Event, PartialEq, Eq, Default)]
+#[derive(Event, PartialEq, Eq, Default, Debug)]
 pub struct PokerMenuSettings {
     pub show_advance_button: bool,
     pub show_score: bool,
     pub score: usize,
+}
+
+#[derive(Event, PartialEq, Eq, Default, Debug)]
+pub struct NarrativeMenuSettings {
+    pub show_advance_button: bool,
 }
 
 pub fn show_menu(
@@ -190,12 +195,6 @@ fn refresh_ui(
                     if let Some(marker) = tags.get("marker")
                         && marker == "button_advance"
                     {
-                        // if poker_menu_settings.show_advance_button {
-                        //     commands.entity(entity).remove::<Visibility>();
-                        // } else {
-                        //     commands.entity(entity).insert(Visibility::Hidden);
-                        // }
-
                         node.display = match poker_menu_settings.show_advance_button {
                             true => Display::Flex,
                             false => Display::None,
@@ -221,6 +220,31 @@ fn refresh_ui(
                         && marker == "text_score"
                     {
                         *text = Text::new(format!("${}", game_state.score));
+                    }
+                }
+            }
+            EventRefreshUI::NovelMenu(title) => {
+                for (_, mut text, tags) in q_text_labels.iter_mut() {
+                    if let Some(marker) = tags.get("marker")
+                        && marker == "text_title"
+                    {
+                        *text = Text::new(title);
+                    }
+                }
+            }
+            EventRefreshUI::Narrative(narrative_menu_settings) => {
+                for (entity, mut node, tags) in q_nodes.iter_mut() {
+                    if let Some(marker) = tags.get("marker")
+                        && marker == "button_advance"
+                    {
+                        node.display = match narrative_menu_settings.show_advance_button {
+                            true => Display::Flex,
+                            false => Display::None,
+                        };
+
+                        if let Ok(mut style) = style.get_mut(entity) {
+                            style.computed.node.display = node.display;
+                        }
                     }
                 }
             }
