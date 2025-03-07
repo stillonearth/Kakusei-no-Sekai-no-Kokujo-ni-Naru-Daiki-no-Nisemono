@@ -13,7 +13,7 @@
             width="500px"
             position="absolute"
             >
-                <text font_size="55">{title}</text>
+                <text font_size="52">CARD SHOP</text>
             </node>
 
             <button
@@ -29,7 +29,7 @@
                 padding="10px"
                 margin:top="20px"
                 on_press="advance"
-                display="{advance_button_display}"
+                tag:marker="button_advance"
             >
                 <text font_size="25">ADVANCE</text>
             </button>
@@ -41,9 +41,8 @@
                 position="absolute" 
                 align_content="center" 
                 font_color="#000"
-                display="{score_display}"
             >
-            round score</text>
+            balance</text>
 
             <text 
                 width="100%" 
@@ -51,8 +50,8 @@
                 bottom="0px" 
                 position="absolute" 
                 align_content="center" 
-                display="{score_display}"
                 tag:marker="text_score"
-            >$0</text>
+            >
+            ${score}</text>
     </node>
 </template>

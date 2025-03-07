@@ -19,7 +19,7 @@ use crate::{
     cards_game::{
         filter_character_deck, filter_initial_character_cards, filter_initial_narrative_cards,
     },
-    game_menu::EventRefreshUI,
+    game_menu::{EventRefreshUI, EventRenderUI, PokerMenuSettings},
     llm::*,
     text2img::{EventText2ImageRequest, EventText2ImageResponse},
     EventStartNarrativeCardShop, EventStartNarrativeGame, EventStartPokerGame, GameState, GameType,
@@ -217,7 +217,7 @@ pub(crate) fn handle_new_vn_node(
     mut ew_start_narrative_card_shop: EventWriter<EventStartNarrativeCardShop>,
     mut ew_hide_vn_text_node: EventWriter<EventHideTextNode>,
     mut ew_show_vn_text_node: EventWriter<EventShowTextNode>,
-    mut ew_refresh_ui: EventWriter<EventRefreshUI>,
+    mut ew_render_ui: EventWriter<EventRenderUI>,
 ) {
     for event in er_handle_node.read() {
         game_state.n_vn_node = event.ast.index();
@@ -255,7 +255,12 @@ pub(crate) fn handle_new_vn_node(
                 who: Some(who),
                 request_type: LLMRequestType::Story,
             });
-            ew_refresh_ui.send(EventRefreshUI::LoadingMenu);
+
+            if game_state.current_menu_type != EventRenderUI::Loading {
+                ew_render_ui.send(EventRenderUI::Loading);
+                game_state.current_menu_type = EventRenderUI::Loading;
+            }
+
             game_state.game_type = GameType::VisualNovel;
         } else {
             novel_settings.pause_handle_switch_node = false;
@@ -268,6 +273,8 @@ pub(crate) fn handle_new_vn_node(
             match mechanic.as_str() {
                 "card play poker" => {
                     ew_start_poker_game.send(EventStartPokerGame {});
+                    game_state.current_menu_type =
+                        EventRenderUI::Poker(PokerMenuSettings { ..default() });
                 }
                 "card play narrative setting" => {
                     ew_start_narrative_game.send(EventStartNarrativeGame::Setting);
@@ -288,7 +295,10 @@ pub(crate) fn handle_new_vn_node(
             }
         } else {
             ew_show_vn_text_node.send(EventShowTextNode {});
-            ew_refresh_ui.send(EventRefreshUI::NovelMenu);
+            if game_state.current_menu_type != EventRenderUI::Novel {
+                ew_render_ui.send(EventRenderUI::Novel);
+                game_state.current_menu_type = EventRenderUI::Novel;
+            }
             game_state.game_type = GameType::VisualNovel;
         }
     }

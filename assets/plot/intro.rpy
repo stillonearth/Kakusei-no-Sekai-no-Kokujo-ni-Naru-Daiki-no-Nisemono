@@ -2,12 +2,7 @@ label start:
     jump chapter1_1
 
 label chapter1_1:
-
-    game_mechanic "card play poker"
-
-    "You can spend your score to buy action cards."
-    "There is 3 types of action cards that affect story narrative."
-    "Setting, Plot Twist and Conflict"
+    scene intro_1
 
     game_mechanic "card shop"
 

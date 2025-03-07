@@ -106,6 +106,8 @@ fn main() {
                 apply_deferred,
                 handle_start_poker_game,
                 apply_deferred,
+                poker_handle_place_card_on_table
+                    .after(bevy_la_mesa::events::handle_place_card_on_table::<cards_game::VNCard>),
             )
                 .chain())
             .run_if(in_state(AppState::Game)),
@@ -119,7 +121,7 @@ fn main() {
             (
                 handle_card_on_table_hover,
                 handle_card_on_table_out,
-                handle_card_press_cardshop,
+                cardshop_handle_card_press,
             )
                 .run_if(in_state(AppState::Game)),
         )

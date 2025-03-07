@@ -48,6 +48,7 @@ pub(crate) struct GameState {
     pub narrative_story_so_far: Vec<String>,
     pub poker_combinations: Vec<PokerCombination>,
     pub score: isize,
+    pub current_menu_type: EventRenderUI,
 }
 
 // ------
@@ -136,30 +137,34 @@ pub fn handle_card_press_cardplay(
     }
 }
 
-pub fn handle_card_press_cardshop(
+pub fn cardshop_handle_card_press(
     mut game_state: ResMut<GameState>,
     mut card_press: EventReader<CardPress>,
     mut ew_discard_card_to_deck: EventWriter<DiscardCardToDeck>,
     q_cards_on_table: Query<(Entity, &Card<VNCard>, &CardOnTable)>,
     q_decks: Query<(Entity, &DeckArea)>,
+    mut er_refresh_ui: EventWriter<EventRefreshUI>,
 ) {
+    if game_state.game_type != GameType::CardShop {
+        return;
+    }
+
     for event in card_press.read() {
-        if game_state.game_type == GameType::CardShop {
-            let graveyard_deck_entity =
-                q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
+        let graveyard_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 2).unwrap().0;
 
-            let card = q_cards_on_table.get(event.entity).unwrap().1;
-            let card_price = card.data.metadata.price().unwrap_or_default();
+        let card = q_cards_on_table.get(event.entity).unwrap().1;
+        let card_price = card.data.metadata.price().unwrap_or_default();
 
-            if card_price <= (game_state.score as u16) {
-                game_state.score -= card_price as isize;
-                ew_discard_card_to_deck.send(DiscardCardToDeck {
-                    card_entity: event.entity,
-                    deck_entity: graveyard_deck_entity,
-                });
-                game_state.collected_deck.push(card.data.clone());
-            }
+        if card_price <= (game_state.score as u16) {
+            game_state.score -= card_price as isize;
+            ew_discard_card_to_deck.send(DiscardCardToDeck {
+                card_entity: event.entity,
+                deck_entity: graveyard_deck_entity,
+            });
+            game_state.collected_deck.push(card.data.clone());
         }
+
+        er_refresh_ui.send(EventRefreshUI::ShopMenu);
     }
 }
 
@@ -405,7 +410,7 @@ pub(crate) fn handle_start_poker_game(
             deck: load_poker_deck(),
         });
 
-        ew_render_ui.send(EventRenderUI::PokerMenu(PokerMenuSettings {
+        ew_render_ui.send(EventRenderUI::Poker(PokerMenuSettings {
             show_advance_button: false,
             show_score: false,
             score: 100,
@@ -444,7 +449,7 @@ pub(crate) fn handle_start_card_shop(
     mut game_state: ResMut<GameState>,
     mut er_start_card_shop: EventReader<EventStartNarrativeCardShop>,
     mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
-    mut ew_refresh_ui: EventWriter<EventRefreshUI>,
+    mut ew_render_ui: EventWriter<EventRenderUI>,
 ) {
     for _ in er_start_card_shop.read() {
         game_state.game_type = GameType::CardShop;
@@ -467,24 +472,11 @@ pub(crate) fn handle_start_card_shop(
             .spawn((
                 Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
                 MeshMaterial3d(materials.add(Color::BLACK)),
-                Transform::from_translation(Vec3::new(9.0, 0.0, 6.5 + 6.5))
+                Transform::from_translation(Vec3::new(9.0, 0.0, 3.0))
                     .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
                 Visibility::Hidden,
                 DeckArea { marker: 2 },
                 Name::new("Deck 2 -- Bought Cards"),
-            ))
-            .id();
-
-        // Deck 2 - All Cards
-        let _ = commands
-            .spawn((
-                Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
-                MeshMaterial3d(materials.add(Color::BLACK)),
-                Transform::from_translation(Vec3::new(8.5, 0.0, 0.0))
-                    .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
-                Visibility::Hidden,
-                DeckArea { marker: 2 },
-                Name::new("Deck -- Bought Cards"),
             ))
             .id();
 
@@ -497,7 +489,7 @@ pub(crate) fn handle_start_card_shop(
                     Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
                     material,
                     Transform::from_translation(Vec3::new(
-                        -6.0 + 2.6 * (i as f32),
+                        -5.0 + 2.6 * (i as f32),
                         0.0,
                         6.0 - 3.6 * (j as f32),
                     )),
@@ -507,6 +499,7 @@ pub(crate) fn handle_start_card_shop(
                         player: 1,
                     },
                     Name::new(format!("Play Area {} {}", i, j)),
+                    // RayCastPickable,
                 ));
             }
         }
@@ -528,7 +521,7 @@ pub(crate) fn handle_start_card_shop(
             deck: filter_narrative_cards(game_state.game_deck.clone()).unwrap(),
         });
 
-        ew_refresh_ui.send(EventRefreshUI::ShopMenu);
+        ew_render_ui.send(EventRenderUI::Shop);
     }
 }
 
@@ -539,6 +532,7 @@ pub(crate) fn handle_start_narrative_game(
     mut game_state: ResMut<GameState>,
     mut er_start_narrative_game: EventReader<EventStartNarrativeGame>,
     mut ew_render_deck: EventWriter<RenderDeck<VNCard>>,
+    mut ew_render_ui: EventWriter<EventRenderUI>,
 ) {
     for event in er_start_narrative_game.read() {
         game_state.game_type = GameType::Narrative;
@@ -568,10 +562,10 @@ pub(crate) fn handle_start_narrative_game(
             Name::new("Deck 2 -- Play Cards"),
         ));
 
-        // Table
+        // Hand
         commands.spawn((
             Name::new("HandArea - Player 1"),
-            Transform::from_translation(Vec3::new(0.0, 1.5, 5.8))
+            Transform::from_translation(Vec3::new(2.0, 2.5, 5.8))
                 .with_rotation(Quat::from_rotation_x(std::f32::consts::PI / 4.0)),
             HandArea { player: 1 },
         ));
@@ -582,7 +576,7 @@ pub(crate) fn handle_start_narrative_game(
         commands.spawn((
             Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
             MeshMaterial3d(face_material.clone()),
-            Transform::from_translation(Vec3::new(-7.6, 0.0, 7.0)),
+            Transform::from_translation(Vec3::new(-7.6 + 2.0, 0.0, 7.0)),
             Visibility::Hidden,
             PlayArea {
                 marker: 1,
@@ -594,7 +588,7 @@ pub(crate) fn handle_start_narrative_game(
         commands.spawn((
             Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
             MeshMaterial3d(face_material.clone()),
-            Transform::from_translation(Vec3::new(-7.6 + 3.05, 0.0, 7.0)),
+            Transform::from_translation(Vec3::new(-7.6 + 2.0 + 3.05, 0.0, 7.0)),
             Visibility::Hidden,
             PlayArea {
                 marker: 2,
@@ -606,7 +600,7 @@ pub(crate) fn handle_start_narrative_game(
         commands.spawn((
             Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
             MeshMaterial3d(face_material.clone()),
-            Transform::from_translation(Vec3::new(-7.6 + 3.05 * 2.0, 0.0, 7.0)),
+            Transform::from_translation(Vec3::new(-7.6 + 2.0 + 3.05 * 2.0, 0.0, 7.0)),
             Visibility::Hidden,
             PlayArea {
                 marker: 3,
@@ -618,7 +612,7 @@ pub(crate) fn handle_start_narrative_game(
         commands.spawn((
             Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
             MeshMaterial3d(face_material.clone()),
-            Transform::from_translation(Vec3::new(-7.6 + 3.05 * 3.0, 0.0, 7.0)),
+            Transform::from_translation(Vec3::new(-7.6 + 2.0 + 3.05 * 3.0, 0.0, 7.0)),
             Visibility::Hidden,
             PlayArea {
                 marker: 4,
@@ -630,7 +624,7 @@ pub(crate) fn handle_start_narrative_game(
         commands.spawn((
             Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
             MeshMaterial3d(face_material.clone()),
-            Transform::from_translation(Vec3::new(-7.6 + 3.05 * 4.0, 0.0, 7.0)),
+            Transform::from_translation(Vec3::new(-7.6 + 1.0 + 3.05 * 4.0, 0.0, 7.0)),
             Visibility::Hidden,
             PlayArea {
                 marker: 5,
@@ -656,6 +650,8 @@ pub(crate) fn handle_start_narrative_game(
                 }
             },
         });
+
+        ew_render_ui.send(EventRenderUI::Narrative);
     }
 }
 
@@ -745,6 +741,7 @@ pub(crate) fn handle_end_card_game(
     q_hand_areas: Query<(Entity, &HandArea)>,
     q_play_areas: Query<(Entity, &PlayArea)>,
     q_deck_areas: Query<(Entity, &DeckArea)>,
+    q_card_showcases: Query<(Entity, &CardShowcase)>,
     mut er_end_game: EventReader<EventEndCardGame>,
     mut ew_switch_next_vn_node: EventWriter<EventSwitchNextNode>,
 ) {
@@ -762,6 +759,10 @@ pub(crate) fn handle_end_card_game(
         }
 
         for (entity, _) in q_hand_areas.iter() {
+            commands.entity(entity).despawn_recursive();
+        }
+
+        for (entity, _) in q_card_showcases.iter() {
             commands.entity(entity).despawn_recursive();
         }
 
