@@ -4,8 +4,6 @@
 
 ## 欺瞞と裏切りの隠された領域での運命の壮大な探求: スキル、戦略、人工知能が支配する世界で、カードを回すたびに新たな挑戦、紆余曲折が起こる
 
-A visual novel / poker-themed rouglike with LLM-generated narrative.
+A visual novel / poker-themed rougelike with LLM-generated narrative.
 
 Built with bevy on Rust.
-
-## todo: event handlers card shop

@@ -159,7 +159,7 @@ fn render_ui(
             }
             EventRenderUI::Loading => {
                 commands.spawn((
-                    HtmlNode(asset_server.load("menu/novel_menu.html")),
+                    HtmlNode(asset_server.load("menu/loading_menu.html")),
                     TemplateProperties::default()
                         .with("advance_button_display", "none")
                         .with("score_display", "none")
@@ -241,6 +241,19 @@ fn refresh_ui(
                             true => Display::Flex,
                             false => Display::None,
                         };
+
+                        if let Ok(mut style) = style.get_mut(entity) {
+                            style.computed.node.display = node.display;
+                        }
+                    }
+                }
+            }
+            EventRefreshUI::LoadingMenu => {
+                for (entity, mut node, tags) in q_nodes.iter_mut() {
+                    if let Some(marker) = tags.get("marker")
+                        && marker == "button_advance"
+                    {
+                        node.display = Display::Flex;
 
                         if let Ok(mut style) = style.get_mut(entity) {
                             style.computed.node.display = node.display;

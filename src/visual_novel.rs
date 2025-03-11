@@ -8,6 +8,7 @@ use bevy_novel::{
         EventHandleNode, EventHideTextNode, EventShowTextNode, EventStartScenario,
         EventSwitchNextNode,
     },
+    find_element_with_index,
     rpy_asset_loader::Rpy,
     NovelData, NovelSettings, NovelText,
 };
@@ -100,11 +101,14 @@ pub(crate) fn handle_llm_response(
     mut er_llm_response: EventReader<EventLLMResponse>,
     mut ew_llm_request: EventWriter<EventLLMRequest>,
     mut ew_text_2_image_reqeust: EventWriter<EventText2ImageRequest>,
+    mut ew_refresh_ui: EventWriter<EventRefreshUI>,
     assets: Res<AssetServer>,
 ) {
     for event in er_llm_response.read() {
         match event.request_type {
             LLMRequestType::Story => {
+                ew_refresh_ui.send(EventRefreshUI::LoadingMenu);
+
                 let sentences = event
                     .response
                     .split("\n")
@@ -296,6 +300,23 @@ pub(crate) fn handle_new_vn_node(
             }
         } else {
             ew_show_vn_text_node.send(EventShowTextNode {});
+
+            // if novel_data.ast[novel_data.c]
+            if let Some(node) =
+                find_element_with_index(novel_data.ast.clone(), novel_data.current_index)
+            {
+                match node {
+                    AST::Say(index, who, what) => {
+                        if what == "...".to_string() {
+                            ew_render_ui.send(EventRenderUI::Loading);
+                            game_state.current_menu_type = EventRenderUI::Loading;
+                            continue;
+                        }
+                    }
+                    _ => {}
+                }
+            }
+
             if game_state.current_menu_type != EventRenderUI::Novel {
                 ew_render_ui.send(EventRenderUI::Novel);
                 game_state.current_menu_type = EventRenderUI::Novel;
