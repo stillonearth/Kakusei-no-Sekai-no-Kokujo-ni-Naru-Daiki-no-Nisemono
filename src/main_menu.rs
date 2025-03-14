@@ -94,7 +94,7 @@ pub fn show_menu(
     // menu
     commands.spawn((
         HtmlNode(asset_server.load("menu/main_menu.html")),
-        TemplateProperties::default(),
+        TemplateProperties::default().with("user_wallet_address", &game_state.wallet.address),
         MainMenuResource {},
     ));
 

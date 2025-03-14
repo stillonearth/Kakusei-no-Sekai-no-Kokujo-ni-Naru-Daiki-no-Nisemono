@@ -32,6 +32,11 @@ pub(crate) enum GameType {
     CardShop,
 }
 
+#[derive(Default)]
+pub(crate) struct CryptoWallet {
+    pub address: String,
+}
+
 #[derive(Resource, Default)]
 pub(crate) struct GameState {
     pub game_deck: Vec<VNCard>,
@@ -50,6 +55,7 @@ pub(crate) struct GameState {
     pub poker_combinations: Vec<PokerCombination>,
     pub score: isize,
     pub current_menu_type: EventRenderUI,
+    pub wallet: CryptoWallet,
 }
 
 // ------

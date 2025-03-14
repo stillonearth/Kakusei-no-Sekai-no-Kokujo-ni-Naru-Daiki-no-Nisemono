@@ -1,4 +1,4 @@
-export function test(uuid) {
-    console.log("update_primary_selection", uuid);
+export function test() {
+    // let userWallet = window.getUserWalletAddress(uuid);
+    return "hello from js";
 }
-

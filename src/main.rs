@@ -162,10 +162,6 @@ fn setup_camera_and_light(mut commands: Commands) {
             order: 1,
             ..default()
         },
-        // PixelZoom::FitSize {
-        //     width: 320,
-        //     height: 180,
-        // },
         Transform::from_xyz(0.0, 0.0, 1000.0),
     ));
 
@@ -208,7 +204,11 @@ struct NarrativeCardsHandle(Handle<NarrativeCards>);
 #[derive(Resource, Deref, DerefMut)]
 struct CharacterCardsHandle(Handle<CharacterCards>);
 
-fn load_resources(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn load_resources(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut game_state: ResMut<GameState>,
+) {
     let scenario_handle = ScenarioHandle(asset_server.load("plot/intro.rpy"));
     commands.insert_resource(scenario_handle);
 
@@ -220,9 +220,16 @@ fn load_resources(mut commands: Commands, asset_server: Res<AssetServer>) {
         NarrativeCardsHandle(asset_server.load("narrative-cards/cards.json"));
     commands.insert_resource(narrative_cards_handle);
 
-    println!("calling javascript extern");
+    game_state.wallet.address = "offline wallet".to_string();
+
     #[cfg(target_arch = "wasm32")]
-    wasm::test("hello".to_string());
+    {
+        info!("calling javascript extern");
+        let value_from_js = wasm::test("hello".to_string());
+        info!("value from js: {}", value_from_js);
+
+        game_state.wallet.address = value_from_js;
+    }
 }
 
 fn load_cards(
