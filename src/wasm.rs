@@ -1,11 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[wasm_bindgen(raw_module = "./assets/wasm_js.js")]
 extern "C" {
-    fn alert(s: &str);
-}
-
-#[wasm_bindgen]
-pub fn greet(name: &str) {
-    alert(&format!("Hello, {}!", name));
+    pub fn test(uuid: String);
 }

@@ -219,6 +219,10 @@ fn load_resources(mut commands: Commands, asset_server: Res<AssetServer>) {
     let narrative_cards_handle =
         NarrativeCardsHandle(asset_server.load("narrative-cards/cards.json"));
     commands.insert_resource(narrative_cards_handle);
+
+    println!("calling javascript extern");
+    #[cfg(target_arch = "wasm32")]
+    wasm::test("hello".to_string());
 }
 
 fn load_cards(

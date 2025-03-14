@@ -301,12 +301,11 @@ pub(crate) fn handle_new_vn_node(
         } else {
             ew_show_vn_text_node.send(EventShowTextNode {});
 
-            // if novel_data.ast[novel_data.c]
             if let Some(node) =
                 find_element_with_index(novel_data.ast.clone(), novel_data.current_index)
             {
                 match node {
-                    AST::Say(index, who, what) => {
+                    AST::Say(_index, _who, what) => {
                         if what == "...".to_string() {
                             ew_render_ui.send(EventRenderUI::Loading);
                             game_state.current_menu_type = EventRenderUI::Loading;
