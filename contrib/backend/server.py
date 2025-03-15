@@ -5,18 +5,21 @@ from PIL import Image
 import base64
 import io
 import uuid
+import subprocess
+import sqlite3
+import uuid
 
 app = Flask(__name__)
 
 
 API_KEY = ""
-LLM_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+LLM_MODEL = "deepseek-ai/DeepSeek-R1"
 
 TOGETHER_CLIENT = Together(api_key=API_KEY)
 
 
 @app.route("/api/llm", methods=["POST"])
-def chat():
+def llm():
     data = request.get_json()
     prompt = data.get("prompt", "")
 
@@ -57,6 +60,52 @@ def generate_image():
     image.save(image_path)
 
     return send_file(image_path, mimetype="image/png")
+
+
+def persist_string_to_db(data):
+    # Create a connection to the SQLite database
+    with sqlite3.connect("example.db") as conn:
+        cursor = conn.cursor()
+
+        # Create table if not exists
+        cursor.execute(
+            """CREATE TABLE IF NOT EXISTS data_storage (uuid_str TEXT PRIMARY KEY, data TEXT)"""
+        )
+
+        # Generate random UUID
+        uuid_key = str(uuid.uuid4())
+
+        # Insert data into the table
+        cursor.execute("INSERT INTO data_storage VALUES (?, ?)", (uuid_key, data))
+
+        # Commit the transaction
+        conn.commit()
+
+        # Retrieve and print the inserted data for verification
+        cursor.execute("SELECT * FROM data_storage WHERE uuid_str = ?", (uuid_key,))
+        result = cursor.fetchone()
+        if result:
+            print("Data persisted successfully:")
+            print(f"UUID: {result[0]}")
+            print(f"Data: {result[1]}")
+
+    return uuid_key
+
+
+@app.route("/api/nft", methods=["POST"])
+def persist_story():
+    data = request.get_json()
+
+    scenario = data.get("scenario", "")
+    owner = data.get("owner", "")
+
+    uuid = persist_string_to_db(scenario)
+    link = "http://kakuseinosekainokokujoninarudaikinonisemono.space/nft/" + uuid
+
+    command = ["node", "mint.js", "mint", owner, link]
+    subprocess.run(command)
+
+    return jsonify({"nft_id": 44}), 200
 
 
 if __name__ == "__main__":

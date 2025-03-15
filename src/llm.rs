@@ -5,7 +5,7 @@ use bevy_wasm_tasks::*;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
-const API_ENDPOINT: &str = "http://167.88.162.83/api";
+use crate::API_ENDPOINT;
 
 #[derive(Default)]
 pub struct LLMPlugin;

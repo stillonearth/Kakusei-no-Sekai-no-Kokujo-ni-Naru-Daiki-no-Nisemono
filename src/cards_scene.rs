@@ -82,6 +82,13 @@ pub(crate) struct EventPlayHand {}
 #[derive(Event)]
 pub(crate) struct EventEndCardGame {}
 
+#[derive(Event)]
+pub(crate) struct EventGameOver {}
+
+// ----------
+// Components
+// ----------
+
 #[derive(Component)]
 pub(crate) struct CardShowcase {}
 

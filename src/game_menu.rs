@@ -40,6 +40,7 @@ pub enum EventRefreshUI {
     ShopMenu,
     LoadingMenu,
     Narrative(NarrativeMenuSettings),
+    GameOver,
 }
 
 /// Despawn previous menu template and render a new one
@@ -51,6 +52,7 @@ pub enum EventRenderUI {
     Shop,
     Loading,
     Narrative,
+    GameOver,
 }
 
 #[derive(Event, PartialEq, Eq, Default, Debug)]
@@ -175,6 +177,14 @@ fn render_ui(
                     Name::new("narative menu"),
                 ));
             }
+            EventRenderUI::GameOver => {
+                commands.spawn((
+                    HtmlNode(asset_server.load("menu/game_over.html")),
+                    TemplateProperties::default(),
+                    GameMenu {},
+                    Name::new("game over menu"),
+                ));
+            }
         }
     }
 }
@@ -258,6 +268,9 @@ fn refresh_ui(
                         }
                     }
                 }
+            }
+            EventRefreshUI::GameOver => {
+                // do nothing here
             }
         }
     }

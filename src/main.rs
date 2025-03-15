@@ -6,6 +6,7 @@ mod cards_solitaire;
 mod game_menu;
 mod llm;
 mod main_menu;
+mod nft;
 mod splashscreen;
 mod text2img;
 mod visual_novel;
@@ -28,6 +29,7 @@ use cards_game::CharacterCards;
 use cards_game::NarrativeCards;
 use cards_game::VNCard;
 use cards_game::VNCardMetadata;
+use nft::NFTPlugin;
 use rpy_asset_loader::Rpy;
 use splashscreen::SplashscreenPlugin;
 use text2img::Text2ImagePlugin;
@@ -38,6 +40,8 @@ use crate::game_menu::GameMenuPlugin;
 use crate::llm::*;
 use crate::main_menu::*;
 use crate::visual_novel::*;
+
+pub const API_ENDPOINT: &str = "http://167.88.162.83/api";
 
 fn main() {
     App::new()
@@ -71,6 +75,7 @@ fn main() {
         .add_plugins((
             SplashscreenPlugin,
             LLMPlugin,
+            NFTPlugin,
             Text2ImagePlugin,
             MainMenuPlugin,
             GameMenuPlugin,
@@ -90,6 +95,7 @@ fn main() {
                 handle_draw_to_table,
                 handle_llm_response,
                 handle_new_vn_node,
+                handle_event_game_over,
                 handle_play_hand,
                 handle_text_2_image_response,
                 handle_end_card_game,
@@ -139,6 +145,7 @@ fn main() {
         .add_event::<EventStartNarrativeGame>()
         .add_event::<EventStartPokerGame>()
         .add_event::<EventStartNarrativeCardShop>()
+        .add_event::<EventGameOver>()
         // Resources
         .insert_resource(GameState {
             max_n_poker_draws: 25,

@@ -22,9 +22,10 @@ use crate::{
     },
     game_menu::{EventRefreshUI, EventRenderUI, PokerMenuSettings},
     llm::*,
+    nft::EventPersistScenarioRequest,
     text2img::{EventText2ImageRequest, EventText2ImageResponse},
-    EventStartNarrativeCardShop, EventStartNarrativeGame, EventStartPokerGame, GameState, GameType,
-    ScenarioHandle,
+    EventGameOver, EventStartNarrativeCardShop, EventStartNarrativeGame, EventStartPokerGame,
+    GameState, GameType, ScenarioHandle,
 };
 
 const PROMPT: &str = r#"
@@ -223,6 +224,7 @@ pub(crate) fn handle_new_vn_node(
     mut ew_show_vn_text_node: EventWriter<EventShowTextNode>,
     mut ew_render_ui: EventWriter<EventRenderUI>,
     mut ew_refresh_ui: EventWriter<EventRefreshUI>,
+    mut ew_game_over: EventWriter<EventGameOver>,
 ) {
     for event in er_handle_node.read() {
         game_state.n_vn_node = event.ast.index();
@@ -296,6 +298,9 @@ pub(crate) fn handle_new_vn_node(
                 "card shop" => {
                     ew_start_narrative_card_shop.send(EventStartNarrativeCardShop {});
                 }
+                "game over" => {
+                    ew_game_over.send(EventGameOver {});
+                }
                 _ => (),
             }
         } else {
@@ -304,15 +309,12 @@ pub(crate) fn handle_new_vn_node(
             if let Some(node) =
                 find_element_with_index(novel_data.ast.clone(), novel_data.current_index)
             {
-                match node {
-                    AST::Say(_index, _who, what) => {
-                        if what == "...".to_string() {
-                            ew_render_ui.send(EventRenderUI::Loading);
-                            game_state.current_menu_type = EventRenderUI::Loading;
-                            continue;
-                        }
+                if let AST::Say(_index, _who, what) = node {
+                    if what == *"..." {
+                        ew_render_ui.send(EventRenderUI::Loading);
+                        game_state.current_menu_type = EventRenderUI::Loading;
+                        continue;
                     }
-                    _ => {}
                 }
             }
 
@@ -324,5 +326,22 @@ pub(crate) fn handle_new_vn_node(
             }
             game_state.game_type = GameType::VisualNovel;
         }
+    }
+}
+
+pub(crate) fn handle_event_game_over(
+    mut er_game_over: EventReader<EventGameOver>,
+    mut ew_render_ui: EventWriter<EventRenderUI>,
+    mut ew_persist_scenario: EventWriter<EventPersistScenarioRequest>,
+    novel_data: Res<NovelData>,
+) {
+    for _ in er_game_over.read() {
+        // show menu
+        ew_render_ui.send(EventRenderUI::GameOver);
+
+        // save scenario to server
+        ew_persist_scenario.send(EventPersistScenarioRequest {
+            scenario: novel_data.ast.clone(),
+        });
     }
 }
