@@ -12,14 +12,12 @@ http://kakuseinosekainokokujoninarudaikinonisemono.space/
 
 ![image](https://github.com/user-attachments/assets/ff533e72-1c42-49ba-a496-c0ff4808cdab)
 
-![image](https://github.com/user-attachments/assets/cb390102-9efc-414c-b4d1-2d5766504eb5)
+![image](https://github.com/user-attachments/assets/589730a0-96f0-400e-8068-3ab66fc0cb79)
 
-![image](https://github.com/user-attachments/assets/162fb051-4844-4513-877b-5929afa00963)
+![image](https://github.com/user-attachments/assets/7da4dcd0-2d10-407d-9707-3986bda6f170)
 
-![image](https://github.com/user-attachments/assets/b0916305-7e6e-436a-b128-aafc35e25d05)
+![image](https://github.com/user-attachments/assets/adbf4dbc-10f8-4161-b48c-dffb921b34f2)
 
-![image](https://github.com/user-attachments/assets/963c9b67-4cb7-47b4-9841-f15bd7c0a6fa)
+![image](https://github.com/user-attachments/assets/315091f3-de17-44d2-9a9b-0d52085b2a51)
 
-![image](https://github.com/user-attachments/assets/68f7eed0-cb7f-4702-a61b-a3f7b892c67f)
-
-![image](https://github.com/user-attachments/assets/7b91c42d-fb20-4201-9a32-ee2b72f8df7d)
+![image](https://github.com/user-attachments/assets/7d281207-1619-4b93-ac46-98791c942f8a)
