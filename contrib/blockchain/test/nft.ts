@@ -22,7 +22,17 @@ describe("nft", function () {
 
     it("Should mint", async function () {
       const { nft, owner } = await loadFixture(deployFixture);
-      let result = await nft.safeMint(owner, "123");
+      let result = await nft.safeMint(owner);
+
+      let txResult = await result.wait();
+      let tokenId = txResult.logs[0].args[2];
+      expect(tokenId).to.equal(0);
+
+      await nft.setBaseUri("https://test.rs/");
+
+      let tokenURI = await nft.tokenURI(0);
+      console.log(tokenURI);
+      expect(tokenURI).to.equal("https://test.rs/0");
     });
   });
 });

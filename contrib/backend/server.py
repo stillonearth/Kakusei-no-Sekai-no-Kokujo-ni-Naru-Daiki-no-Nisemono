@@ -1,21 +1,21 @@
-from flask import Flask, request, jsonify, send_file
-from together import Together
-from PIL import Image
-
 import base64
 import io
 import uuid
 import subprocess
 import sqlite3
 import uuid
+import json
+
+from flask import Flask, request, jsonify, send_file
+from together import Together
+from PIL import Image
+
+
+API_KEY = "5dad429861935a07b26c1cb4033aa3ef8651d2acd16eb729939aa1b739f87d9d"
+LLM_MODEL = "deepseek-ai/DeepSeek-R1"
+TOGETHER_CLIENT = Together(api_key=API_KEY)
 
 app = Flask(__name__)
-
-
-API_KEY = ""
-LLM_MODEL = "deepseek-ai/DeepSeek-R1"
-
-TOGETHER_CLIENT = Together(api_key=API_KEY)
 
 
 @app.route("/api/llm", methods=["POST"])
@@ -62,50 +62,71 @@ def generate_image():
     return send_file(image_path, mimetype="image/png")
 
 
-def persist_string_to_db(data):
-    # Create a connection to the SQLite database
-    with sqlite3.connect("example.db") as conn:
+def save_scenario(scenario, nft_id):
+    with sqlite3.connect("database.db") as conn:
         cursor = conn.cursor()
 
-        # Create table if not exists
         cursor.execute(
-            """CREATE TABLE IF NOT EXISTS data_storage (uuid_str TEXT PRIMARY KEY, data TEXT)"""
+            """CREATE TABLE IF NOT EXISTS scenarios (nft_id INTEGER PRIMARY KEY, data TEXT)"""
         )
 
-        # Generate random UUID
         uuid_key = str(uuid.uuid4())
-
-        # Insert data into the table
-        cursor.execute("INSERT INTO data_storage VALUES (?, ?)", (uuid_key, data))
-
-        # Commit the transaction
+        cursor.execute("INSERT INTO scenarios VALUES (?, ?)", (nft_id, scenario))
         conn.commit()
-
-        # Retrieve and print the inserted data for verification
-        cursor.execute("SELECT * FROM data_storage WHERE uuid_str = ?", (uuid_key,))
-        result = cursor.fetchone()
-        if result:
-            print("Data persisted successfully:")
-            print(f"UUID: {result[0]}")
-            print(f"Data: {result[1]}")
 
     return uuid_key
 
 
-@app.route("/api/nft", methods=["POST"])
-def persist_story():
+@app.route("/api/nft/create", methods=["POST"])
+def create_story_nft():
     data = request.get_json()
 
     scenario = data.get("scenario", "")
     owner = data.get("owner", "")
 
-    uuid = persist_string_to_db(scenario)
-    link = "http://kakuseinosekainokokujoninarudaikinonisemono.space/nft/" + uuid
+    command = ["node", "mint.js", "mint", owner]
+    result = subprocess.run(command, capture_output=True, text=True).stdout.strip("\n")
+    
+    print("----")
+    print(result)
+    print("----")
+    
+    nft_id = int(result)
 
-    command = ["node", "mint.js", "mint", owner, link]
-    subprocess.run(command)
+    save_scenario(scenario, nft_id)
 
-    return jsonify({"nft_id": 44}), 200
+    return jsonify({"nft_id": nft_id}), 200
+
+
+@app.route("/api/nft/<nft_id>", methods=["GET"])
+def get_story_nft(nft_id):
+    if not nft_id:
+        return
+
+    with sqlite3.connect("database.db") as conn:
+        cursor = conn.cursor()
+
+        # Query the scenario_nfts table for the given uuid
+        query = "SELECT scenario FROM scenarios WHERE nft_id = ?"
+        cursor.execute(query, (nft_id,))
+
+        # Check if a record was found
+        result = cursor.fetchone()
+        if not result:
+            conn.close()
+            return jsonify({"error": "NFT not found"}), 404
+
+        scenario = result[0]
+
+        # Create a standard NFT JSON response
+        nft_response = {
+            "name": f"NFT {nft_id}",
+            "description": "nft decription",
+            "image": None,  # Create image
+            "metadata": {"scenario": scenario},
+        }
+
+        return jsonify(nft_response), 200
 
 
 if __name__ == "__main__":
