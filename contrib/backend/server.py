@@ -86,11 +86,7 @@ def create_story_nft():
 
     command = ["node", "mint.js", "mint", owner]
     result = subprocess.run(command, capture_output=True, text=True).stdout.strip("\n")
-    
-    print("----")
-    print(result)
-    print("----")
-    
+
     nft_id = int(result)
 
     save_scenario(scenario, nft_id)

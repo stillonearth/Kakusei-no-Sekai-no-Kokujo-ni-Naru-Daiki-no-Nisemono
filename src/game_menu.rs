@@ -40,7 +40,7 @@ pub enum EventRefreshUI {
     ShopMenu,
     LoadingMenu,
     Narrative(NarrativeMenuSettings),
-    GameOver,
+    GameOver(usize),
 }
 
 /// Despawn previous menu template and render a new one
@@ -269,8 +269,14 @@ fn refresh_ui(
                     }
                 }
             }
-            EventRefreshUI::GameOver => {
-                // do nothing here
+            EventRefreshUI::GameOver(nft_id) => {
+                for (_, mut text, tags) in q_text_labels.iter_mut() {
+                    if let Some(marker) = tags.get("marker")
+                        && marker == "text_minting_status"
+                    {
+                        *text = Text::new(format!("nft minted to your wallet. id: {}", *nft_id));
+                    }
+                }
             }
         }
     }

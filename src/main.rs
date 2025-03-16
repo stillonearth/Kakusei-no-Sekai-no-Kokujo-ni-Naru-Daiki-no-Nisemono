@@ -227,7 +227,7 @@ fn load_resources(
         NarrativeCardsHandle(asset_server.load("narrative-cards/cards.json"));
     commands.insert_resource(narrative_cards_handle);
 
-    game_state.wallet.address = "offline wallet".to_string();
+    game_state.wallet.address = "0x971C6CDa7EDE9db62732D896995c9ee3A3196e40".to_string();
 
     #[cfg(target_arch = "wasm32")]
     {

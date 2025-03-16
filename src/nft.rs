@@ -6,7 +6,7 @@ use renpy_parser::parsers::{ASTVec, AST};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
-use crate::API_ENDPOINT;
+use crate::{game_menu::EventRefreshUI, GameState, API_ENDPOINT};
 
 #[derive(Default)]
 pub struct NFTPlugin;
@@ -25,28 +25,44 @@ impl Plugin for NFTPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<EventPersistScenarioRequest>()
             .add_event::<EventPersistScenarioResponse>()
-            .add_systems(Update, handle_persist_nft_request);
+            .add_systems(
+                Update,
+                (handle_persist_nft_request, handle_persist_nft_response),
+            );
+    }
+}
+
+fn handle_persist_nft_response(
+    mut er_llm_response: EventReader<EventPersistScenarioResponse>,
+    mut ew_refresh_ui: EventWriter<EventRefreshUI>,
+) {
+    for event in er_llm_response.read() {
+        ew_refresh_ui.send(EventRefreshUI::GameOver(event.nft_id));
     }
 }
 
 fn handle_persist_nft_request(
     mut er_llm_request: EventReader<EventPersistScenarioRequest>,
     tasks: Tasks,
+    game_state: Res<GameState>,
 ) {
     for er in er_llm_request.read() {
         let scenario_string = format!("{}", ASTVec(&er.scenario));
+        let owner = game_state.wallet.address.clone();
 
         // TODO: DEDUP
         #[cfg(not(target_arch = "wasm32"))]
         tasks.spawn_tokio(move |ctx| async move {
             let llm_request = NFTPersistRequest {
                 scenario: scenario_string,
+                owner,
             };
 
             let llm_response = api_persist_story(llm_request).await;
 
             if llm_response.is_ok() {
                 let nft_id = llm_response.unwrap();
+
                 ctx.run_on_main_thread(move |ctx| {
                     let event_response = EventPersistScenarioResponse { nft_id };
                     let world: &mut World = ctx.world;
@@ -85,18 +101,17 @@ fn handle_persist_nft_request(
 #[derive(Serialize)]
 struct NFTPersistRequest {
     pub scenario: String,
+    pub owner: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 struct NFTPersistResponse {
     pub nft_id: usize,
 }
 
 async fn api_persist_story(prompt: NFTPersistRequest) -> Result<usize> {
-    let url = format!("{}/nft/save", API_ENDPOINT);
+    let url = format!("{}/nft/create", API_ENDPOINT);
     let payload_json = serde_json::to_string(&prompt)?;
-
-    println!("trying to persist story to blockchain, {}", payload_json);
 
     let client = Client::new();
     let response = client
