@@ -6,10 +6,10 @@ label chapter1_1:
 
     # chapter 1
 
-    game_mechanic "card play poker"
-    game_mechanic "card shop"
-    game_mechanic "card play narrative characters"
-    game_mechanic "card play narrative setting"
+    # game_mechanic "card play poker"
+    # game_mechanic "card shop"
+    # game_mechanic "card play narrative characters"
+    # game_mechanic "card play narrative setting"
 
     llm_generate storyteller "{PROMPT} Setting of novel is: ```{SETTING}```. Characters are: ```{CHARACTERS}."
     game_mechanic "card play narrative conflict"

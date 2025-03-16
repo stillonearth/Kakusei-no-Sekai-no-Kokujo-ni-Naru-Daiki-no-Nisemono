@@ -14,7 +14,6 @@ use bevy_novel::{
 };
 use image::DynamicImage;
 use renpy_parser::parsers::AST;
-use uuid::Uuid;
 
 use crate::{
     cards_game::{
@@ -68,7 +67,7 @@ pub(crate) fn handle_text_2_image_response(
     mut textures: ResMut<Assets<Image>>,
 ) {
     for event in er_text_2_image_response.read() {
-        let image_name = Uuid::new_v4().to_string();
+        let image_name = event.filename.clone();
         let dynamic_image: DynamicImage = event.image.clone();
         let rgba_image = dynamic_image.to_rgba8();
         let texture = Image::new_fill(
@@ -101,7 +100,7 @@ pub(crate) fn handle_llm_response(
     mut novel_data: ResMut<NovelData>,
     mut er_llm_response: EventReader<EventLLMResponse>,
     mut ew_llm_request: EventWriter<EventLLMRequest>,
-    mut ew_text_2_image_reqeust: EventWriter<EventText2ImageRequest>,
+    mut ew_text_2_image_request: EventWriter<EventText2ImageRequest>,
     mut ew_refresh_ui: EventWriter<EventRefreshUI>,
     assets: Res<AssetServer>,
 ) {
@@ -202,7 +201,7 @@ pub(crate) fn handle_llm_response(
                 game_state.n_vn_node_scene_request = game_state.n_vn_node;
             }
             LLMRequestType::Text2ImagePrompt => {
-                ew_text_2_image_reqeust.send(EventText2ImageRequest {
+                ew_text_2_image_request.send(EventText2ImageRequest {
                     prompt: event.response.clone(),
                 });
             }

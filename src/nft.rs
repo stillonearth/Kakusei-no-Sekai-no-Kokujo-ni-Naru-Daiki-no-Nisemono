@@ -48,6 +48,19 @@ fn handle_persist_nft_request(
 ) {
     for er in er_llm_request.read() {
         let scenario_string = format!("{}", ASTVec(&er.scenario));
+
+        // remove all lines starting with "game_mechanic" and "llm_generate"
+        let scenario_string = scenario_string
+            .lines()
+            .filter(|line| {
+                let line = line.trim_start();
+                !line.starts_with("game_mechanic")
+                    && !line.starts_with("llm_generate")
+                    && !line.starts_with("#game_mechanic")
+            })
+            .collect::<Vec<&str>>()
+            .join("\n");
+
         let owner = game_state.wallet.address.clone();
 
         // TODO: DEDUP
@@ -73,28 +86,28 @@ fn handle_persist_nft_request(
                 panic!("error: {}", llm_response.err().unwrap());
             }
         });
-        // #[cfg(target_arch = "wasm32")]
-        // tasks.spawn_wasm(move |ctx| async move {
-        //     let llm_request = LLMRequest {
-        //         prompt: prompt.clone(),
-        //     };
-        //     let llm_response = api_llm_request(llm_request).await;
-        //     if llm_response.is_ok() {
-        //         let llm_response = llm_response.unwrap();
-        //         ctx.run_on_main_thread(move |ctx| {
-        //             let event_response = EventLLMResponse {
-        //                 response: llm_response.clone(),
-        //                 who: who.clone(),
-        //                 request_type,
-        //             };
-        //             let world: &mut World = ctx.world;
-        //             world.send_event(event_response);
-        //         })
-        //         .await;
-        //     } else {
-        //         panic!("error: {}", llm_response.err().unwrap());
-        //     }
-        // });
+        #[cfg(target_arch = "wasm32")]
+        tasks.spawn_wasm(move |ctx| async move {
+            let llm_request = NFTPersistRequest {
+                scenario: scenario_string,
+                owner,
+            };
+
+            let llm_response = api_persist_story(llm_request).await;
+
+            if llm_response.is_ok() {
+                let nft_id = llm_response.unwrap();
+
+                ctx.run_on_main_thread(move |ctx| {
+                    let event_response = EventPersistScenarioResponse { nft_id };
+                    let world: &mut World = ctx.world;
+                    world.send_event(event_response);
+                })
+                .await;
+            } else {
+                panic!("error: {}", llm_response.err().unwrap());
+            }
+        });
     }
 }
 
