@@ -31,11 +31,11 @@ def download_and_process_image(description, filename):
 
 
 def main():
-    with open("new-cards.json") as json_file:
+    with open("psychosis-cards.json") as json_file:
         data = json.load(json_file)
 
         for i, item in enumerate(data[0:64]):
-            description = item.get("effect")
+            description = "Severe Psychosis: `" + item.get("description") + "`; no text, drammatic"
             filename = "card-picture-" + str(i)
 
             if description and filename:

@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::{
     prelude::*,
     render::render_resource::{AsBindGroup, ShaderRef},
@@ -96,13 +98,13 @@ pub fn show_menu(
         MainMenuResource {},
     ));
 
-    // audio
-    //     .play(main_menu_assets.balatro_theme.clone())
-    //     .loop_from(0.5)
-    //     .fade_in(AudioTween::new(
-    //         Duration::from_secs(2),
-    //         AudioEasing::OutPowi(2),
-    //     ));
+    audio
+        .play(main_menu_assets.balatro_theme.clone())
+        .loop_from(0.5)
+        .fade_in(AudioTween::new(
+            Duration::from_secs(2),
+            AudioEasing::OutPowi(2),
+        ));
 
     // main menu handler
     html_funcs.register(

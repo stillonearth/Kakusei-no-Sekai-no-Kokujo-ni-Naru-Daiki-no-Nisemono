@@ -18,6 +18,7 @@ use renpy_parser::parsers::AST;
 use crate::{
     cards_game::{
         filter_character_deck, filter_initial_character_cards, filter_initial_narrative_cards,
+        filter_psychosis_cards,
     },
     game_menu::{EventRefreshUI, EventRenderUI, PokerMenuSettings},
     llm::*,
@@ -32,6 +33,7 @@ You are narrator in a visual novel.
 Create a script for visual novel based on this setting.
 Respond only with story sentences and character lines.
 Do not include any instructions or explanations.
+Do not repeat yourself! Do no repeat character lines!
 Include dialogues for provived characters in format: "Character -> line". If character description is not provided make dialogue third person.
 Respond with at least 20 sentences each separated with new line. Each sentence no longer 10 words.
 "#;
@@ -49,6 +51,7 @@ pub fn start_visual_novel(
         game_state.collected_deck = [
             filter_initial_narrative_cards(game_state.game_deck.clone()),
             filter_initial_character_cards(game_state.game_deck.clone()),
+            filter_psychosis_cards(game_state.game_deck.clone()).unwrap(),
         ]
         .concat();
     }
@@ -254,6 +257,7 @@ pub(crate) fn handle_new_vn_node(
                 .replace("{CONFLICT}", &game_state.narrative_conflicts.join(" "))
                 .replace("{STORY}", &game_state.narrative_story_so_far.join(" "))
                 .replace("{CHARACTERS}", &game_state.characters.join(" "))
+                .replace("{PSYCHOSIS}", &game_state.psychosis.join(" "))
                 .replace("{PROMPT}", PROMPT);
 
             ew_llm_request.send(EventLLMRequest {
@@ -290,6 +294,9 @@ pub(crate) fn handle_new_vn_node(
                 }
                 "card play narrative conflict" => {
                     ew_start_narrative_game.send(EventStartNarrativeGame::Conflict);
+                }
+                "card play narrative psychosis" => {
+                    ew_start_narrative_game.send(EventStartNarrativeGame::Psychosis);
                 }
                 "card play narrative plot twist" => {
                     ew_start_narrative_game.send(EventStartNarrativeGame::PlotTwist);

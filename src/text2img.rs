@@ -76,14 +76,19 @@ fn handle_text_2_image_request(
         });
         #[cfg(target_arch = "wasm32")]
         tasks.spawn_wasm(|ctx| async move {
-            let url = format!("{}/image", API_ENDPOINT);
+            let url = format!("{}/image/v2", API_ENDPOINT);
             let mut url = Url::parse(&url).unwrap();
+
+            let encoded_prompt =
+                form_urlencoded::byte_serialize(prompt.as_bytes()).collect::<String>();
+            url.query_pairs_mut().append_pair("prompt", &encoded_prompt);
 
             let image_hash = generate_image(url.as_ref()).await;
             if image_hash.is_err() {
                 return;
             }
-            let url = format!("{}/image/v2/{}", API_ENDPOINT, image_hash.unwrap());
+            let filename = image_hash.unwrap();
+            let url = format!("{}/image/v2/{}", API_ENDPOINT, filename);
             let image = download_and_load_image(url.as_ref()).await;
 
             if image.is_ok() {

@@ -1,0 +1,214 @@
+[
+    {
+        "name": "Unsolved Mystery Flashbacks",
+        "description": "Past unsolved events resurface, creating suspense and unraveling old secrets."
+    },
+    {
+        "name": "Control Illusion",
+        "description": "The character is convinced they're being controlled by an external force, affecting their decision-making processes."
+    },
+    {
+        "name": "Prophecy Journals",
+        "description": "Upon revisiting their journal, the protagonist discovers entries that seem prophetic, challenging their sense of time and reality."
+    },
+    {
+        "name": "Echoing Thoughts",
+        "description": "The protagonist hears their own thoughts repeated back to them, as if someone else is speaking them aloud."
+    },
+    {
+        "name": "Fragmented Memory",
+        "description": "Chunks of memory begin to break away, leaving gaps in the protagonist’s past that they struggle to fill."
+    },
+    {
+        "name": "Visual Snow",
+        "description": "The world is overlaid with static-like patterns, making it difficult for the protagonist to focus on their surroundings."
+    },
+    {
+        "name": "Time Slip",
+        "description": "The protagonist experiences brief moments where time seems to warp, causing confusion about the present moment."
+    },
+    {
+        "name": "Split-Screen Hallucination",
+        "description": "Two opposing realities unfold simultaneously in the protagonist’s vision, forcing them to navigate between conflicting perspectives."
+    },
+    {
+        "name": "Conversational Echos",
+        "description": "Voices repeat snippets of past conversations out of context, distorting their meaning and intent."
+    },
+    {
+        "name": "Body Swapping Delusion",
+        "description": "The protagonist believes they have involuntarily switched bodies with someone else, leading to identity confusion."
+    },
+    {
+        "name": "Perpetual Motion",
+        "description": "The character feels an overwhelming urge to keep moving, unable to sit still for even a moment."
+    },
+    {
+        "name": "Dissolving Senses",
+        "description": "One or more senses gradually fade, leaving the protagonist in a disorienting sensory vacuum."
+    },
+    {
+        "name": "Reverse Time Memories",
+        "description": "Memories play backward, with events unfolding in reverse chronological order, confusing the protagonist’s understanding of cause and effect."
+    },
+    {
+        "name": "Shadow People",
+        "description": "Dark, indistinct figures follow the protagonist, watching their every move from the corners of their vision."
+    },
+    {
+        "name": "Thought Broadcasting",
+        "description": "The protagonist believes their thoughts are being broadcasted to others, causing them to censor themselves constantly."
+    },
+    {
+        "name": "Selective Amnesia",
+        "description": "The protagonist selectively forgets specific events or people, often those most relevant to their current situation."
+    },
+    {
+        "name": "Hallucinated Objects",
+        "description": "Inanimate objects take on new forms or personalities, demanding attention and altering the protagonist’s interactions with their environment."
+    },
+    {
+        "name": "Thought Interference",
+        "description": "External forces disrupt the protagonist’s thought processes, making it difficult for them to form coherent ideas or decisions."
+    },
+    {
+        "name": "Temporal Lapse",
+        "description": "The protagonist experiences sudden, unpredictable jumps in time, losing track of their timeline and purpose."
+    },
+    {
+        "name": "Cognitive Overload",
+        "description": "Too much information floods the protagonist’s mind at once, making it impossible to process stimuli effectively."
+    },
+    {
+        "name": "Delusional Logic",
+        "description": "The protagonist begins to apply illogical reasoning to everyday situations, believing in connections where none exist."
+    },
+    {
+        "name": "Phantom Voices",
+        "description": "Voices speak directly into the protagonist’s mind, offering cryptic advice or taunting them with unsolved mysteries."
+    },
+    {
+        "name": "Memory Echoes",
+        "description": "Past events replay vividly in the protagonist’s mind, making it difficult to distinguish between memory and reality."
+    },
+    {
+        "name": "Visual Hallucinations of Touch",
+        "description": "The protagonist sees patterns or figures that seem to physically touch them, causing a disconnect between sight and touch."
+    },
+    {
+        "name": "Ebbing Awareness",
+        "description": "The protagonist’s sense of self gradually fades, leading them to question their own identity and existence."
+    },
+    {
+        "name": "Infinite Staircase Hallucination",
+        "description": "A never-ending staircase appears in the protagonist’s vision, symbolizing an unattainable goal or endless descent into chaos."
+    },
+    {
+        "name": "Thought Erasure",
+        "description": "The protagonist finds themselves incapable of retaining new information, as if their brain is erasing thoughts on purpose."
+    },
+    {
+        "name": "Double Vision Merge",
+        "description": "Two images overlap in the protagonist’s vision, creating a composite image that distorts reality and perception."
+    },
+    {
+        "name": "Selective Hearing Loss",
+        "description": "The protagonist hears only fragments of conversations, missing critical information that affects their decisions."
+    },
+    {
+        "name": "Identity Transference",
+        "description": "The protagonist believes they have inherited someone else’s identity, altering their relationships and goals."
+    },
+    {
+        "name": "Memory Suppression",
+        "description": "Key memories are buried deep within the protagonist’s mind, surfacing only under intense pressure or stress."
+    },
+    {
+        "name": "Hallucinated Familiar Faces",
+        "description": "Familiar faces appear in places where they shouldn’t, leading the protagonist to question reality and trust."
+    },
+    {
+        "name": "Temporal Drift",
+        "description": "Time feels distorted, with events occurring out of order or repeating indefinitely, blurring past, present, and future."
+    },
+    {
+        "name": "Thought Addiction",
+        "description": "The protagonist becomes obsessed with specific thoughts, unable to stop replaying them in their mind."
+    },
+    {
+        "name": "Dissociative Flashbacks",
+        "description": "The protagonist experiences dissociative episodes where they relive traumatic events, losing track of the present moment."
+    },
+    {
+        "name": "Hallucinated Weather Patterns",
+        "description": "Unreal weather phenomena manifest around the protagonist, altering their environment and mood."
+    },
+    {
+        "name": "Split-Second Time Dilation",
+        "description": "Time slows down for brief moments, allowing the protagonist to see events in excruciating detail but losing track of their surroundings."
+    },
+    {
+        "name": "Cognitive Tunnel Vision",
+        "description": "The protagonist’s focus narrows, making it difficult to perceive peripheral information or threats."
+    },
+    {
+        "name": "Hallucinated Conversations",
+        "description": "Voices carry on conversations with themselves or others, leaving the protagonist isolated and confused."
+    },
+    {
+        "name": "Identity Fracture",
+        "description": "The protagonist feels like they are splitting into different personalities, each vying for control over their actions."
+    },
+    {
+        "name": "Memory Overwrite",
+        "description": "New memories overwrite old ones, causing inconsistencies in the protagonist’s understanding of their past."
+    },
+    {
+        "name": "Visual Hallucinations of Movement",
+        "description": "Still objects appear to move or shift, even when the protagonist knows they are stationary."
+    },
+    {
+        "name": "Thought Erasure Trigger",
+        "description": "Certain stimuli trigger the complete erasure of specific memories, leaving the protagonist with gaps in their knowledge."
+    },
+    {
+        "name": "Selective Paranoia",
+        "description": "The protagonist becomes paranoid only in certain situations or around specific people, making it hard to trust others fully."
+    },
+    {
+        "name": "Temporal Hallucinations",
+        "description": "The protagonist experiences glimpses of future events or revisits moments that haven’t occurred yet, leading to confusion and mistrust."
+    },
+    {
+        "name": "Thought Suppression",
+        "description": "The protagonist struggles to suppress intrusive thoughts that pop into their mind uncontrollably."
+    },
+    {
+        "name": "Dissociative Identity Switching",
+        "description": "The protagonist’s personality shifts between different identities, each with its own traits and behaviors."
+    },
+    {
+        "name": "Memory Fading",
+        "description": "Memories gradually fade away, leaving the protagonist with an incomplete understanding of their past."
+    },
+    {
+        "name": "Hallucinated Emotions",
+        "description": "The protagonist feels emotions that don’t align with their current situation, confusing their mental state."
+    },
+    {
+        "name": "Temporal Freezing",
+        "description": "Time feels like it’s standing still for brief moments, leaving the protagonist trapped in a static moment."
+    },
+    {
+        "name": "Cognitive Overlap",
+        "description": "The protagonist struggles to separate overlapping thoughts and ideas, making decision-making nearly impossible."
+    },
+    {
+        "name": "Thought Mutation",
+        "description": "Thoughts evolve into something entirely different as they form, leading to illogical conclusions and actions."
+    },
+    {
+        "name": "Identity Doubt",
+        "description": "The protagonist questions their very existence, wondering if they are a figment of someone else’s imagination."
+    }
+]

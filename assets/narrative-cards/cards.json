@@ -1,514 +1,514 @@
 [
-  {
-    "name": "Mysterious Stranger",
-    "card_type": "conflict",
-    "genre": "fantasy",
-    "effect": "Add a new character to the story who challenges the main protagonist.",
-    "flavor_text": "A shadowy figure approaches, their intentions unclear. Who are you?",
-    "price": 10
-  },
-  {
-    "name": "Ancient Prophecy",
-    "card_type": "setting",
-    "genre": "classic",
-    "effect": "Introduce a prophecy that influences the course of events.",
-    "flavor_text": "The ancient scrolls foretell a great calamity. Will it come to pass?",
-    "price": 15
-  },
-  {
-    "name": "Time Warp",
-    "card_type": "plot twist",
-    "genre": "sci-fi",
-    "effect": "Change the time period of the story, altering its context and challenges.",
-    "flavor_text": "Suddenly, the world shifts. Is this a dream or reality?",
-    "price": 20
-  },
-  {
-    "name": "Forgotten Artifact",
-    "card_type": "conflict",
-    "genre": "fantasy",
-    "effect": "Introduce an artifact that has unexpected consequences.",
-    "flavor_text": "The relic hums with ancient power. What secrets does it hold?",
-    "price": 25
-  },
-  {
-    "name": "Unexpected Alliance",
-    "card_type": "conflict",
-    "genre": "spy",
-    "effect": "Two unlikely characters form an alliance, creating a new subplot.",
-    "flavor_text": "Enemies become allies in the face of a greater threat. Together, they stand a chance.",
-    "price": 30
-  },
-  {
-    "name": "Political Intrigue",
-    "card_type": "conflict",
-    "genre": "political thriller",
-    "effect": "A new political figure emerges with hidden motives.",
-    "flavor_text": "The city's council is in disarray. Who can be trusted?",
-    "price": 35
-  },
-  {
-    "name": "Lost Love Letter",
-    "card_type": "plot twist",
-    "genre": "classic",
-    "effect": "A love letter reveals hidden feelings and past regrets.",
-    "flavor_text": "In the forgotten drawer, a letter is found. Whose heart does it belong to?",
-    "price": 40
-  },
-  {
-    "name": "Parallel Universe",
-    "card_type": "setting",
-    "genre": "sci-fi",
-    "effect": "The story moves into an alternate dimension with different rules.",
-    "flavor_text": "A tear in the fabric of reality opens up a new world, filled with possibilities and dangers.",
-    "price": 45
-  },
-  {
-    "name": "Mysterious Disease",
-    "card_type": "conflict",
-    "genre": "classic",
-    "effect": "An illness strikes, causing panic and chaos in the setting.",
-    "flavor_text": "A plague sweeps through the city. Will anyone survive?",
-    "price": 50
-  },
-  {
-    "name": "Sudden Revelation",
-    "card_type": "plot twist",
-    "genre": "spy",
-    "effect": "A major character reveals a long-held secret.",
-    "flavor_text": "The truth has been hidden, but now it comes to light. All is not as it seems.",
-    "price": 55
-  },
-  {
-    "name": "Cataclysmic Event",
-    "card_type": "setting",
-    "genre": "political thriller",
-    "effect": "A natural disaster or catastrophic event reshapes the setting.",
-    "flavor_text": "The world as we know it is torn apart. New challenges arise from the ruins.",
-    "price": 60
-  },
-  {
-    "name": "Mystical Vision",
-    "card_type": "plot twist",
-    "genre": "fantasy",
-    "effect": "A character has a prophetic vision that changes their path.",
-    "flavor_text": "The future is revealed in a dream-like state. What choices will be made?",
-    "price": 65
-  },
-  {
-    "name": "Technological Breakthrough",
-    "card_type": "setting",
-    "genre": "sci-fi",
-    "effect": "A new technology revolutionizes the world.",
-    "flavor_text": "Invention changes everything. The future is brighter and scarier than ever before.",
-    "price": 70
-  },
-  {
-    "name": "Heroic Sacrifice",
-    "card_type": "conflict",
-    "genre": "classic",
-    "effect": "A character makes a selfless sacrifice for the greater good.",
-    "flavor_text": "There is no greater love than to lay down one's life for others. The hero falls, but not without purpose.",
-    "price": 75
-  },
-  {
-    "name": "Betrayal",
-    "card_type": "conflict",
-    "genre": "spy",
-    "effect": "A trusted ally is revealed to be working against the protagonist.",
-    "flavor_text": "Trust has been betrayed. Will the truth ever come out?",
-    "price": 80
-  },
-  {
-    "name": "Unexpected Victory",
-    "card_type": "conflict",
-    "genre": "political thriller",
-    "effect": "A seemingly lost battle is won by an unexpected turn of events.",
-    "flavor_text": "Against all odds, victory is achieved. The underdog prevails.",
-    "price": 85
-  },
-  {
-    "name": "Ancient Curse",
-    "card_type": "conflict",
-    "genre": "fantasy",
-    "effect": "A curse or hex affects the protagonist's life in a significant way.",
-    "flavor_text": "Cursed by fate, the hero must find a way to break the bond of ill fortune.",
-    "price": 90
-  },
-  {
-    "name": "Revolution",
-    "card_type": "setting",
-    "genre": "political thriller",
-    "effect": "A major social or political revolution begins in the setting.",
-    "flavor_text": "The people rise up against oppression. A new era is born, but at what cost?",
-    "price": 95
-  },
-  {
-    "name": "Time Loop",
-    "card_type": "plot twist",
-    "genre": "sci-fi",
-    "effect": "Characters are trapped in a time loop.",
-    "flavor_text": "Day after day, the same events repeat. Will they break free?",
-    "price": 100
-  },
-  {
-    "name": "Hidden Relic",
-    "card_type": "conflict",
-    "genre": "fantasy",
-    "effect": "A powerful relic is discovered, but its true nature remains a mystery.",
-    "flavor_text": "Ancient and mysterious, the relic's power lies in waiting. Will it be used for good or ill?",
-    "price": 105
-  },
-  {
-    "name": "Moral Dilemma",
-    "card_type": "conflict",
-    "genre": "classic",
-    "effect": "A character faces a difficult ethical decision.",
-    "flavor_text": "Right and wrong blur. The path forward is uncertain, but the choice must be made.",
-    "price": 110
-  },
-  {
-    "name": "Secret Identity",
-    "card_type": "conflict",
-    "genre": "spy",
-    "effect": "A character's true identity or motives are revealed to be more complex than expected.",
-    "flavor_text": "The truth is stranger than fiction. Who is the real hero?",
-    "price": 115
-  },
-  {
-    "name": "Eternal Riddle",
-    "card_type": "plot twist",
-    "genre": "fantasy",
-    "effect": "A riddle or puzzle that can only be solved by a chosen few.",
-    "flavor_text": "Solve the eternal riddle, and unlock the secrets of ages past. Fail, and the consequences are dire.",
-    "price": 120
-  },
-  {
-    "name": "World Peace",
-    "card_type": "setting",
-    "genre": "political thriller",
-    "effect": "A world-changing event leads to global peace and unity.",
-    "flavor_text": "War is over. Now comes the hard work of rebuilding and understanding each other.",
-    "price": 125
-  },
-  {
-    "name": "Technological Catastrophe",
-    "card_type": "setting",
-    "genre": "sci-fi",
-    "effect": "A major technological failure or disaster affects society in a profound way.",
-    "flavor_text": "The machines have failed. The world as we know it is at stake.",
-    "price": 130
-  },
-  {
-    "name": "Hero's Quest",
-    "card_type": "conflict",
-    "genre": "fantasy",
-    "effect": "A hero embarks on a grand quest to save their world or people.",
-    "flavor_text": "The fate of the realm lies in your hands. Gather your allies and set forth on an epic journey.",
-    "price": 135
-  },
-  {
-    "name": "Great Invention",
-    "card_type": "setting",
-    "genre": "sci-fi",
-    "effect": "A significant invention changes the course of history.",
-    "flavor_text": "Invention is the mother of progress. A new era dawns with this groundbreaking discovery.",
-    "price": 140
-  },
-  {
-    "name": "Ancient Prophecy",
-    "card_type": "plot twist",
-    "genre": "fantasy",
-    "effect": "A long-forgotten prophecy is rediscovered and comes to life.",
-    "flavor_text": "The words of the ancients foretell a time of great change. Are you ready for what lies ahead?",
-    "price": 145
-  },
-  {
-    "name": "Love Triangle",
-    "card_type": "conflict",
-    "genre": "classic",
-    "effect": "Characters are torn between romantic interests, leading to drama and conflict.",
-    "flavor_text": "Hearts entangled in a web of love and betrayal. Whose side will you take?",
-    "price": 150
-  },
-  {
-    "name": "Espionage",
-    "card_type": "conflict",
-    "genre": "spy",
-    "effect": "A character is caught up in a high-stakes game of espionage and intrigue.",
-    "flavor_text": "The truth lies hidden, but the stakes are too high to look away. Can you stay one step ahead?",
-    "price": 155
-  },
-  {
-    "name": "Future War",
-    "card_type": "plot twist",
-    "genre": "sci-fi",
-    "effect": "A war breaks out in a dystopian future.",
-    "flavor_text": "The world is divided, and the future hangs in the balance. Will you fight for peace or join the ranks?",
-    "price": 160
-  },
-  {
-    "name": "Ancient Artifact",
-    "card_type": "conflict",
-    "genre": "fantasy",
-    "effect": "An ancient artifact with mysterious powers is discovered.",
-    "flavor_text": "Power beyond imagination lies in this relic. Will it be used for good or evil?",
-    "price": 165
-  },
-  {
-    "name": "Social Revolution",
-    "card_type": "setting",
-    "genre": "political thriller",
-    "effect": "A major social movement sparks change and upheaval.",
-    "flavor_text": "The status quo is challenged. A new world order dawns, but at what cost?",
-    "price": 170
-  },
-  {
-    "name": "Technological Singularity",
-    "card_type": "setting",
-    "genre": "sci-fi",
-    "effect": "A technological breakthrough leads to a singularity event.",
-    "flavor_text": "The future is now. Artificial intelligence surpasses human intellect, and the world changes overnight.",
-    "price": 175
-  },
-  {
-    "name": "Hero's Sacrifice",
-    "card_type": "conflict",
-    "genre": "classic",
-    "effect": "A heroic character makes a selfless sacrifice for the greater good.",
-    "flavor_text": "There is no greater love than to lay down one's life for others. The hero falls, but not without purpose.",
-    "price": 180
-  },
-  {
-    "name": "Cataclysmic Event",
-    "card_type": "setting",
-    "genre": "sci-fi",
-    "effect": "A cataclysmic event reshapes the world in a profound way.",
-    "flavor_text": "The world as we know it is no more. Will humanity survive?",
-    "price": 185
-  },
-  {
-    "name": "Hero's Journey",
-    "card_type": "conflict",
-    "genre": "fantasy",
-    "effect": "A hero embarks on a grand quest to save their world or people.",
-    "flavor_text": "The fate of the realm lies in your hands. Gather your allies and set forth on an epic journey.",
-    "price": 190
-  },
-  {
-    "name": "Great Invention",
-    "card_type": "setting",
-    "genre": "sci-fi",
-    "effect": "A significant invention changes the course of history.",
-    "flavor_text": "Invention is the mother of progress. A new era dawns with this groundbreaking discovery.",
-    "price": 195
-  },
-  {
-    "name": "The Lost Scroll",
-    "card_type": "setting",
-    "genre": "fantasy",
-    "effect": "Introduce an ancient prophecy that could change the course of the story.",
-    "flavor_text": "In a dusty corner of an old library, an ancient scroll reveals hidden truths about the world's fate.",
-    "price": 10
-  },
-  {
-    "name": "Sudden Storm",
-    "card_type": "conflict",
-    "genre": "sci-fi",
-    "effect": "A sudden storm hits a key location, causing delays and challenges for characters.",
-    "flavor_text": "An unexpected meteorological event disrupts the plans of our heroes.",
-    "price": 30
-  },
-  {
-    "name": "Mysterious Stranger",
-    "card_type": "conflict",
-    "genre": "classic",
-    "effect": "A mysterious stranger arrives and challenges a main character's beliefs or actions.",
-    "flavor_text": "He appeared out of nowhere, his presence stirring up old memories and suspicions.",
-    "price": 50
-  },
-  {
-    "name": "The Secret Agent",
-    "card_type": "plot twist",
-    "genre": "spy",
-    "effect": "Reveal that a key character is actually a secret agent working for an opposing side.",
-    "flavor_text": "Trust no one, not even the closest allies. They may be watching and waiting to strike.",
-    "price": 80
-  },
-  {
-    "name": "Historical Artifact",
-    "card_type": "setting",
-    "genre": "political thriller",
-    "effect": "A historical artifact is discovered that has political ramifications.",
-    "flavor_text": "The past holds the key to future alliances and conflicts.",
-    "price": 20
-  },
-  {
-    "name": "Unforeseen Alliance",
-    "card_type": "plot twist",
-    "genre": "fantasy",
-    "effect": "Two unlikely characters form an alliance, changing the dynamics of the story.",
-    "flavor_text": "Enemies become friends in the face of a greater threat.",
-    "price": 70
-  },
-  {
-    "name": "Hidden Motives",
-    "card_type": "conflict",
-    "genre": "sci-fi",
-    "effect": "A character reveals hidden motives that shake up the plot.",
-    "flavor_text": "What you see is not always what it seems in a world of technology and illusion.",
-    "price": 40
-  },
-  {
-    "name": "The Oracle's Prediction",
-    "card_type": "plot twist",
-    "genre": "classic",
-    "effect": "An oracle predicts an unexpected future event that alters the story direction.",
-    "flavor_text": "Fate is written in the stars, but it can be rewritten by the bravest of hearts.",
-    "price": 60
-  },
-  {
-    "name": "Bargain with a Daemon",
-    "card_type": "conflict",
-    "genre": "fantasy",
-    "effect": "A character makes a deal with a daemon, setting up future consequences.",
-    "flavor_text": "What is the price of power? It may be higher than you think.",
-    "price": 50
-  },
-  {
-    "name": "Technological Breakthrough",
-    "card_type": "setting",
-    "genre": "sci-fi",
-    "effect": "A new technology changes the game and opens up possibilities for the story.",
-    "flavor_text": "Innovation can be a double-edged sword. What will you do with it?",
-    "price": 30
-  },
-  {
-    "name": "Political Upheaval",
-    "card_type": "conflict",
-    "genre": "political thriller",
-    "effect": "A sudden political event causes an upheaval that impacts the story.",
-    "flavor_text": "Power struggles are never truly over; they merely change form.",
-    "price": 60
-  },
-  {
-    "name": "The Lost City",
-    "card_type": "setting",
-    "genre": "fantasy",
-    "effect": "A lost city is rediscovered, filled with secrets and danger.",
-    "flavor_text": "Adventure awaits in the shadows of time-forgotten ruins.",
-    "price": 40
-  },
-  {
-    "name": "The Great Betrayal",
-    "card_type": "conflict",
-    "genre": "spy",
-    "effect": "A significant betrayal from a trusted character shakes up the narrative.",
-    "flavor_text": "Betrayals can come from unexpected places, even in the darkest of shadows.",
-    "price": 90
-  },
-  {
-    "name": "Cultural Festival",
-    "card_type": "filler",
-    "genre": "classic",
-    "effect": "Introduce a cultural festival that provides background and flavor to the story.",
-    "flavor_text": "Celebrations are moments of joy amidst adversity, giving strength and unity to those who partake.",
-    "price": 20
-  },
-  {
-    "name": "Asteroid Impact",
-    "card_type": "conflict",
-    "genre": "sci-fi",
-    "effect": "An asteroid impact forces characters to adapt to new challenges.",
-    "flavor_text": "When the sky falls, humanity must rise from its ashes.",
-    "price": 70
-  },
-  {
-    "name": "The Hero's Journey Begins",
-    "card_type": "plot twist",
-    "genre": "fantasy",
-    "effect": "A young hero embarks on a quest that changes the course of history.",
-    "flavor_text": "Every great adventure begins with one small step into the unknown.",
-    "price": 80
-  },
-  {
-    "name": "Political Revolution",
-    "card_type": "conflict",
-    "genre": "political thriller",
-    "effect": "A political revolution breaks out, reshaping the story's landscape.",
-    "flavor_text": "Change is inevitable; resist it or ride its waves to a new horizon.",
-    "price": 50
-  },
-  {
-    "name": "The Enchanted Forest",
-    "card_type": "setting",
-    "genre": "fantasy",
-    "effect": "A mystical forest appears, full of magic and mystery.",
-    "flavor_text": "Nature's secrets are whispered to those who listen with an open heart.",
-    "price": 30
-  },
-  {
-    "name": "The Spy's Gambit",
-    "card_type": "conflict",
-    "genre": "spy",
-    "effect": "A risky move by a spy creates complications and drama in the story.",
-    "flavor_text": "Sometimes, to save the day, you must risk it all.",
-    "price": 60
-  },
-  {
-    "name": "Alien Arrival",
-    "card_type": "setting",
-    "genre": "sci-fi",
-    "effect": "An alien race arrives with unknown intentions and consequences.",
-    "flavor_text": "The universe is vast, full of wonders and dangers beyond imagination.",
-    "price": 40
-  },
-  {
-    "name": "The Lost Heir",
-    "card_type": "plot twist",
-    "genre": "political thriller",
-    "effect": "A lost heir to a kingdom or empire is discovered, creating intrigue.",
-    "flavor_text": "Power can be reclaimed by those who have the courage to fight for it.",
-    "price": 80
-  },
-  {
-    "name": "The Dark Lord's Return",
-    "card_type": "conflict",
-    "genre": "fantasy",
-    "effect": "An ancient evil returns, threatening all that is good and just.",
-    "flavor_text": "Darkness can be overcome, but only with the light of hope shining bright.",
-    "price": 90
-  },
-  {
-    "name": "The Great War",
-    "card_type": "conflict",
-    "genre": "classic",
-    "effect": "A major war breaks out, altering the course of history and human lives.",
-    "flavor_text": "War is a crucible that refines both heroes and villains alike.",
-    "price": 50
-  },
-  {
-    "name": "Technological Disaster",
-    "card_type": "conflict",
-    "genre": "sci-fi",
-    "effect": "A technological disaster strikes, causing chaos and requiring adaptation.",
-    "flavor_text": "Progress comes at a price; the cost can be devastating.",
-    "price": 70
-  },
-  {
-    "name": "The Great Reveal",
-    "card_type": "plot twist",
-    "genre": "fantasy",
-    "effect": "A significant revelation changes everything for the characters and story.",
-    "flavor_text": "Sometimes, all it takes is one moment of truth to turn the tide of fate.",
-    "price": 90
-  },
-  {
-    "name": "The Enigmatic Stranger",
-    "card_type": "conflict",
-    "genre": "spy",
-    "effect": "A mysterious stranger arrives with secrets and a hidden agenda.",
-    "flavor_text": "Not all visitors come in peace, and not everyone is who they seem.",
-    "price": 60
-  }
+    {
+        "name": "Mysterious Stranger",
+        "card_type": "conflict",
+        "genre": "fantasy",
+        "effect": "Add a new character to the story who challenges the main protagonist.",
+        "flavor_text": "A shadowy figure approaches, their intentions unclear. Who are you?",
+        "price": 10
+    },
+    {
+        "name": "Ancient Prophecy",
+        "card_type": "setting",
+        "genre": "classic",
+        "effect": "Introduce a prophecy that influences the course of events.",
+        "flavor_text": "The ancient scrolls foretell a great calamity. Will it come to pass?",
+        "price": 15
+    },
+    {
+        "name": "Time Warp",
+        "card_type": "plot twist",
+        "genre": "sci-fi",
+        "effect": "Change the time period of the story, altering its context and challenges.",
+        "flavor_text": "Suddenly, the world shifts. Is this a dream or reality?",
+        "price": 20
+    },
+    {
+        "name": "Forgotten Artifact",
+        "card_type": "conflict",
+        "genre": "fantasy",
+        "effect": "Introduce an artifact that has unexpected consequences.",
+        "flavor_text": "The relic hums with ancient power. What secrets does it hold?",
+        "price": 25
+    },
+    {
+        "name": "Unexpected Alliance",
+        "card_type": "conflict",
+        "genre": "spy",
+        "effect": "Two unlikely characters form an alliance, creating a new subplot.",
+        "flavor_text": "Enemies become allies in the face of a greater threat. Together, they stand a chance.",
+        "price": 30
+    },
+    {
+        "name": "Political Intrigue",
+        "card_type": "conflict",
+        "genre": "political thriller",
+        "effect": "A new political figure emerges with hidden motives.",
+        "flavor_text": "The city's council is in disarray. Who can be trusted?",
+        "price": 35
+    },
+    {
+        "name": "Lost Love Letter",
+        "card_type": "plot twist",
+        "genre": "classic",
+        "effect": "A love letter reveals hidden feelings and past regrets.",
+        "flavor_text": "In the forgotten drawer, a letter is found. Whose heart does it belong to?",
+        "price": 40
+    },
+    {
+        "name": "Parallel Universe",
+        "card_type": "setting",
+        "genre": "sci-fi",
+        "effect": "The story moves into an alternate dimension with different rules.",
+        "flavor_text": "A tear in the fabric of reality opens up a new world, filled with possibilities and dangers.",
+        "price": 45
+    },
+    {
+        "name": "Mysterious Disease",
+        "card_type": "conflict",
+        "genre": "classic",
+        "effect": "An illness strikes, causing panic and chaos in the setting.",
+        "flavor_text": "A plague sweeps through the city. Will anyone survive?",
+        "price": 50
+    },
+    {
+        "name": "Sudden Revelation",
+        "card_type": "plot twist",
+        "genre": "spy",
+        "effect": "A major character reveals a long-held secret.",
+        "flavor_text": "The truth has been hidden, but now it comes to light. All is not as it seems.",
+        "price": 55
+    },
+    {
+        "name": "Cataclysmic Event",
+        "card_type": "setting",
+        "genre": "political thriller",
+        "effect": "A natural disaster or catastrophic event reshapes the setting.",
+        "flavor_text": "The world as we know it is torn apart. New challenges arise from the ruins.",
+        "price": 60
+    },
+    {
+        "name": "Mystical Vision",
+        "card_type": "plot twist",
+        "genre": "fantasy",
+        "effect": "A character has a prophetic vision that changes their path.",
+        "flavor_text": "The future is revealed in a dream-like state. What choices will be made?",
+        "price": 65
+    },
+    {
+        "name": "Technological Breakthrough",
+        "card_type": "setting",
+        "genre": "sci-fi",
+        "effect": "A new technology revolutionizes the world.",
+        "flavor_text": "Invention changes everything. The future is brighter and scarier than ever before.",
+        "price": 70
+    },
+    {
+        "name": "Heroic Sacrifice",
+        "card_type": "conflict",
+        "genre": "classic",
+        "effect": "A character makes a selfless sacrifice for the greater good.",
+        "flavor_text": "There is no greater love than to lay down one's life for others. The hero falls, but not without purpose.",
+        "price": 75
+    },
+    {
+        "name": "Betrayal",
+        "card_type": "conflict",
+        "genre": "spy",
+        "effect": "A trusted ally is revealed to be working against the protagonist.",
+        "flavor_text": "Trust has been betrayed. Will the truth ever come out?",
+        "price": 80
+    },
+    {
+        "name": "Unexpected Victory",
+        "card_type": "conflict",
+        "genre": "political thriller",
+        "effect": "A seemingly lost battle is won by an unexpected turn of events.",
+        "flavor_text": "Against all odds, victory is achieved. The underdog prevails.",
+        "price": 85
+    },
+    {
+        "name": "Ancient Curse",
+        "card_type": "conflict",
+        "genre": "fantasy",
+        "effect": "A curse or hex affects the protagonist's life in a significant way.",
+        "flavor_text": "Cursed by fate, the hero must find a way to break the bond of ill fortune.",
+        "price": 90
+    },
+    {
+        "name": "Revolution",
+        "card_type": "setting",
+        "genre": "political thriller",
+        "effect": "A major social or political revolution begins in the setting.",
+        "flavor_text": "The people rise up against oppression. A new era is born, but at what cost?",
+        "price": 95
+    },
+    {
+        "name": "Time Loop",
+        "card_type": "plot twist",
+        "genre": "sci-fi",
+        "effect": "Characters are trapped in a time loop.",
+        "flavor_text": "Day after day, the same events repeat. Will they break free?",
+        "price": 100
+    },
+    {
+        "name": "Hidden Relic",
+        "card_type": "conflict",
+        "genre": "fantasy",
+        "effect": "A powerful relic is discovered, but its true nature remains a mystery.",
+        "flavor_text": "Ancient and mysterious, the relic's power lies in waiting. Will it be used for good or ill?",
+        "price": 105
+    },
+    {
+        "name": "Moral Dilemma",
+        "card_type": "conflict",
+        "genre": "classic",
+        "effect": "A character faces a difficult ethical decision.",
+        "flavor_text": "Right and wrong blur. The path forward is uncertain, but the choice must be made.",
+        "price": 110
+    },
+    {
+        "name": "Secret Identity",
+        "card_type": "conflict",
+        "genre": "spy",
+        "effect": "A character's true identity or motives are revealed to be more complex than expected.",
+        "flavor_text": "The truth is stranger than fiction. Who is the real hero?",
+        "price": 115
+    },
+    {
+        "name": "Eternal Riddle",
+        "card_type": "plot twist",
+        "genre": "fantasy",
+        "effect": "A riddle or puzzle that can only be solved by a chosen few.",
+        "flavor_text": "Solve the eternal riddle, and unlock the secrets of ages past. Fail, and the consequences are dire.",
+        "price": 120
+    },
+    {
+        "name": "World Peace",
+        "card_type": "setting",
+        "genre": "political thriller",
+        "effect": "A world-changing event leads to global peace and unity.",
+        "flavor_text": "War is over. Now comes the hard work of rebuilding and understanding each other.",
+        "price": 125
+    },
+    {
+        "name": "Technological Catastrophe",
+        "card_type": "setting",
+        "genre": "sci-fi",
+        "effect": "A major technological failure or disaster affects society in a profound way.",
+        "flavor_text": "The machines have failed. The world as we know it is at stake.",
+        "price": 130
+    },
+    {
+        "name": "Hero's Quest",
+        "card_type": "conflict",
+        "genre": "fantasy",
+        "effect": "A hero embarks on a grand quest to save their world or people.",
+        "flavor_text": "The fate of the realm lies in your hands. Gather your allies and set forth on an epic journey.",
+        "price": 135
+    },
+    {
+        "name": "Great Invention",
+        "card_type": "setting",
+        "genre": "sci-fi",
+        "effect": "A significant invention changes the course of history.",
+        "flavor_text": "Invention is the mother of progress. A new era dawns with this groundbreaking discovery.",
+        "price": 140
+    },
+    {
+        "name": "Ancient Prophecy",
+        "card_type": "plot twist",
+        "genre": "fantasy",
+        "effect": "A long-forgotten prophecy is rediscovered and comes to life.",
+        "flavor_text": "The words of the ancients foretell a time of great change. Are you ready for what lies ahead?",
+        "price": 145
+    },
+    {
+        "name": "Love Triangle",
+        "card_type": "conflict",
+        "genre": "classic",
+        "effect": "Characters are torn between romantic interests, leading to drama and conflict.",
+        "flavor_text": "Hearts entangled in a web of love and betrayal. Whose side will you take?",
+        "price": 150
+    },
+    {
+        "name": "Espionage",
+        "card_type": "conflict",
+        "genre": "spy",
+        "effect": "A character is caught up in a high-stakes game of espionage and intrigue.",
+        "flavor_text": "The truth lies hidden, but the stakes are too high to look away. Can you stay one step ahead?",
+        "price": 155
+    },
+    {
+        "name": "Future War",
+        "card_type": "plot twist",
+        "genre": "sci-fi",
+        "effect": "A war breaks out in a dystopian future.",
+        "flavor_text": "The world is divided, and the future hangs in the balance. Will you fight for peace or join the ranks?",
+        "price": 160
+    },
+    {
+        "name": "Ancient Artifact",
+        "card_type": "conflict",
+        "genre": "fantasy",
+        "effect": "An ancient artifact with mysterious powers is discovered.",
+        "flavor_text": "Power beyond imagination lies in this relic. Will it be used for good or evil?",
+        "price": 165
+    },
+    {
+        "name": "Social Revolution",
+        "card_type": "setting",
+        "genre": "political thriller",
+        "effect": "A major social movement sparks change and upheaval.",
+        "flavor_text": "The status quo is challenged. A new world order dawns, but at what cost?",
+        "price": 170
+    },
+    {
+        "name": "Technological Singularity",
+        "card_type": "setting",
+        "genre": "sci-fi",
+        "effect": "A technological breakthrough leads to a singularity event.",
+        "flavor_text": "The future is now. Artificial intelligence surpasses human intellect, and the world changes overnight.",
+        "price": 175
+    },
+    {
+        "name": "Hero's Sacrifice",
+        "card_type": "conflict",
+        "genre": "classic",
+        "effect": "A heroic character makes a selfless sacrifice for the greater good.",
+        "flavor_text": "There is no greater love than to lay down one's life for others. The hero falls, but not without purpose.",
+        "price": 180
+    },
+    {
+        "name": "Cataclysmic Event",
+        "card_type": "setting",
+        "genre": "sci-fi",
+        "effect": "A cataclysmic event reshapes the world in a profound way.",
+        "flavor_text": "The world as we know it is no more. Will humanity survive?",
+        "price": 185
+    },
+    {
+        "name": "Hero's Journey",
+        "card_type": "conflict",
+        "genre": "fantasy",
+        "effect": "A hero embarks on a grand quest to save their world or people.",
+        "flavor_text": "The fate of the realm lies in your hands. Gather your allies and set forth on an epic journey.",
+        "price": 190
+    },
+    {
+        "name": "Great Invention",
+        "card_type": "setting",
+        "genre": "sci-fi",
+        "effect": "A significant invention changes the course of history.",
+        "flavor_text": "Invention is the mother of progress. A new era dawns with this groundbreaking discovery.",
+        "price": 195
+    },
+    {
+        "name": "The Lost Scroll",
+        "card_type": "setting",
+        "genre": "fantasy",
+        "effect": "Introduce an ancient prophecy that could change the course of the story.",
+        "flavor_text": "In a dusty corner of an old library, an ancient scroll reveals hidden truths about the world's fate.",
+        "price": 10
+    },
+    {
+        "name": "Sudden Storm",
+        "card_type": "conflict",
+        "genre": "sci-fi",
+        "effect": "A sudden storm hits a key location, causing delays and challenges for characters.",
+        "flavor_text": "An unexpected meteorological event disrupts the plans of our heroes.",
+        "price": 30
+    },
+    {
+        "name": "Mysterious Stranger",
+        "card_type": "conflict",
+        "genre": "classic",
+        "effect": "A mysterious stranger arrives and challenges a main character's beliefs or actions.",
+        "flavor_text": "He appeared out of nowhere, his presence stirring up old memories and suspicions.",
+        "price": 50
+    },
+    {
+        "name": "The Secret Agent",
+        "card_type": "plot twist",
+        "genre": "spy",
+        "effect": "Reveal that a key character is actually a secret agent working for an opposing side.",
+        "flavor_text": "Trust no one, not even the closest allies. They may be watching and waiting to strike.",
+        "price": 80
+    },
+    {
+        "name": "Historical Artifact",
+        "card_type": "setting",
+        "genre": "political thriller",
+        "effect": "A historical artifact is discovered that has political ramifications.",
+        "flavor_text": "The past holds the key to future alliances and conflicts.",
+        "price": 20
+    },
+    {
+        "name": "Unforeseen Alliance",
+        "card_type": "plot twist",
+        "genre": "fantasy",
+        "effect": "Two unlikely characters form an alliance, changing the dynamics of the story.",
+        "flavor_text": "Enemies become friends in the face of a greater threat.",
+        "price": 70
+    },
+    {
+        "name": "Hidden Motives",
+        "card_type": "conflict",
+        "genre": "sci-fi",
+        "effect": "A character reveals hidden motives that shake up the plot.",
+        "flavor_text": "What you see is not always what it seems in a world of technology and illusion.",
+        "price": 40
+    },
+    {
+        "name": "The Oracle's Prediction",
+        "card_type": "plot twist",
+        "genre": "classic",
+        "effect": "An oracle predicts an unexpected future event that alters the story direction.",
+        "flavor_text": "Fate is written in the stars, but it can be rewritten by the bravest of hearts.",
+        "price": 60
+    },
+    {
+        "name": "Bargain with a Daemon",
+        "card_type": "conflict",
+        "genre": "fantasy",
+        "effect": "A character makes a deal with a daemon, setting up future consequences.",
+        "flavor_text": "What is the price of power? It may be higher than you think.",
+        "price": 50
+    },
+    {
+        "name": "Technological Breakthrough",
+        "card_type": "setting",
+        "genre": "sci-fi",
+        "effect": "A new technology changes the game and opens up possibilities for the story.",
+        "flavor_text": "Innovation can be a double-edged sword. What will you do with it?",
+        "price": 30
+    },
+    {
+        "name": "Political Upheaval",
+        "card_type": "conflict",
+        "genre": "political thriller",
+        "effect": "A sudden political event causes an upheaval that impacts the story.",
+        "flavor_text": "Power struggles are never truly over; they merely change form.",
+        "price": 60
+    },
+    {
+        "name": "The Lost City",
+        "card_type": "setting",
+        "genre": "fantasy",
+        "effect": "A lost city is rediscovered, filled with secrets and danger.",
+        "flavor_text": "Adventure awaits in the shadows of time-forgotten ruins.",
+        "price": 40
+    },
+    {
+        "name": "The Great Betrayal",
+        "card_type": "conflict",
+        "genre": "spy",
+        "effect": "A significant betrayal from a trusted character shakes up the narrative.",
+        "flavor_text": "Betrayals can come from unexpected places, even in the darkest of shadows.",
+        "price": 90
+    },
+    {
+        "name": "Cultural Festival",
+        "card_type": "filler",
+        "genre": "classic",
+        "effect": "Introduce a cultural festival that provides background and flavor to the story.",
+        "flavor_text": "Celebrations are moments of joy amidst adversity, giving strength and unity to those who partake.",
+        "price": 20
+    },
+    {
+        "name": "Asteroid Impact",
+        "card_type": "conflict",
+        "genre": "sci-fi",
+        "effect": "An asteroid impact forces characters to adapt to new challenges.",
+        "flavor_text": "When the sky falls, humanity must rise from its ashes.",
+        "price": 70
+    },
+    {
+        "name": "The Hero's Journey Begins",
+        "card_type": "plot twist",
+        "genre": "fantasy",
+        "effect": "A young hero embarks on a quest that changes the course of history.",
+        "flavor_text": "Every great adventure begins with one small step into the unknown.",
+        "price": 80
+    },
+    {
+        "name": "Political Revolution",
+        "card_type": "conflict",
+        "genre": "political thriller",
+        "effect": "A political revolution breaks out, reshaping the story's landscape.",
+        "flavor_text": "Change is inevitable; resist it or ride its waves to a new horizon.",
+        "price": 50
+    },
+    {
+        "name": "The Enchanted Forest",
+        "card_type": "setting",
+        "genre": "fantasy",
+        "effect": "A mystical forest appears, full of magic and mystery.",
+        "flavor_text": "Nature's secrets are whispered to those who listen with an open heart.",
+        "price": 30
+    },
+    {
+        "name": "The Spy's Gambit",
+        "card_type": "conflict",
+        "genre": "spy",
+        "effect": "A risky move by a spy creates complications and drama in the story.",
+        "flavor_text": "Sometimes, to save the day, you must risk it all.",
+        "price": 60
+    },
+    {
+        "name": "Alien Arrival",
+        "card_type": "setting",
+        "genre": "sci-fi",
+        "effect": "An alien race arrives with unknown intentions and consequences.",
+        "flavor_text": "The universe is vast, full of wonders and dangers beyond imagination.",
+        "price": 40
+    },
+    {
+        "name": "The Lost Heir",
+        "card_type": "plot twist",
+        "genre": "political thriller",
+        "effect": "A lost heir to a kingdom or empire is discovered, creating intrigue.",
+        "flavor_text": "Power can be reclaimed by those who have the courage to fight for it.",
+        "price": 80
+    },
+    {
+        "name": "The Dark Lord's Return",
+        "card_type": "conflict",
+        "genre": "fantasy",
+        "effect": "An ancient evil returns, threatening all that is good and just.",
+        "flavor_text": "Darkness can be overcome, but only with the light of hope shining bright.",
+        "price": 90
+    },
+    {
+        "name": "The Great War",
+        "card_type": "conflict",
+        "genre": "classic",
+        "effect": "A major war breaks out, altering the course of history and human lives.",
+        "flavor_text": "War is a crucible that refines both heroes and villains alike.",
+        "price": 50
+    },
+    {
+        "name": "Technological Disaster",
+        "card_type": "conflict",
+        "genre": "sci-fi",
+        "effect": "A technological disaster strikes, causing chaos and requiring adaptation.",
+        "flavor_text": "Progress comes at a price; the cost can be devastating.",
+        "price": 70
+    },
+    {
+        "name": "The Great Reveal",
+        "card_type": "plot twist",
+        "genre": "fantasy",
+        "effect": "A significant revelation changes everything for the characters and story.",
+        "flavor_text": "Sometimes, all it takes is one moment of truth to turn the tide of fate.",
+        "price": 90
+    },
+    {
+        "name": "The Enigmatic Stranger",
+        "card_type": "conflict",
+        "genre": "spy",
+        "effect": "A mysterious stranger arrives with secrets and a hidden agenda.",
+        "flavor_text": "Not all visitors come in peace, and not everyone is who they seem.",
+        "price": 60
+    }
 ]

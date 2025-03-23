@@ -51,6 +51,7 @@ pub(crate) struct GameState {
     pub narrative_plot_twists: Vec<String>,
     pub narrative_settings: Vec<String>,
     pub characters: Vec<String>,
+    pub psychosis: Vec<String>,
     pub narrative_story_so_far: Vec<String>,
     pub poker_combinations: Vec<PokerCombination>,
     pub score: isize,
@@ -74,6 +75,7 @@ pub(crate) enum EventStartNarrativeGame {
     PlotTwist,
     Conflict,
     Characters,
+    Psychosis,
 }
 
 #[derive(Event)]
@@ -131,6 +133,9 @@ pub fn handle_card_press_cardplay(
                 }
                 "conflict" => {
                     game_state.narrative_conflicts.push(effect);
+                }
+                "psychosis" => {
+                    game_state.psychosis.push(effect);
                 }
                 "character" => {
                     game_state.characters.push(format!(
@@ -666,6 +671,12 @@ pub(crate) fn handle_start_narrative_game(
                 }
                 EventStartNarrativeGame::Characters => {
                     filter_character_deck(game_state.collected_deck.clone()).unwrap()
+                }
+                EventStartNarrativeGame::Psychosis => {
+                    let psychosis_cards =
+                        filter_psychosis_cards(game_state.collected_deck.clone()).unwrap();
+
+                    psychosis_cards
                 }
             },
         });

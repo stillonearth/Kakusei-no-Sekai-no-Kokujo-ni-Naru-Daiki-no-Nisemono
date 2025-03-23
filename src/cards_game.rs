@@ -27,6 +27,12 @@ pub struct NarrativeCard {
 }
 
 #[derive(Deserialize, Clone)]
+pub struct PsychosisCard {
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Deserialize, Clone)]
 pub struct CharacterCard {
     pub name: String,
     pub description: String,
@@ -41,6 +47,9 @@ pub struct CharacterCards(pub Vec<CharacterCard>);
 #[derive(Deserialize, Asset, TypePath, Deref, DerefMut)]
 pub struct NarrativeCards(pub Vec<NarrativeCard>);
 
+#[derive(Deserialize, Asset, TypePath, Deref, DerefMut)]
+pub struct PsychosisCards(pub Vec<PsychosisCard>);
+
 #[derive(Clone, Debug)]
 pub(crate) enum VNCardMetadata {
     // value, suit
@@ -49,6 +58,7 @@ pub(crate) enum VNCardMetadata {
     Narrative(usize, String, String, String, String, u16),
     // index, name, description, price
     Character(usize, String, String, u16),
+    Psychosis(usize, String, String),
 }
 
 impl Default for VNCardMetadata {
@@ -79,6 +89,9 @@ impl VNCardMetadata {
         }
         if let VNCardMetadata::Character(_, _, _, _) = self {
             return Some("character".to_string());
+        }
+        if let VNCardMetadata::Psychosis(_, _, _) = self {
+            return Some("psychosis".to_string());
         }
         None
     }
@@ -124,6 +137,13 @@ impl VNCardMetadata {
     pub(crate) fn is_narrative(&self) -> bool {
         if let VNCardMetadata::Narrative(_index, _card_type, _genre, _name, _effect, _price) = self
         {
+            return true;
+        }
+        false
+    }
+
+    pub(crate) fn is_psychosis(&self) -> bool {
+        if let VNCardMetadata::Psychosis(_index, _name, _description) = self {
             return true;
         }
         false
@@ -267,6 +287,15 @@ pub(crate) fn filter_narrative_cards(deck: Vec<VNCard>) -> Result<Vec<VNCard>> {
     Ok(cards)
 }
 
+pub(crate) fn filter_psychosis_cards(deck: Vec<VNCard>) -> Result<Vec<VNCard>> {
+    let cards: Vec<VNCard> = deck
+        .iter()
+        .filter(|card| card.metadata.is_psychosis())
+        .cloned()
+        .collect();
+    Ok(cards)
+}
+
 fn filter_narrative_cards_by_type(deck: Vec<VNCard>, tp: String) -> Result<Vec<VNCard>> {
     let cards: Vec<VNCard> = deck
         .iter()
@@ -284,6 +313,10 @@ pub fn filer_narrative_setting_deck(deck: Vec<VNCard>) -> Result<Vec<VNCard>> {
 
 pub fn filter_narrative_plot_twist_deck(deck: Vec<VNCard>) -> Result<Vec<VNCard>> {
     filter_narrative_cards_by_type(deck, "plot twist".to_string())
+}
+
+pub fn filter_narrative_psychosis_deck(deck: Vec<VNCard>) -> Result<Vec<VNCard>> {
+    filter_narrative_cards_by_type(deck, "psychosis".to_string())
 }
 
 pub fn filter_narrative_conflict_deck(deck: Vec<VNCard>) -> Result<Vec<VNCard>> {
@@ -310,6 +343,7 @@ impl CardMetadata for VNCard {
             VNCardMetadata::Poker(_, _) => "poker-cards/Back_1.png".into(),
             VNCardMetadata::Narrative(_, _, _, _, _, _) => "poker-cards/Back_2.png".into(),
             VNCardMetadata::Character(_, _, _, _) => "poker-cards/Back_3.png".into(),
+            VNCardMetadata::Psychosis(_, _, _) => "poker-cards/Back_1.png".into(),
         }
     }
 }
@@ -637,14 +671,16 @@ mod tests {
 
         let hearts: Vec<_> = deck
             .iter()
-            .filter(|card| card.metadata.suit() == Some("Hearts".to_string())).cloned()
+            .filter(|card| card.metadata.suit() == Some("Hearts".to_string()))
+            .cloned()
             .collect();
 
         assert_eq!(hearts.len(), 13);
 
         let mut royal_flush_set: Vec<_> = hearts
             .iter()
-            .filter(|card| card.metadata.value().unwrap() >= 10).cloned()
+            .filter(|card| card.metadata.value().unwrap() >= 10)
+            .cloned()
             .collect();
 
         assert_eq!(royal_flush_set.len(), 5);
@@ -663,7 +699,8 @@ mod tests {
 
         let hearts: Vec<_> = deck
             .iter()
-            .filter(|card| card.metadata.suit() == Some("Hearts".to_string())).cloned()
+            .filter(|card| card.metadata.suit() == Some("Hearts".to_string()))
+            .cloned()
             .collect();
 
         assert_eq!(hearts.len(), 13);
@@ -671,7 +708,8 @@ mod tests {
         let mut straight_flush_set: Vec<_> = hearts
             .iter()
             .filter(|card| card.metadata.value().unwrap() < 10)
-            .take(5).cloned()
+            .take(5)
+            .cloned()
             .collect();
 
         assert!(is_straight_flush(&straight_flush_set));
@@ -688,7 +726,8 @@ mod tests {
 
         let mut cards: Vec<_> = deck
             .iter()
-            .filter(|card| card.metadata.value() == Some(5)).cloned()
+            .filter(|card| card.metadata.value() == Some(5))
+            .cloned()
             .collect();
 
         assert_eq!(cards.len(), 4);
@@ -718,14 +757,16 @@ mod tests {
         let fours: Vec<_> = deck
             .iter()
             .filter(|card| card.metadata.value() == Some(4))
-            .take(3).cloned()
+            .take(3)
+            .cloned()
             .collect();
 
         assert_eq!(fours.len(), 3);
         let twos: Vec<_> = deck
             .iter()
             .filter(|card| card.metadata.value() == Some(2))
-            .take(2).cloned()
+            .take(2)
+            .cloned()
             .collect();
 
         assert_eq!(twos.len(), 2);
@@ -751,7 +792,8 @@ mod tests {
 
         let hearts: Vec<_> = deck
             .iter()
-            .filter(|card| card.metadata.suit() == Some("Hearts".to_string())).cloned()
+            .filter(|card| card.metadata.suit() == Some("Hearts".to_string()))
+            .cloned()
             .collect();
 
         assert_eq!(hearts.len(), 13);
@@ -759,7 +801,8 @@ mod tests {
         let mut flush_set: Vec<_> = hearts
             .iter()
             .filter(|card| card.metadata.value().unwrap() > 2)
-            .take(5).cloned()
+            .take(5)
+            .cloned()
             .collect();
 
         assert_eq!(flush_set.len(), 5);
@@ -780,7 +823,8 @@ mod tests {
 
         let hearts: Vec<_> = deck
             .iter()
-            .filter(|card| card.metadata.suit() == Some("Hearts".to_string())).cloned()
+            .filter(|card| card.metadata.suit() == Some("Hearts".to_string()))
+            .cloned()
             .collect();
 
         assert_eq!(hearts.len(), 13);
@@ -788,7 +832,8 @@ mod tests {
         let mut straight_flush_set: Vec<_> = hearts
             .iter()
             .filter(|card| card.metadata.value().unwrap() < 10)
-            .take(5).cloned()
+            .take(5)
+            .cloned()
             .collect();
 
         assert!(straight(&straight_flush_set));
@@ -806,7 +851,8 @@ mod tests {
         let mut cards: Vec<_> = deck
             .iter()
             .filter(|card| card.metadata.value() == Some(4))
-            .take(3).cloned()
+            .take(3)
+            .cloned()
             .collect();
 
         assert_eq!(cards.len(), 3);
@@ -841,14 +887,16 @@ mod tests {
         let pair_1: Vec<_> = deck
             .iter()
             .filter(|card| card.metadata.value() == Some(6))
-            .take(2).cloned()
+            .take(2)
+            .cloned()
             .collect();
         assert_eq!(pair_1.len(), 2);
 
         let pair_2: Vec<_> = deck
             .iter()
             .filter(|card| card.metadata.value() == Some(7))
-            .take(2).cloned()
+            .take(2)
+            .cloned()
             .collect();
         assert_eq!(pair_2.len(), 2);
 
@@ -878,21 +926,24 @@ mod tests {
         let pair_1: Vec<_> = deck
             .iter()
             .filter(|card| card.metadata.value() == Some(6))
-            .take(2).cloned()
+            .take(2)
+            .cloned()
             .collect();
         assert_eq!(pair_1.len(), 2);
 
         let pair_2: Vec<_> = deck
             .iter()
             .filter(|card| card.metadata.value() == Some(8))
-            .take(1).cloned()
+            .take(1)
+            .cloned()
             .collect();
         assert_eq!(pair_2.len(), 1);
 
         let pair_3: Vec<_> = deck
             .iter()
             .filter(|card| card.metadata.value() == Some(9))
-            .take(1).cloned()
+            .take(1)
+            .cloned()
             .collect();
         assert_eq!(pair_3.len(), 1);
 
