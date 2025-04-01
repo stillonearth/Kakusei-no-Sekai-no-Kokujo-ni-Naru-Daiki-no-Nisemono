@@ -39,6 +39,19 @@ async function mintNft(owner) {
   return parseInt(nftId);
 }
 
+async function setBaseUri(baseUri) {
+  let txResponse = await nftContract.setBaseUri(baseUri);
+
+  await txResponse.wait();
+}
+
+async function tokenUri(tokenId) {
+  let result = await nftContract.tokenURI(tokenId);
+
+  return result;
+}
+
+
 const program = new Command();
 
 program
@@ -52,6 +65,24 @@ program
   .argument("<owner>", "owner of nft")
   .action(async (owner) => {
     console.log(await mintNft(owner));
+    process.exit();
+  });
+
+program
+  .command("set-base-uri")
+  .description("mint kakusei-no-sekai nft")
+  .argument("<base_uri>", "owner of nft")
+  .action(async (base_uri) => {
+    console.log(await setBaseUri(base_uri));
+    process.exit();
+  });
+
+program
+  .command("token-uri")
+  .description("get uri for token id")
+  .argument("<id>", "id of token")
+  .action(async (id) => {
+    console.log(await tokenUri(id));
     process.exit();
   });
 

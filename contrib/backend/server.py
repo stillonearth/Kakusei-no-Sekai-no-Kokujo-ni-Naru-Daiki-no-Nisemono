@@ -4,35 +4,52 @@ import uuid
 import subprocess
 import sqlite3
 import uuid
-import json
 import os
 
 from flask import Flask, request, jsonify, send_file
 from together import Together
 from PIL import Image
+from ollama import Client
+from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain_ollama import ChatOllama
 
+USE_LOCAL_OLLAMA = True
 
 API_KEY = "5dad429861935a07b26c1cb4033aa3ef8651d2acd16eb729939aa1b739f87d9d"
-LLM_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+TOGETHER_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
 TOGETHER_CLIENT = Together(api_key=API_KEY)
 
+OLLAMA_MODEL = "gemma3:12b"
+OLLAMA_CLIENT = Client(
+    host="http://192.168.88.242:11434",
+)
+
+
 app = Flask(__name__)
+
+
+def prompt_llm(prompt):
+    messages = [
+        {"role": "user", "content": prompt},
+    ]
+
+    if not USE_LOCAL_OLLAMA:
+        response = TOGETHER_CLIENT.chat.completions.create(
+            model=TOGETHER_MODEL, messages=messages
+        )
+        response = response.choices[0].message.content
+    else:
+        response = OLLAMA_CLIENT.chat(model=OLLAMA_MODEL, messages=messages)
+        response = response.message.content
+
+    return response
 
 
 @app.route("/api/llm", methods=["POST"])
 def llm():
     data = request.get_json()
     prompt = data.get("prompt", "")
-
-    messages = [
-        {"role": "user", "content": prompt},
-    ]
-
-    response = TOGETHER_CLIENT.chat.completions.create(
-        model=LLM_MODEL, messages=messages
-    )
-    response = response.choices[0].message.content
-
+    response = prompt_llm(prompt)
     return jsonify({"response": response}), 200
 
 
@@ -62,6 +79,7 @@ def generate_image():
 
     return send_file(image_path, mimetype="image/jpeg")
 
+
 @app.route("/api/image/v2", methods=["GET"])
 def generate_image_v2():
     prompt = request.args.get("prompt", "")
@@ -86,7 +104,8 @@ def generate_image_v2():
     image_path = f"images/{unique_filename}"
     image.save(image_path)
 
-    return {'hash': unique_filename}
+    return {"hash": unique_filename}
+
 
 @app.route("/api/image/v2/<image_name>", methods=["GET"])
 def serve_image_by_hash(image_name):
@@ -158,6 +177,70 @@ def get_story_nft(nft_id):
         }
 
         return jsonify(nft_response), 200
+
+
+# using strcutured llm to generate nft fields
+class Scenario(BaseModel):
+    summary: str = Field(description="Brief summary of scenario")
+    title: str = Field(description="Title of scenario")
+    poster: str = Field(description="Description of poster for movie based on scenario")
+
+OLLAMA_STRUCTURED_MODEL = ChatOllama(model="gemma3", base_url="http://192.168.88.242:11434")
+STRUCTURED_LLM = OLLAMA_STRUCTURED_MODEL.with_structured_output(Scenario)
+
+@app.route("/api/nft/<nft_id>/refresh", methods=["GET"])
+def refresh_story_nft(nft_id):
+    if not nft_id:
+        return
+
+    with sqlite3.connect("database.db") as conn:
+        cursor = conn.cursor()
+
+        # Query the scenario_nfts table for the given uuid
+        query = "SELECT data FROM scenarios WHERE nft_id = ?"
+        cursor.execute(query, (nft_id,))
+
+        # Check if a record was found
+        result = cursor.fetchone()
+        if not result:
+            return jsonify({"error": "NFT not found"}), 404
+
+        raw_scenario = remove_hide_and_show(result[0])
+
+        scenario = STRUCTURED_LLM.invoke("Process this scenario " + raw_scenario)
+
+        # Create a standard NFT JSON response
+        nft_response = {
+            "name": f"#{nft_id}: {scenario.title}",
+            "description": scenario.summary,
+            "poster": scenario.poster,
+            # "image": None,  # Create image
+            # "metadata": {"scenario": raw_scenario},
+        }
+
+        return jsonify(nft_response), 200
+
+
+# Utility functions
+
+def remove_hide_and_show(renpy_string):
+    """
+    Removes lines starting with "show" or "hide" from a Ren'Py scenario string.
+
+    Args:
+      renpy_string: The Ren'Py scenario as a string.
+
+    Returns:
+      A new string with the "show" and "hide" lines removed.
+    """
+
+    lines = renpy_string.splitlines()
+    filtered_lines = [
+        line
+        for line in lines
+        if not (line.startswith("show") or line.startswith("hide"))
+    ]
+    return "\n".join(filtered_lines)
 
 
 if __name__ == "__main__":
