@@ -12,12 +12,3 @@ http://kakuseinosekainokokujoninarudaikinonisemono.space/
 
 ![image](https://github.com/user-attachments/assets/ff533e72-1c42-49ba-a496-c0ff4808cdab)
 
-![image](https://github.com/user-attachments/assets/589730a0-96f0-400e-8068-3ab66fc0cb79)
-
-![image](https://github.com/user-attachments/assets/7da4dcd0-2d10-407d-9707-3986bda6f170)
-
-![image](https://github.com/user-attachments/assets/adbf4dbc-10f8-4161-b48c-dffb921b34f2)
-
-![image](https://github.com/user-attachments/assets/315091f3-de17-44d2-9a9b-0d52085b2a51)
-
-![image](https://github.com/user-attachments/assets/7d281207-1619-4b93-ac46-98791c942f8a)
