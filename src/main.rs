@@ -43,7 +43,7 @@ use crate::main_menu::*;
 use crate::visual_novel::*;
 
 // pub const API_ENDPOINT: &str = "http://167.88.162.83/api";
-pub const API_ENDPOINT: &str = "http://127.0.0.1:5000/api";
+pub const API_ENDPOINT: &str = "https://kakuseinosekainokokujoninarudaikinonisemono.space/api";
 
 fn main() {
     App::new()

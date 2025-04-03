@@ -161,6 +161,7 @@ STRUCTURED_LLM = TOGETHER_STRUCTURED_MODEL.with_structured_output(Scenario)
 def create_nft_metadata_from_scenario(nft_id, scenario):
     clean_scenario = remove_hide_and_show(scenario)
     sce = STRUCTURED_LLM.invoke("Process this scenario " + clean_scenario)
+    print(sce)
     image_response = generate_image_from_prompt(sce.poster)
 
     nft_response = {
