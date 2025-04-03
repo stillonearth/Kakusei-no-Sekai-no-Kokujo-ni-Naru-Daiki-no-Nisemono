@@ -103,7 +103,10 @@ def create_story_nft():
     with sqlite3.connect("database.db") as conn:
         cursor = conn.cursor()
 
-        cursor.execute("INSERT INTO scenarios VALUES (?, ?)", (nft_id, matadata_json))
+        cursor.execute(
+            "INSERT INTO scenarios (nft_id, data) VALUES (?, ?)",
+            (nft_id, matadata_json),
+        )
         conn.commit()
 
         return jsonify({"nft_id": nft_id}), 200

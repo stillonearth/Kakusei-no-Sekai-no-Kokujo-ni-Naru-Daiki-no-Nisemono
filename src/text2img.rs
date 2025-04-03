@@ -8,7 +8,7 @@ use serde::Deserialize;
 use std::io::Cursor;
 use url::{form_urlencoded, Url};
 
-const API_ENDPOINT: &str = "http://167.88.162.83/api";
+use crate::API_ENDPOINT;
 
 #[derive(Default)]
 pub struct Text2ImagePlugin;
