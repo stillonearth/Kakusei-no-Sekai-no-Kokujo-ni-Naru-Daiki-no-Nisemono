@@ -9,6 +9,3 @@ A visual novel / poker-themed rougelike with LLM-generated narrative. Generated 
 Built with bevy on Rust.
 
 http://kakuseinosekainokokujoninarudaikinonisemono.space/
-
-![image](https://github.com/user-attachments/assets/ff533e72-1c42-49ba-a496-c0ff4808cdab)
-
