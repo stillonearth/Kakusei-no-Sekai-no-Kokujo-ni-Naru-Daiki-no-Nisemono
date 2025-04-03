@@ -1,3 +1,7 @@
 flask
 together
 pillow
+flask-cors
+langchain-together
+langchain-ollama
+langchain

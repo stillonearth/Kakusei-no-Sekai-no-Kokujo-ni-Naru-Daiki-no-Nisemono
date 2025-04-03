@@ -14,12 +14,13 @@ from PIL import Image
 from ollama import Client
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_ollama import ChatOllama
+from langchain_together import ChatTogether
 
-USE_LOCAL_OLLAMA = True
+USE_LOCAL_OLLAMA = False
 
-API_KEY = "5dad429861935a07b26c1cb4033aa3ef8651d2acd16eb729939aa1b739f87d9d"
+TOGETHER_API_KEY = ""
 TOGETHER_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
-TOGETHER_CLIENT = Together(api_key=API_KEY)
+TOGETHER_CLIENT = Together(api_key=TOGETHER_API_KEY)
 
 OLLAMA_MODEL = "gemma3:12b"
 OLLAMA_CLIENT = Client(
@@ -98,14 +99,14 @@ def create_story_nft():
     nft_id = int(result)
 
     metadata = create_nft_metadata_from_scenario(nft_id, scenario)
-    matadata_json = json.dumps(metadata, indent=4)
+    metadata_json = json.dumps(metadata, indent=4)
 
     with sqlite3.connect("database.db") as conn:
         cursor = conn.cursor()
 
         cursor.execute(
             "INSERT INTO scenarios (nft_id, data) VALUES (?, ?)",
-            (nft_id, matadata_json),
+            (nft_id, metadata_json),
         )
         conn.commit()
 
@@ -141,11 +142,16 @@ class Scenario(BaseModel):
     poster: str = Field(description="Description of poster for movie based on scenario")
 
 
-OLLAMA_STRUCTURED_MODEL = ChatOllama(
-    model="gemma3", base_url="http://192.168.88.242:11434"
-)
-STRUCTURED_LLM = OLLAMA_STRUCTURED_MODEL.with_structured_output(Scenario)
+# OLLAMA_STRUCTURED_MODEL = ChatOllama(
+#     model="gemma3", base_url="http://192.168.88.242:11434"
+# )
+# STRUCTURED_LLM = OLLAMA_STRUCTURED_MODEL.with_structured_output(Scenario)
 
+TOGETHER_STRUCTURED_MODEL = ChatTogether(
+    model=TOGETHER_MODEL,
+    api_key=TOGETHER_API_KEY
+)
+STRUCTURED_LLM = TOGETHER_STRUCTURED_MODEL.with_structured_output(Scenario)
 
 # -----------------
 # Utility Functions
