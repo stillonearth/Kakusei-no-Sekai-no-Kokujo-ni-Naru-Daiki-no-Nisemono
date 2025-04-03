@@ -8,6 +8,7 @@ import uuid
 import os
 
 from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS
 from together import Together
 from PIL import Image
 from ollama import Client
@@ -16,16 +17,17 @@ from langchain_ollama import ChatOllama
 
 USE_LOCAL_OLLAMA = True
 
-API_KEY = ""
+API_KEY = "5dad429861935a07b26c1cb4033aa3ef8651d2acd16eb729939aa1b739f87d9d"
 TOGETHER_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
 TOGETHER_CLIENT = Together(api_key=API_KEY)
 
 OLLAMA_MODEL = "gemma3:12b"
 OLLAMA_CLIENT = Client(
-    host="",
+    host="http://192.168.88.242:11434",
 )
 
 WEBAPP = Flask(__name__)
+CORS(WEBAPP)
 
 # -----------
 # API Handles
@@ -185,8 +187,6 @@ def remove_hide_and_show(renpy_string):
 
 
 def refresh_story_nft(nft_id):
-
-    print("Processing scenario NFT ID:", nft_id)
 
     with sqlite3.connect("database.db") as conn:
         cursor = conn.cursor()
