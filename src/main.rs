@@ -204,6 +204,7 @@ enum AppState {
     #[default]
     Loading1,
     Loading2,
+    Loading3,
     Game,
     MainMenu,
 }
@@ -247,6 +248,7 @@ pub(crate) struct GameState {
     pub score: isize,
     pub current_menu_type: EventRenderUI,
     pub wallet: CryptoWallet,
+    pub player_nft_url: Option<String>,
 }
 
 #[derive(Resource, Deref, DerefMut)]
@@ -265,7 +267,6 @@ fn load_resources(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut game_state: ResMut<GameState>,
-    mut ew_load_nft: EventWriter<EventLoadNFTRequest>,
 ) {
     let scenario_handle = ScenarioHandle(asset_server.load("plot/intro.rpy"));
     commands.insert_resource(scenario_handle);
@@ -290,7 +291,8 @@ fn load_resources(
         && let Some(nft_link) = nft_link
     {
         game_state.game_type = GameType::VisualNovelPlayer;
-        ew_load_nft.send(EventLoadNFTRequest { url: nft_link });
+        game_state.player_nft_url = Some(nft_link.to_string());
+        // ew_load_nft.send(EventLoadNFTRequest { url: nft_link });
     }
 
     // load app settings from wasm container
@@ -322,6 +324,7 @@ fn load_cards(
     psychosis_cards_assets: Res<Assets<PsychosisCards>>,
     mut game_state: ResMut<GameState>,
     mut app_state: ResMut<NextState<AppState>>,
+    mut ew_load_nft: EventWriter<EventLoadNFTRequest>,
 ) {
     if let Some(narrative_cards) = narrative_cards_assets.get(narrative_cards_handle.id())
         && let Some(character_cards) = character_cards_assets.get(character_cards_handle.id())
@@ -368,7 +371,9 @@ fn load_cards(
         game_state.game_deck = deck.clone();
 
         if game_state.game_type == GameType::VisualNovelPlayer {
-            app_state.set(AppState::Game);
+            let nft_link = game_state.player_nft_url.clone().unwrap_or_default();
+            ew_load_nft.send(EventLoadNFTRequest { url: nft_link });
+            app_state.set(AppState::Loading3);
         } else {
             app_state.set(AppState::MainMenu);
         }

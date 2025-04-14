@@ -10,7 +10,7 @@ use renpy_parser::{
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
-use crate::{menu_game::EventRefreshUI, GameState, ScenarioHandle, API_ENDPOINT};
+use crate::{menu_game::EventRefreshUI, AppState, GameState, ScenarioHandle, API_ENDPOINT};
 
 #[derive(Default)]
 pub struct NFTPlugin;
@@ -159,7 +159,7 @@ fn handle_load_nft_request(
                 })
                 .await;
             } else {
-                panic!("error: {}", nft_response.err().unwrap());
+                panic!("error: {:?}", nft_response.err());
             }
         });
         #[cfg(target_arch = "wasm32")]
@@ -183,18 +183,26 @@ fn handle_load_nft_request(
 }
 
 fn handle_load_nft_response(
+    mut app_state: ResMut<NextState<AppState>>,
     mut ew_start_scenario: EventWriter<EventStartScenario>,
     mut er_load_nft_response: EventReader<EventLoadNFTResponse>,
     // mut ew_refresh_ui: EventWriter<EventRefreshUI>,
 ) {
     for event in er_load_nft_response.read() {
         let scenario_string = event.nft.scenario.clone();
+        let nft_lines: Vec<_> = scenario_string.lines().take(320).collect();
+        let nft_lines = &nft_lines[50..];
+        let scenario = nft_lines.join("\n");
 
-        let result = parse_scenario_from_string(&scenario_string, "_");
+        let result = parse_scenario_from_string(&scenario, "_");
         if let Ok((scenario, _)) = result {
+            println!("start scenario");
+
             ew_start_scenario.send(EventStartScenario {
                 ast: scenario.clone(),
             });
+
+            // app_state.set(AppState::Game);
         } else {
             println!("could not load scenario {:?}", result);
         }
