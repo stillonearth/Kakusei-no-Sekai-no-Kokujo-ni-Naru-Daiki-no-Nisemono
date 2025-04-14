@@ -1,17 +1,18 @@
 #![feature(let_chains)]
 
+mod api_llm;
+mod api_nft;
+mod api_text2img;
 mod cards_game;
 mod cards_scene;
 mod cards_solitaire;
-mod game_menu;
-mod llm;
-mod main_menu;
-mod nft;
+mod menu_game;
+mod menu_main;
 mod splashscreen;
-mod text2img;
 mod visual_novel;
 mod wasm;
 
+use api_nft::EventLoadNFTRequest;
 use bevy::asset::AssetMetaCheck;
 use bevy::color::palettes::css::WHITE;
 use bevy_hui::HuiPlugin;
@@ -25,24 +26,26 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_la_mesa::*;
 use bevy_modern_pixel_camera::prelude::*;
 use bevy_novel::*;
+
+use api_nft::NFTPlugin;
+use api_text2img::Text2ImagePlugin;
 use cards_game::CharacterCards;
 use cards_game::NarrativeCards;
+use cards_game::PokerCombination;
 use cards_game::PsychosisCards;
 use cards_game::VNCard;
 use cards_game::VNCardMetadata;
-use nft::NFTPlugin;
+use menu_game::EventRenderUI;
 use rpy_asset_loader::Rpy;
 use splashscreen::SplashscreenPlugin;
-use text2img::Text2ImagePlugin;
 
+use crate::api_llm::*;
 use crate::cards_scene::*;
 use crate::cards_solitaire::*;
-use crate::game_menu::GameMenuPlugin;
-use crate::llm::*;
-use crate::main_menu::*;
+use crate::menu_game::GameMenuPlugin;
+use crate::menu_main::*;
 use crate::visual_novel::*;
 
-// pub const API_ENDPOINT: &str = "http://167.88.162.83/api";
 pub const API_ENDPOINT: &str = "https://kakuseinosekainokokujoninarudaikinonisemono.space/api";
 
 fn main() {
@@ -152,7 +155,7 @@ fn main() {
         // Resources
         .insert_resource(GameState {
             max_n_poker_draws: 25,
-            score: 400,
+            score: 0,
             collected_deck: vec![],
             ..default()
         })
@@ -192,7 +195,9 @@ fn setup_camera_and_light(mut commands: Commands) {
     });
 }
 
-// Initialization
+// ------
+// States
+// ------
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 enum AppState {
@@ -203,7 +208,46 @@ enum AppState {
     MainMenu,
 }
 
-// Card Resources
+// ---------
+// Resources
+// ---------
+
+#[derive(Resource, Default, Debug, PartialEq, Eq)]
+pub(crate) enum GameType {
+    #[default]
+    VisualNovel,
+    Poker,
+    Narrative,
+    CardShop,
+    VisualNovelPlayer,
+}
+
+#[derive(Default)]
+pub(crate) struct CryptoWallet {
+    pub address: String,
+}
+
+#[derive(Resource, Default)]
+pub(crate) struct GameState {
+    pub game_deck: Vec<VNCard>,
+    pub collected_deck: Vec<VNCard>,
+    pub game_type: GameType,
+    pub max_n_poker_draws: usize,
+    pub n_draws: usize,
+    pub n_turns: usize,
+    pub n_vn_node_scene_request: usize,
+    pub n_vn_node: usize,
+    pub narrative_conflicts: Vec<String>,
+    pub narrative_plot_twists: Vec<String>,
+    pub narrative_settings: Vec<String>,
+    pub characters: Vec<String>,
+    pub psychosis: Vec<String>,
+    pub narrative_story_so_far: Vec<String>,
+    pub poker_combinations: Vec<PokerCombination>,
+    pub score: isize,
+    pub current_menu_type: EventRenderUI,
+    pub wallet: CryptoWallet,
+}
 
 #[derive(Resource, Deref, DerefMut)]
 struct ScenarioHandle(Handle<Rpy>);
@@ -221,6 +265,7 @@ fn load_resources(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut game_state: ResMut<GameState>,
+    mut ew_load_nft: EventWriter<EventLoadNFTRequest>,
 ) {
     let scenario_handle = ScenarioHandle(asset_server.load("plot/intro.rpy"));
     commands.insert_resource(scenario_handle);
@@ -237,16 +282,35 @@ fn load_resources(
         PsychosisCardsHandle(asset_server.load("psychosis-cards/cards.json"));
     commands.insert_resource(psychosis_cards_handle);
 
-    game_state.wallet.address = "0x971C6CDa7EDE9db62732D896995c9ee3A3196e40".to_string();
+    let game_mode_string =
+        "player|https://kakuseinosekainokokujoninarudaikinonisemono.space/api/nft/44";
+    let (game_mode, nft_link) = parse_game_mode_string(game_mode_string);
 
+    if game_mode == "player"
+        && let Some(nft_link) = nft_link
+    {
+        game_state.game_type = GameType::VisualNovelPlayer;
+        ew_load_nft.send(EventLoadNFTRequest { url: nft_link });
+    }
+
+    // load app settings from wasm container
     #[cfg(target_arch = "wasm32")]
     {
-        info!("calling javascript extern");
-        let value_from_js = wasm::test("hello".to_string());
-        info!("value from js: {}", value_from_js);
+        let user_connected_wallet = wasm::user_connected_wallet();
+        game_state.wallet.address = user_connected_wallet;
 
-        game_state.wallet.address = value_from_js;
+        let game_mode = wasm::mode();
+        // game_state.wallet.address = user_connected_wallet;
     }
+}
+
+fn parse_game_mode_string(game_mode_string: &str) -> (String, Option<String>) {
+    let parts: Vec<&str> = game_mode_string.split('|').collect();
+    if parts.len() == 2 {
+        return (parts[0].to_string(), Some(parts[1].to_string()));
+    }
+
+    return (parts[0].to_string(), None);
 }
 
 fn load_cards(
@@ -302,8 +366,11 @@ fn load_cards(
         }
 
         game_state.game_deck = deck.clone();
-        app_state.set(AppState::MainMenu);
-    } else {
-        // println!("couldn't load");
+
+        if game_state.game_type == GameType::VisualNovelPlayer {
+            app_state.set(AppState::Game);
+        } else {
+            app_state.set(AppState::MainMenu);
+        }
     }
 }

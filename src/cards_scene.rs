@@ -11,53 +11,15 @@ use bevy_tweening::Animator;
 use bevy_tweening::Tween;
 
 use crate::cards_game::*;
-use crate::game_menu::EventRefreshUI;
-use crate::game_menu::EventRenderUI;
-use crate::game_menu::NarrativeMenuSettings;
-use crate::game_menu::PokerMenuSettings;
+use crate::menu_game::EventRefreshUI;
+use crate::menu_game::EventRenderUI;
+use crate::menu_game::NarrativeMenuSettings;
+use crate::menu_game::PokerMenuSettings;
 use crate::EventCardPositionHover;
 use crate::EventCardPositionOut;
 use crate::EventCardPositionPress;
-
-// ---------
-// Resources
-// ---------
-
-#[derive(Resource, Default, Debug, PartialEq, Eq)]
-pub(crate) enum GameType {
-    #[default]
-    VisualNovel,
-    Poker,
-    Narrative,
-    CardShop,
-}
-
-#[derive(Default)]
-pub(crate) struct CryptoWallet {
-    pub address: String,
-}
-
-#[derive(Resource, Default)]
-pub(crate) struct GameState {
-    pub game_deck: Vec<VNCard>,
-    pub collected_deck: Vec<VNCard>,
-    pub game_type: GameType,
-    pub max_n_poker_draws: usize,
-    pub n_draws: usize,
-    pub n_turns: usize,
-    pub n_vn_node_scene_request: usize,
-    pub n_vn_node: usize,
-    pub narrative_conflicts: Vec<String>,
-    pub narrative_plot_twists: Vec<String>,
-    pub narrative_settings: Vec<String>,
-    pub characters: Vec<String>,
-    pub psychosis: Vec<String>,
-    pub narrative_story_so_far: Vec<String>,
-    pub poker_combinations: Vec<PokerCombination>,
-    pub score: isize,
-    pub current_menu_type: EventRenderUI,
-    pub wallet: CryptoWallet,
-}
+use crate::GameState;
+use crate::GameType;
 
 // ------
 // Events
@@ -361,6 +323,7 @@ pub(crate) fn handle_deck_rendered(
                 });
             }
             GameType::VisualNovel => {}
+            GameType::VisualNovelPlayer => {}
         }
     }
 }

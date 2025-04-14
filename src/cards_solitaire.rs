@@ -9,8 +9,8 @@ use bevy_la_mesa::{
 };
 
 use crate::cards_game::check_poker_hand;
-use crate::game_menu::EventRefreshUI;
-use crate::game_menu::PokerMenuSettings;
+use crate::menu_game::EventRefreshUI;
+use crate::menu_game::PokerMenuSettings;
 use crate::GameType;
 use crate::{cards_game::VNCard, GameState};
 
