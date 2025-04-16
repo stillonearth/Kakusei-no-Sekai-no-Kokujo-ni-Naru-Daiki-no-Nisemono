@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use anyhow::Result;
-use bevy_novel::events::EventStartScenario;
+use bevy_novel::{events::EventStartScenario, NovelText};
 use bevy_wasm_tasks::*;
 use renpy_parser::{
     parse_scenario_from_string,
@@ -11,7 +11,8 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    api_text2img::EventDownloadImageRequest, menu_game::EventRefreshUI, AppState, GameState, API_ENDPOINT,
+    api_text2img::EventDownloadImageRequest, menu_game::EventRefreshUI, AppState, GameState,
+    API_ENDPOINT,
 };
 
 #[derive(Default)]
@@ -186,10 +187,13 @@ fn handle_load_nft_response(
     mut ew_start_scenario: EventWriter<EventStartScenario>,
     mut er_load_nft_response: EventReader<EventLoadNFTResponse>,
     mut ew_download_image: EventWriter<EventDownloadImageRequest>,
+    mut q_novel_text: Query<(Entity, &mut Node, &NovelText)>,
 ) {
     for event in er_load_nft_response.read() {
         // quickfix due to fauly serialization
         let scenario_string = event.nft.scenario.clone().replace(" \"...\"", "");
+
+        println!("scenario_string: {}", scenario_string);
 
         let result = parse_scenario_from_string(&scenario_string, "_");
         if let Ok((scenario, _errors)) = result {
@@ -225,6 +229,11 @@ fn handle_load_nft_response(
             ew_start_scenario.send(EventStartScenario {
                 ast: scenario.clone(),
             });
+
+            for (_, mut node, _) in q_novel_text.iter_mut() {
+                node.left = Val::Percent(20.0);
+                node.margin = UiRect::new(Val::Px(20.0), Val::Px(0.0), Val::Px(0.0), Val::Px(0.0));
+            }
         } else {
             panic!("could not load scenario {:?}", result);
         }

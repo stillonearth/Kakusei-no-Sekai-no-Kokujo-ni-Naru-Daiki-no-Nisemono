@@ -12,9 +12,15 @@ impl Plugin for GameMenuPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(AppState::Game), show_menu)
             .add_systems(OnExit(AppState::Game), despawn_menu)
+            .add_systems(OnEnter(AppState::NovelPlayer), show_menu)
+            .add_systems(OnExit(AppState::NovelPlayer), despawn_menu)
             .add_systems(
                 Update,
                 (render_ui, refresh_ui).run_if(in_state(AppState::Game)),
+            )
+            .add_systems(
+                Update,
+                (render_ui, refresh_ui).run_if(in_state(AppState::NovelPlayer)),
             )
             .add_event::<EventHideMainMenu>()
             .add_event::<EventShowMainMenu>()

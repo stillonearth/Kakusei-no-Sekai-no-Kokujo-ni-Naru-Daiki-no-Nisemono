@@ -291,6 +291,10 @@ fn load_resources(
     commands.insert_resource(psychosis_cards_handle);
 
     game_state.wallet.address = "0x971C6CDa7EDE9db62732D896995c9ee3A3196e40".to_string();
+    // game_state.game_type = GameType::VisualNovelPlayer;
+    // game_state.player_nft_url =
+    //     Some("https://kakuseinosekainokokujoninarudaikinonisemono.space/api/nft/34".to_string());
+
     // load app settings from wasm container
     #[cfg(target_arch = "wasm32")]
     {
@@ -302,7 +306,7 @@ fn load_resources(
 
         if game_mode == "player" {
             game_state.game_type = GameType::VisualNovelPlayer;
-            game_state.player_nft_url = nft_link;
+            game_state.player_nft_url = Some(nft_link);
         }
     }
 }
