@@ -104,10 +104,16 @@ fn main() {
                 handle_event_game_over,
                 handle_play_hand,
                 handle_text_2_image_response,
+                handle_download_image_response,
                 handle_end_card_game,
             )
                 .chain())
             .run_if(in_state(AppState::Game)),
+        )
+        .add_systems(
+            Update,
+            ((handle_new_vn_node, handle_download_image_response).chain())
+                .run_if(in_state(AppState::NovelPlayer)),
         )
         .add_systems(
             Update,
@@ -206,6 +212,7 @@ enum AppState {
     Loading2,
     Loading3,
     Game,
+    NovelPlayer,
     MainMenu,
 }
 
@@ -283,18 +290,7 @@ fn load_resources(
         PsychosisCardsHandle(asset_server.load("psychosis-cards/cards.json"));
     commands.insert_resource(psychosis_cards_handle);
 
-    let game_mode_string =
-        "player|https://kakuseinosekainokokujoninarudaikinonisemono.space/api/nft/44";
-    let (game_mode, nft_link) = parse_game_mode_string(game_mode_string);
-
-    if game_mode == "player"
-        && let Some(nft_link) = nft_link
-    {
-        game_state.game_type = GameType::VisualNovelPlayer;
-        game_state.player_nft_url = Some(nft_link.to_string());
-        // ew_load_nft.send(EventLoadNFTRequest { url: nft_link });
-    }
-
+    game_state.wallet.address = "0x971C6CDa7EDE9db62732D896995c9ee3A3196e40".to_string();
     // load app settings from wasm container
     #[cfg(target_arch = "wasm32")]
     {
@@ -302,17 +298,13 @@ fn load_resources(
         game_state.wallet.address = user_connected_wallet;
 
         let game_mode = wasm::mode();
-        // game_state.wallet.address = user_connected_wallet;
-    }
-}
+        let nft_link = wasm::nft_link();
 
-fn parse_game_mode_string(game_mode_string: &str) -> (String, Option<String>) {
-    let parts: Vec<&str> = game_mode_string.split('|').collect();
-    if parts.len() == 2 {
-        return (parts[0].to_string(), Some(parts[1].to_string()));
+        if game_mode == "player" {
+            game_state.game_type = GameType::VisualNovelPlayer;
+            game_state.player_nft_url = nft_link;
+        }
     }
-
-    return (parts[0].to_string(), None);
 }
 
 fn load_cards(

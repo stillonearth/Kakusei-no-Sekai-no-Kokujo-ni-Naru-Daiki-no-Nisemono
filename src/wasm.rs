@@ -4,4 +4,5 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     pub fn user_connected_wallet() -> String;
     pub fn mode() -> String;
+    pub fn nft_link() -> String;
 }

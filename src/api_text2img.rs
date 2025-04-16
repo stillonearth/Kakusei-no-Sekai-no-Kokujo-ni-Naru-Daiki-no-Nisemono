@@ -19,6 +19,17 @@ pub struct EventText2ImageRequest {
 }
 
 #[derive(Event)]
+pub struct EventDownloadImageRequest {
+    pub filename: String,
+}
+
+#[derive(Event)]
+pub struct EventDownloadImageResponse {
+    pub image: DynamicImage,
+    pub filename: String,
+}
+
+#[derive(Event)]
 pub struct EventText2ImageResponse {
     pub image: DynamicImage,
     pub filename: String,
@@ -33,7 +44,56 @@ impl Plugin for Text2ImagePlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<EventText2ImageRequest>()
             .add_event::<EventText2ImageResponse>()
-            .add_systems(Update, handle_text_2_image_request);
+            .add_event::<EventDownloadImageRequest>()
+            .add_event::<EventDownloadImageResponse>()
+            .add_systems(Update, (handle_text_2_image_request, handle_download_image));
+    }
+}
+
+fn handle_download_image(
+    mut er_download_image_request: EventReader<EventDownloadImageRequest>,
+    tasks: Tasks,
+) {
+    for er in er_download_image_request.read() {
+        let url = format!(
+            "https://kakuseinosekainokokujoninarudaikinonisemono.space/api/image/v2/{}",
+            er.filename
+        );
+        let filename = er.filename.clone();
+
+        // TODO: DEDUP
+        #[cfg(not(target_arch = "wasm32"))]
+        tasks.spawn_tokio(|ctx| async move {
+            let image = download_and_load_image(url.as_ref()).await;
+
+            if image.is_ok() {
+                ctx.run_on_main_thread(move |ctx| {
+                    let world: &mut World = ctx.world;
+
+                    world.send_event(EventDownloadImageResponse {
+                        image: image.unwrap(),
+                        filename: filename.clone(),
+                    });
+                })
+                .await;
+            }
+        });
+        #[cfg(target_arch = "wasm32")]
+        tasks.spawn_wasm(|ctx| async move {
+            let image = download_and_load_image(url.as_ref()).await;
+
+            if image.is_ok() {
+                ctx.run_on_main_thread(move |ctx| {
+                    let event_response = EventDownloadImageResponse {
+                        image: image.unwrap(),
+                        filename,
+                    };
+                    let world: &mut World = ctx.world;
+                    world.send_event(event_response);
+                })
+                .await;
+            }
+        });
     }
 }
 

@@ -76,7 +76,7 @@ fn handle_llm_request(mut er_llm_request: EventReader<EventLLMRequest>, tasks: T
                 })
                 .await;
             } else {
-                panic!("error: {}", llm_response.err().unwrap());
+                panic!("error: {:?}", llm_response.err());
             }
         });
         #[cfg(target_arch = "wasm32")]

@@ -42,7 +42,7 @@ bevy = { version = "0.15.2", default-features = false, features = [
   "x11",
 ] }
 bevy_asset_loader = "0.22"
-bevy_common_assets = {version="0.12.0", features = ["json"]}
+bevy_common_assets = { version = "0.12.0", features = ["json"] }
 bevy_defer = "0.13"
 bevy_la_mesa = { path = "../bevy_la_mesa" }
 bevy_novel = { path = "../bevy_novel" }
@@ -50,27 +50,26 @@ bevy_tweening = "0.12"
 bevy-inspector-egui = "0.29"
 image = "0.25"
 rand = "0.8"
-renpy_parser = "0.0.12"
+renpy_parser = "0.0.13"
 reqwest = "0.12.9"
 serde = "1.0"
 serde_json = "1.0"
 url = "2.5.4"
-bevy_hui = {git="https://github.com/Lommix/bevy_hui.git", rev="08f8f6f"}
-# bevy_hui_widgets = "0.2"
-bevy_kira_audio = { version = "0.22", features = ["ogg", "mp3"]}
+bevy_hui = { git = "https://github.com/Lommix/bevy_hui.git", rev = "08f8f6f" }
+bevy_kira_audio = { version = "0.22", features = ["ogg", "mp3"] }
 bevy_modern_pixel_camera = "0.2.1"
 wasm-bindgen = "0.2.100"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-bevy-wasm-tasks = {git="https://github.com/stillonearth/bevy-wasm-tasks.git", rev="09060af", features=["tokio"]}
+bevy-wasm-tasks = { git = "https://github.com/stillonearth/bevy-wasm-tasks.git", rev = "09060af", features = [
+  "tokio",
+] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-bevy-wasm-tasks = {git="https://github.com/stillonearth/bevy-wasm-tasks.git", rev="09060af", features=["wasm"]}
+bevy-wasm-tasks = { git = "https://github.com/stillonearth/bevy-wasm-tasks.git", rev = "09060af", features = [
+  "wasm",
+] }
 
 [dependencies.uuid]
 version = "1.11.0"
-features = [
-    "v4",
-    "fast-rng",
-]
-
+features = ["v4", "fast-rng"]

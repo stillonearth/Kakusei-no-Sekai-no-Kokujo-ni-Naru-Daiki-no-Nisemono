@@ -636,10 +636,9 @@ pub(crate) fn handle_start_narrative_game(
                     filter_character_deck(game_state.collected_deck.clone()).unwrap()
                 }
                 EventStartNarrativeGame::Psychosis => {
-                    let psychosis_cards =
-                        filter_psychosis_cards(game_state.collected_deck.clone()).unwrap();
+                    
 
-                    psychosis_cards
+                    filter_psychosis_cards(game_state.collected_deck.clone()).unwrap()
                 }
             },
         });

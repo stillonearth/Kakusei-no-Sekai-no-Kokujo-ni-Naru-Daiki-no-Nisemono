@@ -10,7 +10,9 @@ use renpy_parser::{
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
-use crate::{menu_game::EventRefreshUI, AppState, GameState, ScenarioHandle, API_ENDPOINT};
+use crate::{
+    api_text2img::EventDownloadImageRequest, menu_game::EventRefreshUI, AppState, GameState, API_ENDPOINT,
+};
 
 #[derive(Default)]
 pub struct NFTPlugin;
@@ -74,17 +76,14 @@ fn handle_persist_nft_request(
     for er in er_llm_request.read() {
         let scenario_string = format!("{}", ASTVec(&er.scenario));
 
-        // remove all lines starting with "game_mechanic" and "llm_generate"
-        let scenario_string = scenario_string
-            .lines()
-            .filter(|line| {
-                let line = line.trim_start();
-                !line.starts_with("game_mechanic")
-                    && !line.starts_with("llm_generate")
-                    && !line.starts_with("#game_mechanic")
-            })
-            .collect::<Vec<&str>>()
-            .join("\n");
+        // hack! serializing is currently broken: a duplicated scenario gets
+        // after first "game_mechanic "game over""
+
+        let parts = scenario_string
+            .split("game_mechanic \"game over\"")
+            .collect::<Vec<&str>>();
+
+        let scenario_string = parts[0].to_string();
 
         let owner = game_state.wallet.address.clone();
 
@@ -108,7 +107,7 @@ fn handle_persist_nft_request(
                 })
                 .await;
             } else {
-                panic!("error: {}", llm_response.err().unwrap());
+                panic!("error: {:?}", llm_response.err());
             }
         });
         #[cfg(target_arch = "wasm32")]
@@ -186,25 +185,48 @@ fn handle_load_nft_response(
     mut app_state: ResMut<NextState<AppState>>,
     mut ew_start_scenario: EventWriter<EventStartScenario>,
     mut er_load_nft_response: EventReader<EventLoadNFTResponse>,
-    // mut ew_refresh_ui: EventWriter<EventRefreshUI>,
+    mut ew_download_image: EventWriter<EventDownloadImageRequest>,
 ) {
     for event in er_load_nft_response.read() {
-        let scenario_string = event.nft.scenario.clone();
-        let nft_lines: Vec<_> = scenario_string.lines().take(320).collect();
-        let nft_lines = &nft_lines[50..];
-        let scenario = nft_lines.join("\n");
+        // quickfix due to fauly serialization
+        let scenario_string = event.nft.scenario.clone().replace(" \"...\"", "");
 
-        let result = parse_scenario_from_string(&scenario, "_");
-        if let Ok((scenario, _)) = result {
-            println!("start scenario");
+        let result = parse_scenario_from_string(&scenario_string, "_");
+        if let Ok((scenario, _errors)) = result {
+            for node in scenario.iter() {
+                match node {
+                    AST::Label(_, _, asts, _) => {
+                        for child_node in asts.iter() {
+                            if let AST::Scene(_, filename, _) = child_node {
+                                if let Some(filename) = filename {
+                                    if filename.ends_with(".jpeg") {
+                                        ew_download_image.send(EventDownloadImageRequest {
+                                            filename: filename.clone(),
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    AST::Scene(_, filename, _) => {
+                        if let Some(filename) = filename {
+                            if filename.ends_with(".jpeg") {
+                                ew_download_image.send(EventDownloadImageRequest {
+                                    filename: filename.clone(),
+                                });
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
 
+            app_state.set(AppState::NovelPlayer);
             ew_start_scenario.send(EventStartScenario {
                 ast: scenario.clone(),
             });
-
-            // app_state.set(AppState::Game);
         } else {
-            println!("could not load scenario {:?}", result);
+            panic!("could not load scenario {:?}", result);
         }
     }
 }

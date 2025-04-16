@@ -16,16 +16,16 @@ use image::DynamicImage;
 use renpy_parser::parsers::AST;
 
 use crate::{
+    api_llm::*,
+    api_nft::EventPersistScenarioRequest,
+    api_text2img::{EventDownloadImageResponse, EventText2ImageRequest, EventText2ImageResponse},
     cards_game::{
         filter_character_deck, filter_initial_character_cards, filter_initial_narrative_cards,
         filter_psychosis_cards,
     },
     menu_game::{EventRefreshUI, EventRenderUI, PokerMenuSettings},
-    api_llm::*,
-    api_nft::EventPersistScenarioRequest,
-    api_text2img::{EventText2ImageRequest, EventText2ImageResponse},
-    EventGameOver, EventStartNarrativeCardShop, EventStartNarrativeGame, EventStartPokerGame,
-    GameState, GameType, ScenarioHandle,
+    AppState, EventGameOver, EventStartNarrativeCardShop, EventStartNarrativeGame,
+    EventStartPokerGame, GameState, GameType, ScenarioHandle,
 };
 
 const PROMPT: &str = r#"
@@ -94,6 +94,37 @@ pub(crate) fn handle_text_2_image_response(
         novel_data.write_image_cache(image_name.clone(), sprite);
         novel_data.push_scene_node(image_name.clone(), game_state.n_vn_node_scene_request + 1);
         ew_switch_next_node.send(EventSwitchNextNode {});
+    }
+}
+
+pub(crate) fn handle_download_image_response(
+    mut novel_data: ResMut<NovelData>,
+    mut er_download_image: EventReader<EventDownloadImageResponse>,
+    mut textures: ResMut<Assets<Image>>,
+) {
+    for event in er_download_image.read() {
+        let image_name = event.filename.clone();
+        let dynamic_image: DynamicImage = event.image.clone();
+        let rgba_image = dynamic_image.to_rgba8();
+        let texture = Image::new_fill(
+            Extent3d {
+                width: rgba_image.width(),
+                height: rgba_image.height(),
+                depth_or_array_layers: 1,
+            },
+            TextureDimension::D2,
+            &rgba_image,
+            TextureFormat::Rgba8UnormSrgb,
+            RenderAssetUsages::all(),
+        );
+
+        let texture_handle = textures.add(texture);
+        let sprite = Sprite {
+            image: texture_handle.clone(),
+            ..Default::default()
+        };
+
+        novel_data.write_image_cache(image_name.clone(), sprite);
     }
 }
 
@@ -227,11 +258,17 @@ pub(crate) fn handle_new_vn_node(
     mut ew_render_ui: EventWriter<EventRenderUI>,
     mut ew_refresh_ui: EventWriter<EventRefreshUI>,
     mut ew_game_over: EventWriter<EventGameOver>,
+    app_state: Res<State<AppState>>,
 ) {
     for event in er_handle_node.read() {
         game_state.n_vn_node = event.ast.index();
 
         if let AST::LLMGenerate(_, who, prompt) = event.ast.clone() {
+            if *app_state.get() == AppState::NovelPlayer {
+                ew_switch_next_node.send(EventSwitchNextNode {});
+                continue;
+            }
+
             novel_data.push_text_node(
                 Some("".to_string()),
                 "...".to_string(),
@@ -277,6 +314,11 @@ pub(crate) fn handle_new_vn_node(
         }
 
         if let AST::GameMechanic(_, mechanic) = event.ast.clone() {
+            if *app_state.get() == AppState::NovelPlayer {
+                ew_switch_next_node.send(EventSwitchNextNode {});
+                continue;
+            }
+
             ew_hide_vn_text_node.send(EventHideTextNode {});
             novel_settings.pause_handle_switch_node = true;
 
