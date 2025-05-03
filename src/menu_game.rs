@@ -102,10 +102,10 @@ pub fn show_menu(
                 || game_state.game_type == GameType::Poker
                 || game_state.game_type == GameType::Narrative
             {
-                ew_play_hand.send(EventPlayHand {});
-                ew_end_game.send(EventEndCardGame {});
+                ew_play_hand.write(EventPlayHand {});
+                ew_end_game.write(EventEndCardGame {});
             }
-            ew_switch_next_node.send(EventSwitchNextNode {});
+            ew_switch_next_node.write(EventSwitchNextNode {});
         },
     );
 }
@@ -116,7 +116,7 @@ fn despawn_menu(
     audio: Res<Audio>,
 ) {
     for (entity, _) in q_main_menu_entities.iter() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 
     audio.stop();
@@ -131,7 +131,7 @@ fn render_ui(
 ) {
     for event in er_refresh_ui.read() {
         for (entity, _) in q_game_menu.iter() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
 
         match event {

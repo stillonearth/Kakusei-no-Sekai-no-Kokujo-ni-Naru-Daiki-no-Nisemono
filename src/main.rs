@@ -16,6 +16,7 @@ use api_nft::EventLoadNFTRequest;
 use bevy::asset::AssetMetaCheck;
 use bevy::color::palettes::css::WHITE;
 use bevy_hui::HuiPlugin;
+use bevy_inspector_egui::bevy_egui::EguiPlugin;
 use bevy_kira_audio::AudioPlugin;
 use bevy_wasm_tasks::*;
 
@@ -75,6 +76,9 @@ fn main() {
             TasksPlugin::default(),
             AudioPlugin,
             HuiPlugin,
+            EguiPlugin {
+                enable_multipass_for_primary_context: true,
+            },
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
             PixelCameraPlugin,
         ))
@@ -366,7 +370,7 @@ fn load_cards(
 
         if game_state.game_type == GameType::VisualNovelPlayer {
             let nft_link = game_state.player_nft_url.clone().unwrap_or_default();
-            ew_load_nft.send(EventLoadNFTRequest { url: nft_link });
+            ew_load_nft.write(EventLoadNFTRequest { url: nft_link });
             app_state.set(AppState::Loading3);
         } else {
             app_state.set(AppState::MainMenu);

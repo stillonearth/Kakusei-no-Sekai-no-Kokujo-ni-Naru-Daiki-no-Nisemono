@@ -96,7 +96,7 @@ fn handle_llm_request(mut er_llm_request: EventReader<EventLLMRequest>, tasks: T
                         request_type,
                     };
                     let world: &mut World = ctx.world;
-                    world.send_event(event_response);
+                    world.write_event(event_response);
                 })
                 .await;
             } else {
