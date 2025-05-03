@@ -1,22 +1,17 @@
 [package]
 name = "kakuseinosekainokokujoninarudaikinonisemono"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
 anyhow = "1.0"
-bevy = { version = "0.15.2", default-features = false, features = [
-  "android-game-activity",
-  "android-game-activity",
-  "android_shared_stdcxx",
+bevy = { version = "0.16", default-features = false, features = [
+  "std",
   "animation",
   "bevy_asset",
   "bevy_color",
   "bevy_core_pipeline",
-  "bevy_gilrs",
-  "bevy_gizmos",
-  "bevy_gltf",
   "bevy_mesh_picking_backend",
   "bevy_pbr",
   "bevy_picking",
@@ -30,9 +25,7 @@ bevy = { version = "0.15.2", default-features = false, features = [
   "bevy_ui_picking_backend",
   "bevy_window",
   "bevy_winit",
-  "custom_cursor",
   "default_font",
-  "hdr",
   "multi_threaded",
   "png",
   "smaa_luts",
@@ -41,13 +34,13 @@ bevy = { version = "0.15.2", default-features = false, features = [
   "webgl2",
   "x11",
 ] }
-bevy_asset_loader = "0.22"
-bevy_common_assets = { version = "0.12.0", features = ["json"] }
-bevy_defer = "0.13"
-bevy_la_mesa = { path = "../bevy_la_mesa" }
-bevy_novel = { path = "../bevy_novel" }
-bevy_tweening = "0.12"
-bevy-inspector-egui = "0.29"
+bevy_asset_loader = { git = "https://github.com/NiklasEi/bevy_asset_loader.git", rev = "ef87931d79" }
+bevy_common_assets = { version = "0.13", features = ["json"] }
+bevy_defer = "0.14"
+bevy_la_mesa = { git = "https://github.com/stillonearth/bevy_la_mesa.git" }
+bevy_novel = { git = "https://github.com/stillonearth/bevy_novel.git" }
+bevy_tweening = "0.13"
+bevy-inspector-egui = "0.31"
 image = "0.25"
 rand = "0.8"
 renpy_parser = "0.0.13"
@@ -55,18 +48,18 @@ reqwest = "0.12.9"
 serde = "1.0"
 serde_json = "1.0"
 url = "2.5.4"
-bevy_hui = { git = "https://github.com/Lommix/bevy_hui.git", rev = "08f8f6f" }
-bevy_kira_audio = { version = "0.22", features = ["ogg", "mp3"] }
-bevy_modern_pixel_camera = "0.2.1"
+bevy_hui = { version = "0.4" }
+bevy_kira_audio = { version = "0.23", features = ["ogg", "mp3"] }
+bevy_modern_pixel_camera = "0.3"
 wasm-bindgen = "0.2.100"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-bevy-wasm-tasks = { git = "https://github.com/stillonearth/bevy-wasm-tasks.git", rev = "09060af", features = [
+bevy-wasm-tasks = { git = "https://github.com/stillonearth/bevy-wasm-tasks.git", rev = "62af5afd5b0", features = [
   "tokio",
 ] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-bevy-wasm-tasks = { git = "https://github.com/stillonearth/bevy-wasm-tasks.git", rev = "09060af", features = [
+bevy-wasm-tasks = { git = "https://github.com/stillonearth/bevy-wasm-tasks.git", rev = "62af5afd5b0", features = [
   "wasm",
 ] }
 

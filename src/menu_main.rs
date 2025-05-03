@@ -148,7 +148,7 @@ pub fn show_menu(
                     player: 1,
                 },
                 Name::new(format!("Play Area {} {}", i, j)),
-                RayCastPickable,
+                Pickable::default(),
                 MainMenuResource {},
             ));
         }

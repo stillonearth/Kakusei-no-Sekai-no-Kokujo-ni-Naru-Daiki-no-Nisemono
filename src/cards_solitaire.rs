@@ -68,7 +68,7 @@ pub fn handle_card_position_press(
             return;
         }
 
-        let (card_entity, _, _) = q_cards_in_hand.single();
+        let (card_entity, _, _) = q_cards_in_hand.single().unwrap();
         let main_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
 
         if let Ok((_, mut visibility, area)) = q_play_areas.get_mut(event.entity) {

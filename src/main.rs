@@ -119,11 +119,8 @@ fn main() {
             Update,
             ((
                 handle_start_card_shop,
-                apply_deferred,
                 handle_start_narrative_game,
-                apply_deferred,
                 handle_start_poker_game,
-                apply_deferred,
                 poker_handle_place_card_on_table
                     .after(bevy_la_mesa::events::handle_place_card_on_table::<cards_game::VNCard>),
             )
@@ -191,13 +188,14 @@ fn setup_camera_and_light(mut commands: Commands) {
             order: 2,
             ..default()
         },
-        RayCastPickable,
+        Pickable::default(),
         Transform::from_xyz(0.0, 18.2, 11.9).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     commands.insert_resource(AmbientLight {
         color: WHITE.into(),
         brightness: 1000.0,
+        ..default()
     });
 }
 

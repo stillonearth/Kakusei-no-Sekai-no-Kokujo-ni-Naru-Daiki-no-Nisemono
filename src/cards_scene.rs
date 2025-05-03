@@ -384,7 +384,7 @@ pub(crate) fn handle_start_poker_game(
                             player: 1,
                         },
                         Name::new(format!("Play Area {} {}", i, j)),
-                        RayCastPickable,
+                        Pickable::default(),
                     ))
                     .observe(on_card_position_press)
                     .observe(on_card_position_over)
@@ -410,7 +410,7 @@ fn on_card_position_press(
     mut ew: EventWriter<EventCardPositionPress>,
 ) {
     ew.send(EventCardPositionPress {
-        entity: click.entity(),
+        entity: click.target(),
     });
 }
 
@@ -419,13 +419,13 @@ fn on_card_position_over(
     mut ew: EventWriter<EventCardPositionHover>,
 ) {
     ew.send(EventCardPositionHover {
-        entity: click.entity(),
+        entity: click.target(),
     });
 }
 
 fn on_card_position_out(click: Trigger<Pointer<Out>>, mut ew: EventWriter<EventCardPositionOut>) {
     ew.send(EventCardPositionOut {
-        entity: click.entity(),
+        entity: click.target(),
     });
 }
 
@@ -636,8 +636,6 @@ pub(crate) fn handle_start_narrative_game(
                     filter_character_deck(game_state.collected_deck.clone()).unwrap()
                 }
                 EventStartNarrativeGame::Psychosis => {
-                    
-
                     filter_psychosis_cards(game_state.collected_deck.clone()).unwrap()
                 }
             },

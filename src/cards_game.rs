@@ -3,10 +3,10 @@ use std::fmt;
 
 use anyhow::Result;
 use bevy::asset::Asset;
+use bevy::platform::collections::hash_map::HashMap;
 use bevy::prelude::{Deref, DerefMut};
 use bevy::reflect::TypePath;
 use bevy::render::render_resource::encase::rts_array::Length;
-use bevy::utils::HashMap;
 use bevy_la_mesa::CardMetadata;
 use serde::Deserialize;
 
