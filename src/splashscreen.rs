@@ -12,7 +12,7 @@ impl Plugin for SplashscreenPlugin {
             OnExit(AppState::Loading2),
             |mut commands: Commands, q_menu_components: Query<(Entity, &Splashscreen)>| {
                 for (e, _) in q_menu_components.iter() {
-                    commands.entity(e).despawn_recursive();
+                    commands.entity(e).despawn();
                 }
             },
         )

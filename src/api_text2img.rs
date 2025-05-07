@@ -89,7 +89,7 @@ fn handle_download_image(
                         filename,
                     };
                     let world: &mut World = ctx.world;
-                    world.send_event(event_response);
+                    world.write_event(event_response);
                 })
                 .await;
             }
@@ -158,7 +158,7 @@ fn handle_text_2_image_request(
                         filename,
                     };
                     let world: &mut World = ctx.world;
-                    world.send_event(event_response);
+                    world.write_event(event_response);
                 })
                 .await;
             }

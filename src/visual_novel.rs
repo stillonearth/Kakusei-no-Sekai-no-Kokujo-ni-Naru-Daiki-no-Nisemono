@@ -46,7 +46,7 @@ pub fn start_visual_novel(
     mut q_novel_text: Query<(Entity, &mut Node, &NovelText)>,
 ) {
     if let Some(rpy) = rpy_assets.get(scenario_handle.id()) {
-        ew_start_scenario.send(EventStartScenario { ast: rpy.0.clone() });
+        ew_start_scenario.write(EventStartScenario { ast: rpy.0.clone() });
 
         game_state.collected_deck = [
             filter_initial_narrative_cards(game_state.game_deck.clone()),
@@ -93,7 +93,7 @@ pub(crate) fn handle_text_2_image_response(
 
         novel_data.write_image_cache(image_name.clone(), sprite);
         novel_data.push_scene_node(image_name.clone(), game_state.n_vn_node_scene_request + 1);
-        ew_switch_next_node.send(EventSwitchNextNode {});
+        ew_switch_next_node.write(EventSwitchNextNode {});
     }
 }
 
@@ -141,7 +141,7 @@ pub(crate) fn handle_llm_response(
     for event in er_llm_response.read() {
         match event.request_type {
             LLMRequestType::Story => {
-                ew_refresh_ui.send(EventRefreshUI::LoadingMenu);
+                ew_refresh_ui.write(EventRefreshUI::LoadingMenu);
 
                 let sentences = event
                     .response
@@ -226,7 +226,7 @@ pub(crate) fn handle_llm_response(
                     sentences.join(" ")
                 );
 
-                ew_llm_request.send(EventLLMRequest {
+                ew_llm_request.write(EventLLMRequest {
                     prompt: text_2_image_prompt,
                     who: None,
                     request_type: LLMRequestType::Text2ImagePrompt,
@@ -235,7 +235,7 @@ pub(crate) fn handle_llm_response(
                 game_state.n_vn_node_scene_request = game_state.n_vn_node;
             }
             LLMRequestType::Text2ImagePrompt => {
-                ew_text_2_image_request.send(EventText2ImageRequest {
+                ew_text_2_image_request.write(EventText2ImageRequest {
                     prompt: event.response.clone(),
                 });
             }
@@ -265,7 +265,7 @@ pub(crate) fn handle_new_vn_node(
 
         if let AST::LLMGenerate(_, who, prompt) = event.ast.clone() {
             if *app_state.get() == AppState::NovelPlayer {
-                ew_switch_next_node.send(EventSwitchNextNode {});
+                ew_switch_next_node.write(EventSwitchNextNode {});
                 continue;
             }
 
@@ -274,7 +274,7 @@ pub(crate) fn handle_new_vn_node(
                 "...".to_string(),
                 game_state.n_vn_node + 1,
             );
-            ew_switch_next_node.send(EventSwitchNextNode {});
+            ew_switch_next_node.write(EventSwitchNextNode {});
             novel_settings.pause_handle_switch_node = true;
 
             let prompt = prompt
@@ -297,14 +297,14 @@ pub(crate) fn handle_new_vn_node(
                 .replace("{PSYCHOSIS}", &game_state.psychosis.join(" "))
                 .replace("{PROMPT}", PROMPT);
 
-            ew_llm_request.send(EventLLMRequest {
+            ew_llm_request.write(EventLLMRequest {
                 prompt,
                 who: Some(who),
                 request_type: LLMRequestType::Story,
             });
 
             if game_state.current_menu_type != EventRenderUI::Loading {
-                ew_render_ui.send(EventRenderUI::Loading);
+                ew_render_ui.write(EventRenderUI::Loading);
                 game_state.current_menu_type = EventRenderUI::Loading;
             }
 
@@ -315,51 +315,51 @@ pub(crate) fn handle_new_vn_node(
 
         if let AST::GameMechanic(_, mechanic) = event.ast.clone() {
             if *app_state.get() == AppState::NovelPlayer {
-                ew_switch_next_node.send(EventSwitchNextNode {});
+                ew_switch_next_node.write(EventSwitchNextNode {});
                 continue;
             }
 
-            ew_hide_vn_text_node.send(EventHideTextNode {});
+            ew_hide_vn_text_node.write(EventHideTextNode {});
             novel_settings.pause_handle_switch_node = true;
 
             match mechanic.as_str() {
                 "card play poker" => {
-                    ew_start_poker_game.send(EventStartPokerGame {});
+                    ew_start_poker_game.write(EventStartPokerGame {});
                     game_state.current_menu_type =
                         EventRenderUI::Poker(PokerMenuSettings { ..default() });
                 }
                 "card play narrative setting" => {
-                    ew_start_narrative_game.send(EventStartNarrativeGame::Setting);
+                    ew_start_narrative_game.write(EventStartNarrativeGame::Setting);
                 }
                 "card play narrative characters" => {
-                    ew_start_narrative_game.send(EventStartNarrativeGame::Characters);
+                    ew_start_narrative_game.write(EventStartNarrativeGame::Characters);
                 }
                 "card play narrative conflict" => {
-                    ew_start_narrative_game.send(EventStartNarrativeGame::Conflict);
+                    ew_start_narrative_game.write(EventStartNarrativeGame::Conflict);
                 }
                 "card play narrative psychosis" => {
-                    ew_start_narrative_game.send(EventStartNarrativeGame::Psychosis);
+                    ew_start_narrative_game.write(EventStartNarrativeGame::Psychosis);
                 }
                 "card play narrative plot twist" => {
-                    ew_start_narrative_game.send(EventStartNarrativeGame::PlotTwist);
+                    ew_start_narrative_game.write(EventStartNarrativeGame::PlotTwist);
                 }
                 "card shop" => {
-                    ew_start_narrative_card_shop.send(EventStartNarrativeCardShop {});
+                    ew_start_narrative_card_shop.write(EventStartNarrativeCardShop {});
                 }
                 "game over" => {
-                    ew_game_over.send(EventGameOver {});
+                    ew_game_over.write(EventGameOver {});
                 }
                 _ => (),
             }
         } else {
-            ew_show_vn_text_node.send(EventShowTextNode {});
+            ew_show_vn_text_node.write(EventShowTextNode {});
 
             if let Some(node) =
                 find_element_with_index(novel_data.ast.clone(), novel_data.current_index)
             {
                 if let AST::Say(_index, _who, what) = node {
                     if what == *"..." {
-                        ew_render_ui.send(EventRenderUI::Loading);
+                        ew_render_ui.write(EventRenderUI::Loading);
                         game_state.current_menu_type = EventRenderUI::Loading;
                         continue;
                     }
@@ -367,10 +367,10 @@ pub(crate) fn handle_new_vn_node(
             }
 
             if game_state.current_menu_type != EventRenderUI::Novel {
-                ew_render_ui.send(EventRenderUI::Novel);
+                ew_render_ui.write(EventRenderUI::Novel);
                 game_state.current_menu_type = EventRenderUI::Novel;
             } else {
-                ew_refresh_ui.send(EventRefreshUI::NovelMenu("".to_string()));
+                ew_refresh_ui.write(EventRefreshUI::NovelMenu("".to_string()));
             }
             game_state.game_type = GameType::VisualNovel;
         }
@@ -385,10 +385,10 @@ pub(crate) fn handle_event_game_over(
 ) {
     for _ in er_game_over.read() {
         // show menu
-        ew_render_ui.send(EventRenderUI::GameOver);
+        ew_render_ui.write(EventRenderUI::GameOver);
 
         // save scenario to server
-        ew_persist_scenario.send(EventPersistScenarioRequest {
+        ew_persist_scenario.write(EventPersistScenarioRequest {
             scenario: novel_data.ast.clone(),
         });
     }

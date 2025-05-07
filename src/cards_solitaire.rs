@@ -68,7 +68,7 @@ pub fn handle_card_position_press(
             return;
         }
 
-        let (card_entity, _, _) = q_cards_in_hand.single();
+        let (card_entity, _, _) = q_cards_in_hand.single().unwrap();
         let main_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
 
         if let Ok((_, mut visibility, area)) = q_play_areas.get_mut(event.entity) {
@@ -76,7 +76,7 @@ pub fn handle_card_position_press(
                 continue;
             }
 
-            ew_place_card_on_table.send(PlaceCardOnTable {
+            ew_place_card_on_table.write(PlaceCardOnTable {
                 card_entity,
                 player: 1,
                 marker: area.marker,
@@ -144,7 +144,7 @@ pub fn poker_handle_place_card_on_table(
                 }
             }
 
-            ew_refresh_ui.send(EventRefreshUI::PokerMenu(PokerMenuSettings {
+            ew_refresh_ui.write(EventRefreshUI::PokerMenu(PokerMenuSettings {
                 show_advance_button: game_state.n_draws == game_state.max_n_poker_draws,
                 show_score: true,
                 score: total_score,

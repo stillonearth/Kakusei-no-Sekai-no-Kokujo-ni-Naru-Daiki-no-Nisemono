@@ -111,7 +111,7 @@ pub fn show_menu(
         "start_game",
         |In(_), mut app_state: ResMut<NextState<AppState>>| {
             app_state.set(AppState::Game);
-            // ew_start_game.send(EventStartGame {});
+            // ew_start_game.write(EventStartGame {});
         },
     );
 
@@ -148,13 +148,13 @@ pub fn show_menu(
                     player: 1,
                 },
                 Name::new(format!("Play Area {} {}", i, j)),
-                RayCastPickable,
+                Pickable::default(),
                 MainMenuResource {},
             ));
         }
     }
 
-    ew_render_deck.send(RenderDeck::<VNCard> {
+    ew_render_deck.write(RenderDeck::<VNCard> {
         deck_entity: deck_shop_cards,
         deck: filter_narrative_cards(game_state.game_deck.clone()).unwrap(),
     });
@@ -166,7 +166,7 @@ pub fn despawn_menu(
     audio: Res<Audio>,
 ) {
     for (entity, _) in q_main_menu_entities.iter() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 
     audio.stop();
@@ -224,7 +224,7 @@ pub fn shuffle_deck(
     let deck_idle_time = 1.0;
     let main_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
     for _ in er_deck_rendered.read() {
-        ew_shuffle.send(DeckShuffle {
+        ew_shuffle.write(DeckShuffle {
             deck_entity: main_deck_entity,
             duration: 20,
         });

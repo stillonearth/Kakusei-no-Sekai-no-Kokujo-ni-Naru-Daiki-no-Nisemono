@@ -108,13 +108,13 @@ pub fn handle_card_press_cardplay(
                 _ => {}
             }
 
-            ew_place_card_on_table.send(PlaceCardOnTable {
+            ew_place_card_on_table.write(PlaceCardOnTable {
                 card_entity: event.entity,
                 player: 1,
                 marker: n_cards_on_table + 1,
             });
 
-            er_refresh_ui.send(EventRefreshUI::Narrative(NarrativeMenuSettings {
+            er_refresh_ui.write(EventRefreshUI::Narrative(NarrativeMenuSettings {
                 show_advance_button: true,
             }));
 
@@ -143,14 +143,14 @@ pub fn cardshop_handle_card_press(
 
         if card_price <= (game_state.score as u16) {
             game_state.score -= card_price as isize;
-            ew_discard_card_to_deck.send(DiscardCardToDeck {
+            ew_discard_card_to_deck.write(DiscardCardToDeck {
                 card_entity: event.entity,
                 deck_entity: graveyard_deck_entity,
             });
             game_state.collected_deck.push(card.data.clone());
         }
 
-        er_refresh_ui.send(EventRefreshUI::ShopMenu);
+        er_refresh_ui.write(EventRefreshUI::ShopMenu);
     }
 }
 
@@ -227,7 +227,7 @@ pub(crate) fn handle_play_hand(
             }
 
             for (entity, _, _) in q_cards.p1().iter() {
-                ew_discard_card_to_deck.send(DiscardCardToDeck {
+                ew_discard_card_to_deck.write(DiscardCardToDeck {
                     card_entity: entity,
                     deck_entity: main_deck_entity,
                 });
@@ -236,7 +236,7 @@ pub(crate) fn handle_play_hand(
 
         if game_state.game_type == GameType::Narrative {
             for (entity, _, _) in q_cards.p1().iter() {
-                ew_discard_card_to_deck.send(DiscardCardToDeck {
+                ew_discard_card_to_deck.write(DiscardCardToDeck {
                     card_entity: entity,
                     deck_entity: main_deck_entity,
                 });
@@ -245,14 +245,14 @@ pub(crate) fn handle_play_hand(
 
         if game_state.game_type == GameType::Poker {
             for (entity, _, _) in q_cards.p0().iter() {
-                ew_discard_card_to_deck.send(DiscardCardToDeck {
+                ew_discard_card_to_deck.write(DiscardCardToDeck {
                     card_entity: entity,
                     deck_entity: graveyard_deck_entity,
                 });
             }
         }
 
-        ew_align_cards_in_hand.send(AlignCardsInHand { player: 1 });
+        ew_align_cards_in_hand.write(AlignCardsInHand { player: 1 });
     }
 }
 
@@ -275,7 +275,7 @@ pub(crate) fn handle_deck_rendered(
         let shuffle_animation_time = ((n_cards_on_table * 75) as f32) * 0.001;
 
         game_state.n_draws = 0;
-        ew_shuffle.send(DeckShuffle {
+        ew_shuffle.write(DeckShuffle {
             deck_entity: main_deck_entity,
             duration: 75,
         });
@@ -384,7 +384,7 @@ pub(crate) fn handle_start_poker_game(
                             player: 1,
                         },
                         Name::new(format!("Play Area {} {}", i, j)),
-                        RayCastPickable,
+                        Pickable::default(),
                     ))
                     .observe(on_card_position_press)
                     .observe(on_card_position_over)
@@ -392,12 +392,12 @@ pub(crate) fn handle_start_poker_game(
             }
         }
 
-        ew_render_deck.send(RenderDeck::<VNCard> {
+        ew_render_deck.write(RenderDeck::<VNCard> {
             deck_entity: deck_play_cards,
             deck: load_poker_deck(),
         });
 
-        ew_render_ui.send(EventRenderUI::Poker(PokerMenuSettings {
+        ew_render_ui.write(EventRenderUI::Poker(PokerMenuSettings {
             show_advance_button: false,
             show_score: false,
             score: 100,
@@ -409,8 +409,8 @@ fn on_card_position_press(
     click: Trigger<Pointer<Click>>,
     mut ew: EventWriter<EventCardPositionPress>,
 ) {
-    ew.send(EventCardPositionPress {
-        entity: click.entity(),
+    ew.write(EventCardPositionPress {
+        entity: click.target(),
     });
 }
 
@@ -418,14 +418,14 @@ fn on_card_position_over(
     click: Trigger<Pointer<Over>>,
     mut ew: EventWriter<EventCardPositionHover>,
 ) {
-    ew.send(EventCardPositionHover {
-        entity: click.entity(),
+    ew.write(EventCardPositionHover {
+        entity: click.target(),
     });
 }
 
 fn on_card_position_out(click: Trigger<Pointer<Out>>, mut ew: EventWriter<EventCardPositionOut>) {
-    ew.send(EventCardPositionOut {
-        entity: click.entity(),
+    ew.write(EventCardPositionOut {
+        entity: click.target(),
     });
 }
 
@@ -503,12 +503,12 @@ pub(crate) fn handle_start_card_shop(
             Name::new("Card Show Case".to_string()),
         ));
 
-        ew_render_deck.send(RenderDeck::<VNCard> {
+        ew_render_deck.write(RenderDeck::<VNCard> {
             deck_entity: deck_shop_cards,
             deck: filter_narrative_cards(game_state.game_deck.clone()).unwrap(),
         });
 
-        ew_render_ui.send(EventRenderUI::Shop);
+        ew_render_ui.write(EventRenderUI::Shop);
     }
 }
 
@@ -620,7 +620,7 @@ pub(crate) fn handle_start_narrative_game(
             Name::new("Play Area 5"),
         ));
 
-        ew_render_deck.send(RenderDeck::<VNCard> {
+        ew_render_deck.write(RenderDeck::<VNCard> {
             deck_entity: deck_play_cards,
             deck: match event {
                 EventStartNarrativeGame::Setting => {
@@ -636,14 +636,12 @@ pub(crate) fn handle_start_narrative_game(
                     filter_character_deck(game_state.collected_deck.clone()).unwrap()
                 }
                 EventStartNarrativeGame::Psychosis => {
-                    
-
                     filter_psychosis_cards(game_state.collected_deck.clone()).unwrap()
                 }
             },
         });
 
-        ew_render_ui.send(EventRenderUI::Narrative);
+        ew_render_ui.write(EventRenderUI::Narrative);
     }
 }
 
@@ -739,25 +737,25 @@ pub(crate) fn handle_end_card_game(
 ) {
     for _ in er_end_game.read() {
         for (entity, _) in q_cards.iter() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
 
         for (entity, _) in q_play_areas.iter() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
 
         for (entity, _) in q_deck_areas.iter() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
 
         for (entity, _) in q_hand_areas.iter() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
 
         for (entity, _) in q_card_showcases.iter() {
-            commands.entity(entity).despawn_recursive();
+            commands.entity(entity).despawn();
         }
 
-        ew_switch_next_vn_node.send(EventSwitchNextNode {});
+        ew_switch_next_vn_node.write(EventSwitchNextNode {});
     }
 }

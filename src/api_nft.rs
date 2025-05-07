@@ -65,7 +65,7 @@ fn handle_persist_nft_response(
     mut ew_refresh_ui: EventWriter<EventRefreshUI>,
 ) {
     for event in er_llm_response.read() {
-        ew_refresh_ui.send(EventRefreshUI::GameOver(event.nft_id));
+        ew_refresh_ui.write(EventRefreshUI::GameOver(event.nft_id));
     }
 }
 
@@ -126,7 +126,7 @@ fn handle_persist_nft_request(
                 ctx.run_on_main_thread(move |ctx| {
                     let event_response = EventPersistScenarioResponse { nft_id };
                     let world: &mut World = ctx.world;
-                    world.send_event(event_response);
+                    world.write_event(event_response);
                 })
                 .await;
             } else {
@@ -172,7 +172,7 @@ fn handle_load_nft_request(
                 ctx.run_on_main_thread(move |ctx| {
                     let event_response = EventLoadNFTResponse { nft };
                     let world: &mut World = ctx.world;
-                    world.send_event(event_response);
+                    world.write_event(event_response);
                 })
                 .await;
             } else {
@@ -204,7 +204,7 @@ fn handle_load_nft_response(
                             if let AST::Scene(_, filename, _) = child_node {
                                 if let Some(filename) = filename {
                                     if filename.ends_with(".jpeg") {
-                                        ew_download_image.send(EventDownloadImageRequest {
+                                        ew_download_image.write(EventDownloadImageRequest {
                                             filename: filename.clone(),
                                         });
                                     }
@@ -215,7 +215,7 @@ fn handle_load_nft_response(
                     AST::Scene(_, filename, _) => {
                         if let Some(filename) = filename {
                             if filename.ends_with(".jpeg") {
-                                ew_download_image.send(EventDownloadImageRequest {
+                                ew_download_image.write(EventDownloadImageRequest {
                                     filename: filename.clone(),
                                 });
                             }
@@ -226,7 +226,7 @@ fn handle_load_nft_response(
             }
 
             app_state.set(AppState::NovelPlayer);
-            ew_start_scenario.send(EventStartScenario {
+            ew_start_scenario.write(EventStartScenario {
                 ast: scenario.clone(),
             });
 
@@ -269,7 +269,7 @@ async fn api_persist_story(prompt: NFTPersistRequest) -> Result<usize> {
 }
 
 #[derive(Deserialize, Debug)]
-struct StoryNFT {
+pub struct StoryNFT {
     pub description: String,
     pub image: String,
     pub name: String,
