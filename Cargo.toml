@@ -33,18 +33,19 @@ bevy = { version = "0.16", default-features = false, features = [
   "tonemapping_luts",
   "webgl2",
   "x11",
+  "web"
 ] }
-bevy_asset_loader = { git = "https://github.com/NiklasEi/bevy_asset_loader.git", rev = "ef87931d79" }
+bevy_asset_loader = "0.23.0-rc.4"
 bevy_common_assets = { version = "0.13", features = ["json"] }
 bevy_defer = "0.14"
-bevy_la_mesa = { git = "https://github.com/stillonearth/bevy_la_mesa.git" }
-bevy_novel = { git = "https://github.com/stillonearth/bevy_novel.git" }
+bevy_la_mesa = { version = "0.16" }
+bevy_novel = { version = "0.16"  }
 bevy_tweening = "0.13"
 bevy-inspector-egui = "0.31"
 image = "0.25"
 rand = "0.8"
 renpy_parser = "0.0.13"
-reqwest = "0.12.9"
+reqwest = "0.12"
 serde = "1.0"
 serde_json = "1.0"
 url = "2.5.4"

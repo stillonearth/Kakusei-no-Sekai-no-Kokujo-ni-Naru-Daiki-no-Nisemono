@@ -84,12 +84,12 @@ fn handle_download_image(
 
             if image.is_ok() {
                 ctx.run_on_main_thread(move |ctx| {
-                    let event_response = EventDownloadImageResponse {
-                        image: image.unwrap(),
-                        filename,
-                    };
                     let world: &mut World = ctx.world;
-                    world.write_event(event_response);
+
+                    world.send_event(EventDownloadImageResponse {
+                        image: image.unwrap(),
+                        filename: filename.clone(),
+                    });
                 })
                 .await;
             }
@@ -158,7 +158,7 @@ fn handle_text_2_image_request(
                         filename,
                     };
                     let world: &mut World = ctx.world;
-                    world.write_event(event_response);
+                    world.send_event(event_response);
                 })
                 .await;
             }

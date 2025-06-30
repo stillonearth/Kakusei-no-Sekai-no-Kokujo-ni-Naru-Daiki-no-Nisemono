@@ -96,11 +96,11 @@ fn handle_llm_request(mut er_llm_request: EventReader<EventLLMRequest>, tasks: T
                         request_type,
                     };
                     let world: &mut World = ctx.world;
-                    world.write_event(event_response);
+                    world.send_event(event_response);
                 })
                 .await;
             } else {
-                panic!("error: {}", llm_response.err().unwrap());
+                panic!("error: {:?}", llm_response.err());
             }
         });
     }

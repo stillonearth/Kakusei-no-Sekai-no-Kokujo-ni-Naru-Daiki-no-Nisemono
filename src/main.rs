@@ -167,8 +167,8 @@ fn main() {
             ..default()
         })
         .insert_resource(MeshPickingSettings {
-            require_markers: true,
-            ray_cast_visibility: RayCastVisibility::Any,
+            require_markers: false,
+            ray_cast_visibility: RayCastVisibility::VisibleInView,
         })
         .init_state::<AppState>()
         .run();

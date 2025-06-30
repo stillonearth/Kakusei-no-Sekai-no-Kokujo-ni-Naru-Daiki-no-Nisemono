@@ -138,6 +138,10 @@ pub fn cardshop_handle_card_press(
     for event in card_press.read() {
         let graveyard_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 2).unwrap().0;
 
+        if q_cards_on_table.get(event.entity).is_err() {
+            continue;
+        }
+
         let card = q_cards_on_table.get(event.entity).unwrap().1;
         let card_price = card.data.metadata.price().unwrap_or_default();
 
@@ -384,7 +388,6 @@ pub(crate) fn handle_start_poker_game(
                             player: 1,
                         },
                         Name::new(format!("Play Area {} {}", i, j)),
-                        Pickable::default(),
                     ))
                     .observe(on_card_position_press)
                     .observe(on_card_position_over)
@@ -406,26 +409,26 @@ pub(crate) fn handle_start_poker_game(
 }
 
 fn on_card_position_press(
-    click: Trigger<Pointer<Click>>,
+    press: Trigger<Pointer<Click>>,
     mut ew: EventWriter<EventCardPositionPress>,
 ) {
     ew.write(EventCardPositionPress {
-        entity: click.target(),
+        entity: press.target(),
     });
 }
 
 fn on_card_position_over(
-    click: Trigger<Pointer<Over>>,
+    over: Trigger<Pointer<Over>>,
     mut ew: EventWriter<EventCardPositionHover>,
 ) {
     ew.write(EventCardPositionHover {
-        entity: click.target(),
+        entity: over.target(),
     });
 }
 
-fn on_card_position_out(click: Trigger<Pointer<Out>>, mut ew: EventWriter<EventCardPositionOut>) {
+fn on_card_position_out(out: Trigger<Pointer<Out>>, mut ew: EventWriter<EventCardPositionOut>) {
     ew.write(EventCardPositionOut {
-        entity: click.target(),
+        entity: out.target(),
     });
 }
 
@@ -486,7 +489,7 @@ pub(crate) fn handle_start_card_shop(
                         player: 1,
                     },
                     Name::new(format!("Play Area {} {}", i, j)),
-                    // RayCastPickable,
+                    // Pickable::default(),
                 ));
             }
         }

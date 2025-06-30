@@ -126,11 +126,11 @@ fn handle_persist_nft_request(
                 ctx.run_on_main_thread(move |ctx| {
                     let event_response = EventPersistScenarioResponse { nft_id };
                     let world: &mut World = ctx.world;
-                    world.write_event(event_response);
+                    world.send_event(event_response);
                 })
                 .await;
             } else {
-                panic!("error: {}", llm_response.err().unwrap());
+                panic!("error: {:?}", llm_response.err());
             }
         });
     }
@@ -172,11 +172,11 @@ fn handle_load_nft_request(
                 ctx.run_on_main_thread(move |ctx| {
                     let event_response = EventLoadNFTResponse { nft };
                     let world: &mut World = ctx.world;
-                    world.write_event(event_response);
+                    world.send_event(event_response);
                 })
                 .await;
             } else {
-                panic!("error: {}", nft_response.err().unwrap());
+                panic!("error: {:?}", nft_response.err());
             }
         });
     }
